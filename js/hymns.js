@@ -97,7 +97,7 @@ function showRecords(filter) {
 					showSong(j);
 				};
 			})(i);
-			item.innerText = songArray.songs.song[i].title;
+			item.innerText = songArray.songs[i].title;
 			modalBody.append(item);
 			item.appendChild(number);
 		}
