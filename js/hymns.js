@@ -3,6 +3,7 @@ let toc = document.getElementById('toc'),
 	back = document.getElementById('back'),
 	modal = document.getElementById('overlay'),
 	modalClose = modal.querySelector('.close'),
+	refresh = document.getElementById('refresh'),
 	modalBody = document.getElementById('modalBody');
 
 let navigation = [],
@@ -31,6 +32,11 @@ back.addEventListener('click', async () => {
 	back.setAttribute('disabled', '');
 });
 
+refresh.addEventListener('click', () => {
+	localStorage.removeItem('songs');
+	location.reload(true);
+});
+
 /**
  * Returns a delayed promise
  */
@@ -48,7 +54,9 @@ function populateNav() {
 	for (let i = 0; i < navigation.length; i++) {
 		navigation[i].addEventListener('click', function() {
 			let filter = this.innerText;
-			filter.replace(/-/g, ' ').split(' ');
+			filter = filter.replace(/-/g, ' ');
+			filter = filter.split(' ');
+			console.log(filter);
 			showRecords(filter);
 		});
 	}
@@ -62,18 +70,15 @@ function showRecords(filter) {
 		modalBody.removeChild(modalBody.firstChild);
 	}
 	if (filter[0] === 'All') {
-		let allFilter = 443;
-		showRecords(allFilter);
-	} else if (Number.isInteger(filter)) {
+		let totalFilter = songArray.length;
 		//Display song titles by numbers
-		for (let i = 0; i < filter; i++) {
+		for (let i = 0; i < totalFilter; i++) {
 			let item = document.createElement('div');
 			let number = document.createElement('span');
 			number.classList.add('num');
 			number.innerText = i + 1;
 			item.appendChild(number);
 			item.onclick = (function(j) {
-				console.log(j);
 				return function() {
 					showSong(j);
 				};
@@ -82,8 +87,22 @@ function showRecords(filter) {
 			modalBody.append(item);
 			item.appendChild(number);
 		}
-		modal.removeAttribute('hidden');
-		modal.classList.add('active');
+	} else if (Number.isInteger(Number.parseInt(filter[0]))) {
+		for (let i = Number.parseInt(filter[0]) - 1; i < Number.parseInt(filter[1]); i++) {
+			let item = document.createElement('div');
+			let number = document.createElement('span');
+			number.classList.add('num');
+			number.innerText = i + 1;
+			item.appendChild(number);
+			item.onclick = (function(j) {
+				return function() {
+					showSong(j);
+				};
+			})(i);
+			item.innerText = songArray[i].title;
+			modalBody.append(item);
+			item.appendChild(number);
+		}
 	} else {
 		//Display song titles by letter
 		let length = Object.keys(songArray).length;
@@ -111,8 +130,8 @@ function showRecords(filter) {
 			modalBody.append(item);
 			item.appendChild(number);
 		}
-		showModal(true);
 	}
+	showModal(true);
 }
 
 async function showModal(state) {
