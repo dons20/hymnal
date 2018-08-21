@@ -10,7 +10,7 @@ let navigation = [],
 
 /* Start Point */
 populateNav();
-loadJSON(data); //Data is assigned from songs.js
+initializeSongs();
 
 //Hide modal on Esc
 document.addEventListener('keyup', (e) => {
@@ -20,13 +20,15 @@ document.addEventListener('keyup', (e) => {
 modal.addEventListener('click', async () => {
 	await (() => {
 		return new Promise((resolve) => {
-			resolve(modal.classList.remove('active'));
+			modal.classList.remove('active');
+			resolve();
 		});
 	})();
 	await delay(300);
 	await (() => {
 		return new Promise((resolve) => {
-			resolve(modal.setAttribute('hidden', ''));
+			modal.setAttribute('hidden', '');
+			resolve();
 		});
 	})();
 });
@@ -34,13 +36,15 @@ modal.addEventListener('click', async () => {
 modalClose.addEventListener('click', async () => {
 	await (() => {
 		return new Promise((resolve) => {
-			resolve(modal.classList.remove('active'));
+			modal.classList.remove('active');
+			resolve();
 		});
 	})();
 	await delay(300);
 	await (() => {
 		return new Promise((resolve) => {
-			resolve(modal.setAttribute('hidden', ''));
+			modal.setAttribute('hidden', '');
+			resolve();
 		});
 	})();
 });
@@ -97,19 +101,19 @@ function showRecords(filter) {
 					showSong(j);
 				};
 			})(i);
-			item.innerText = songArray.songs[i].title;
+			item.innerText = songArray[i].title;
 			modalBody.append(item);
 			item.appendChild(number);
 		}
 		modal.removeAttribute('hidden');
 		modal.classList.add('active');
 	} else {
-		let length = Object.keys(songArray.songs).length;
+		let length = Object.keys(songArray).length;
 		let array = [];
 		//Display song titles by letter
 		for (let i = 0; i < length; i++) {
-			if (songArray.songs[i].title.charAt(0) === newFilter[0]) {
-				array.push([songArray.songs[i].title, i]);
+			if (songArray[i].title.charAt(0) === newFilter[0]) {
+				array.push([songArray[i].title, i]);
 			}
 		}
 		array.sort(function(a, b) {
@@ -139,14 +143,14 @@ function showRecords(filter) {
  * Creates DOM layout for song details
  */
 function showSong(index) {
-	let songInfo = songArray.songs[index];
-	let songStruct = [];
-	let orderSong = [];
-	let number = songInfo.number;
-	let title = songInfo.title;
-	let verses = songInfo.verse;
-	let chorus = songInfo.chorus;
-	let author = songInfo.author;
+	let songInfo = songArray[index],
+		songStruct = [],
+		orderSong = [],
+		number = songInfo.number,
+		title = songInfo.title,
+		verses = songInfo.verse,
+		chorus = songInfo.chorus,
+		author = songInfo.author;
 
 	song.innerHTML = '';
 	songStruct.push(number, title, verses, chorus, author);
@@ -241,9 +245,53 @@ function isEmpty(str) {
 /**
  * Loads JSON info into local storage and populates songArray
  */
-function loadJSON(file) {
-	if (localStorage.getItem('songs') === null) {
-		localStorage.setItem('songs', JSON.stringify(file));
+async function initializeSongs() {
+	//Check if songs has been stored already
+	if (!localStorage.hasOwnProperty('songs')) {
+		//Create songs from file
+		console.info('Searching for list of songs...');
+		await createSongs();
 	}
-	songArray = JSON.parse(localStorage.getItem('songs'));
+	songArray = await pullFromStorage();
+
+	function pullFromStorage() {
+		return new Promise((resolve) => {
+			console.info('Loading songs into memory...');
+			resolve(JSON.parse(localStorage.getItem('songs')));
+		});
+	}
+
+	async function createSongs() {
+		let file = await createData();
+		await processData(file);
+
+		return new Promise((resolve, reject) => {
+			resolve();
+		}).catch((err) => {
+			console.error(err);
+		});
+	}
+
+	function createData() {
+		return new Promise(async (resolve, reject) => {
+			let url = 'js/songs.json';
+			let response = await fetch(url);
+			if (response.ok) {
+				console.info('Song database found!');
+				resolve(response.json());
+			} else {
+				throw `File "${url}" not found on server!`;
+			}
+		}).catch((err) => {
+			console.error(err);
+		});
+	}
+
+	function processData(file) {
+		return new Promise((resolve) => {
+			console.info('Loading song data...');
+			localStorage.setItem('songs', JSON.stringify(file));
+			resolve();
+		});
+	}
 }

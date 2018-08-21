@@ -140,7 +140,7 @@ h3 {
 	background-image: url('../img/search-minus.svg');
 }
 
-#modal .num {
+.modal .num {
     left: 5%;
 	position: absolute;
 }
@@ -188,7 +188,7 @@ h3 {
 	cursor: pointer;
 }
 
-.overlay > #modal {
+.overlay > .modal {
 	background-color: #fff;
 	border-radius: 0 10px 10px 0;
     margin: 0 auto;
@@ -204,21 +204,21 @@ h3 {
 	width: 80%; 
 }
 
-.overlay > #modal::-webkit-scrollbar-track {
+.overlay > .modal::-webkit-scrollbar-track {
 	border-radius: 10px;
 	background-color: #F5F5F5;
 	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
 			box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
 }
 
-.overlay > #modal::-webkit-scrollbar
+.overlay > .modal::-webkit-scrollbar
 {
 	background-color: #F5F5F5;
 	border-radius: 10px;
 	width: 12px;
 }
 
-.overlay > #modal::-webkit-scrollbar-thumb
+.overlay > .modal::-webkit-scrollbar-thumb
 {
 	background-color: #D62929;
 	border-radius: 10px;
@@ -226,7 +226,7 @@ h3 {
 			box-shadow: inset 0 0 6px rgba(0,0,0,.3);
 }
 
-.overlay > #modal:before {
+.overlay > .modal:before {
 	background: #f7ff00;
 	background: -webkit-linear-gradient(to right, #db36a4, #f7ff00); 
 	background: linear-gradient(to right, #db36a4, #f7ff00);
@@ -237,7 +237,7 @@ h3 {
 	width: 100%; height: .5rem;
 }
 
-.overlay > #modal > #modalBody > div {
+.overlay > .modal > .modalBody > div {
 	background: none;
 	color: #444;
 	font-size: 16px;
@@ -248,12 +248,12 @@ h3 {
 	transition: all 0.3s ease-out;
 }
 
-.overlay > #modal > #modalBody > div:hover {
+.overlay > .modal > .modalBody > div:hover {
 	background: rgba(253, 114, 98, 0.2);
 	cursor: pointer;
 }
 
-.overlay.active > #modal {
+.overlay.active > .modal {
 	transform: scale(1);
 }
 
