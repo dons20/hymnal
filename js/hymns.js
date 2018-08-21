@@ -18,35 +18,11 @@ document.addEventListener('keyup', (e) => {
 });
 
 modal.addEventListener('click', async () => {
-	await (() => {
-		return new Promise((resolve) => {
-			modal.classList.remove('active');
-			resolve();
-		});
-	})();
-	await delay(300);
-	await (() => {
-		return new Promise((resolve) => {
-			modal.setAttribute('hidden', '');
-			resolve();
-		});
-	})();
+	showModal(false);
 });
 
 modalClose.addEventListener('click', async () => {
-	await (() => {
-		return new Promise((resolve) => {
-			modal.classList.remove('active');
-			resolve();
-		});
-	})();
-	await delay(300);
-	await (() => {
-		return new Promise((resolve) => {
-			modal.setAttribute('hidden', '');
-			resolve();
-		});
-	})();
+	showModal(false);
 });
 
 back.addEventListener('click', async () => {
@@ -72,7 +48,8 @@ function populateNav() {
 	for (let i = 0; i < navigation.length; i++) {
 		navigation[i].addEventListener('click', function() {
 			let filter = this.innerText;
-			showRecords(filter.replace(/-/g, ' '));
+			filter.replace(/-/g, ' ').split(' ');
+			showRecords(filter);
 		});
 	}
 }
@@ -81,22 +58,22 @@ function populateNav() {
  * Displays songs depending on filter
  */
 function showRecords(filter) {
-	let newFilter = filter.split(' ');
 	while (modalBody.firstChild) {
 		modalBody.removeChild(modalBody.firstChild);
 	}
-	if (newFilter === 'All') {
-		let allFilter = [['1 443']].join();
+	if (filter[0] === 'All') {
+		let allFilter = 443;
 		showRecords(allFilter);
-	} else if (newFilter.length > 1) {
+	} else if (Number.isInteger(filter)) {
 		//Display song titles by numbers
-		for (let i = 0; i < newFilter[1]; i++) {
+		for (let i = 0; i < filter; i++) {
 			let item = document.createElement('div');
 			let number = document.createElement('span');
-			number.classList += 'num';
+			number.classList.add('num');
 			number.innerText = i + 1;
 			item.appendChild(number);
 			item.onclick = (function(j) {
+				console.log(j);
 				return function() {
 					showSong(j);
 				};
@@ -108,11 +85,11 @@ function showRecords(filter) {
 		modal.removeAttribute('hidden');
 		modal.classList.add('active');
 	} else {
+		//Display song titles by letter
 		let length = Object.keys(songArray).length;
 		let array = [];
-		//Display song titles by letter
 		for (let i = 0; i < length; i++) {
-			if (songArray[i].title.charAt(0) === newFilter[0]) {
+			if (songArray[i].title.charAt(0) === filter[0]) {
 				array.push([songArray[i].title, i]);
 			}
 		}
@@ -134,8 +111,43 @@ function showRecords(filter) {
 			modalBody.append(item);
 			item.appendChild(number);
 		}
-		modal.removeAttribute('hidden');
-		modal.classList.add('active');
+		showModal(true);
+	}
+}
+
+async function showModal(state) {
+	if (state) {
+		await (() => {
+			return new Promise((resolve) => {
+				modal.removeAttribute('hidden');
+				resolve();
+			});
+		})();
+
+		await delay(10);
+
+		await (() => {
+			return new Promise((resolve) => {
+				modal.classList.add('active');
+				resolve();
+			});
+		})();
+	} else {
+		await (() => {
+			return new Promise((resolve) => {
+				modal.classList.remove('active');
+				resolve();
+			});
+		})();
+
+		await delay(300);
+
+		await (() => {
+			return new Promise((resolve) => {
+				modal.setAttribute('hidden', '');
+				resolve();
+			});
+		})();
 	}
 }
 
