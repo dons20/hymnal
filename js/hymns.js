@@ -134,39 +134,11 @@ function showRecords(filter) {
 	showModal(true);
 }
 
-async function showModal(state) {
+function showModal(state) {
 	if (state) {
-		await (() => {
-			return new Promise((resolve) => {
-				modal.removeAttribute('hidden');
-				resolve();
-			});
-		})();
-
-		await delay(10);
-
-		await (() => {
-			return new Promise((resolve) => {
-				modal.classList.add('active');
-				resolve();
-			});
-		})();
+		modal.classList.add('active');
 	} else {
-		await (() => {
-			return new Promise((resolve) => {
-				modal.classList.remove('active');
-				resolve();
-			});
-		})();
-
-		await delay(300);
-
-		await (() => {
-			return new Promise((resolve) => {
-				modal.setAttribute('hidden', '');
-				resolve();
-			});
-		})();
+		modal.classList.remove('active');
 	}
 }
 

@@ -1,9 +1,9 @@
+[disabled],
 [hidden] {
 	display: none !important;
 }
 
 [disabled] {
-	display: none !important;
 	cursor: not-allowed !important;
 }
 
@@ -154,6 +154,7 @@ h3 {
 	background-color: rgba(0,0,0,0.75);
 	opacity: 0;
 	overflow: auto;
+	pointer-events: none;
 	position: fixed;
 	text-align: center;
 	transition: all 0.3s ease-out;
@@ -163,6 +164,7 @@ h3 {
 }
 
 .overlay.active {
+	pointer-events: auto;
 	opacity: 1;
 }
 
