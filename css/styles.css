@@ -116,7 +116,7 @@ h3 {
 }
 
 #controls > button:hover {
-	border-bottom: 3px solid #f00;
+	border-bottom: 2px solid rgb(242, 255, 56);
     transform: translateY(-2px);
 }
 
@@ -130,6 +130,10 @@ h3 {
 
 #controls > #full {
 	background-image: url('../img/expand.svg');
+}
+
+#controls > #refresh {
+	background-image: url('../img/sync-alt-solid.svg');
 }
 
 #controls > #sizeUp {
