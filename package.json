@@ -1,0 +1,28 @@
+{
+  "name": "hymnal",
+  "version": "1.0.0",
+  "description": "An offline-capable hymnal with search",
+  "main": "index.html",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dons20/hymnal.git"
+  },
+  "keywords": [
+    "hymnal"
+  ],
+  "author": "Keno Clayton",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dons20/hymnal/issues"
+  },
+  "homepage": "https://github.com/dons20/hymnal#readme",
+  "devDependencies": {
+    "gulp": "^4.0.0"
+  }
+}

@@ -25,5 +25,7 @@ node_modules/
 # Brunch output folder.
 public/
 
-#VSCode config files
+# Local config files
 .vscode/
+.eslintrc.json
+oldIndex.html

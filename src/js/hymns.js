@@ -18,15 +18,15 @@ document.addEventListener('keyup', (e) => {
 	if (e.which == 27) modalClose.click();
 });
 
-modal.addEventListener('click', async () => {
+modal.addEventListener('click', () => {
 	showModal(false);
 });
 
-modalClose.addEventListener('click', async () => {
+modalClose.addEventListener('click', () => {
 	showModal(false);
 });
 
-back.addEventListener('click', async () => {
+back.addEventListener('click', () => {
 	toc.removeAttribute('hidden');
 	song.setAttribute('hidden', '');
 	back.setAttribute('disabled', '');
@@ -38,15 +38,6 @@ refresh.addEventListener('click', () => {
 });
 
 /**
- * Returns a delayed promise
- */
-function delay(ms) {
-	return new Promise((resolve) => {
-		setTimeout(resolve, ms);
-	});
-}
-
-/**
  *	Adds click listeners to spans in contents
  */
 function populateNav() {
@@ -56,7 +47,6 @@ function populateNav() {
 			let filter = this.innerText;
 			filter = filter.replace(/-/g, ' ');
 			filter = filter.split(' ');
-			console.log(filter);
 			showRecords(filter);
 		});
 	}
@@ -148,7 +138,7 @@ function showModal(state) {
 function showSong(index) {
 	let songInfo = songArray[index],
 		songStruct = [],
-		orderSong = [],
+		//orderSong = [],
 		number = songInfo.number,
 		title = songInfo.title,
 		verses = songInfo.verse,
@@ -241,9 +231,9 @@ function cleanupString(string) {
 /**
  * Checks for empty string
  */
-function isEmpty(str) {
+/* function isEmpty(str) {
 	return !str || 0 === str.length;
-}
+} */
 
 /**
  * Loads JSON info into local storage and populates songArray
@@ -268,7 +258,7 @@ async function initializeSongs() {
 		let file = await createData();
 		await processData(file);
 
-		return new Promise((resolve, reject) => {
+		return new Promise((resolve) => {
 			resolve();
 		}).catch((err) => {
 			console.error(err);
@@ -276,7 +266,7 @@ async function initializeSongs() {
 	}
 
 	function createData() {
-		return new Promise(async (resolve, reject) => {
+		return new Promise(async (resolve) => {
 			let url = 'js/songs.json';
 			let response = await fetch(url);
 			if (response.ok) {
