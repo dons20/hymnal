@@ -1,9 +1,38 @@
 {
-    "presets": [
-        ["env", {
-            "targets": {
-                "browsers": ["> 1%, not ie 11, not op_mini all"]
-            }
-        }]
-    ]
+    "env": {
+        "legacy": {
+            "presets": [
+                ["minify", {
+                    "mangle": "true",
+                    "simplify": "true"
+                }],
+                ["env", {
+                    "targets": {
+                        "browsers": ["> 1%, not ie 11, not op_mini all"]
+                    }
+                }]
+            ],
+            "comments": false
+        },
+        "modern": {
+            "presets": [
+                ["minify", {
+                    "mangle": "true",
+                    "simplify": "true"
+                }],
+                ["env", {
+                    "targets": {
+                        "browsers": [
+                            "Chrome >= 60",
+                            "Safari >= 10.1",
+                            "iOS >= 10.3",
+                            "Firefox >= 54",
+                            "Edge >= 15"
+                        ]
+                    }
+                }]
+            ],
+            "comments": false   
+        }
+    }
 }

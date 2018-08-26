@@ -7,10 +7,11 @@
     "doc": "docs"
   },
   "scripts": {
-    "clean": "rimraf docs/*",
-    "buildModern": "babel src/js/hymns.js -o docs/js/hymns.js -presets=env",
-    "buildLegacy": "babel --no-babelrc src/js/hymns.js > docs/js/hymns.legacy.js",
-    "build": "echo '=> Building Source Files' && buildModern && buildLegacy"
+    "clean": "rimraf docs/* && echo Purging old files...",
+    "preBuild": "mkdirp docs/js docs/css docs/img && echo Creating directories...",
+    "buildModern": "cross-env BABEL_ENV=modern babel src/js/hymns.js -o docs/js/hymns.min.js && echo Building ES6+ Files...",
+    "buildLegacy": "cross-env BABEL_ENV=legacy babel src/js/hymns.js -o docs/js/hymns.legacy.min.js && echo Building ES5 Files...",
+    "build": "echo Building Source Files... && npm run preBuild && npm run buildModern && npm run buildLegacy"
   },
   "repository": {
     "type": "git",
@@ -27,10 +28,10 @@
   "homepage": "https://github.com/dons20/hymnal#readme",
   "devDependencies": {
     "babel-cli": "^6.26.0",
+    "babel-preset-minify": "canary",
     "babel-preset-env": "^1.7.0",
+    "cross-env": "^5.2.0",
     "rimraf": "^2.6.2",
-    "uglify-es": "^3.3.9",
-    "uglify-js": "^3.4.8",
     "watch": "^1.0.2"
   }
 }

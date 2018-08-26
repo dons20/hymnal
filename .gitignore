@@ -29,3 +29,5 @@ public/
 .vscode/
 .eslintrc.json
 oldIndex.html
+.npmrc
+Building
