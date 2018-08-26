@@ -8,10 +8,12 @@
   },
   "scripts": {
     "clean": "rimraf docs/* && echo Purging old files...",
-    "preBuild": "mkdirp docs/js docs/css docs/img && echo Creating directories...",
-    "buildModern": "cross-env BABEL_ENV=modern babel src/js/hymns.js -o docs/js/hymns.min.js && echo Building ES6+ Files...",
-    "buildLegacy": "cross-env BABEL_ENV=legacy babel src/js/hymns.js -o docs/js/hymns.legacy.min.js && echo Building ES5 Files...",
-    "build": "echo Building Source Files... && npm run preBuild && npm run buildModern && npm run buildLegacy"
+    "prebuild": "echo Creating Directories... && mkdirp docs/js docs/css && ROBOCOPY src docs index.html && ROBOCOPY src/img docs/img",
+    "compile-sass": "echo Building and Minifying CSS... && node-sass --output-style compressed src/css/styles.scss | tee docs/css/style.min.css > src/css/styles.min.css",
+    "compile-modern-js": "echo Building ES6+ Files... && cross-env BABEL_ENV=modern babel src/js/hymns.js | tee docs/js/hymns.min.js > src/js/hymns.min.js",
+    "compile-legacy-js": "echo Building ES5 Files... && cross-env BABEL_ENV=legacy babel src/js/hymns.js | tee docs/js/hymns.legacy.min.js > src/js/hymns.legacy.min.js",
+    "build": "echo Building Source Files... && npm run compile-sass && npm run compile-modern-js && npm run compile-legacy-js",
+    "rebuild": "npm run clean && npm run build"
   },
   "repository": {
     "type": "git",
@@ -28,9 +30,10 @@
   "homepage": "https://github.com/dons20/hymnal#readme",
   "devDependencies": {
     "babel-cli": "^6.26.0",
-    "babel-preset-minify": "canary",
     "babel-preset-env": "^1.7.0",
+    "babel-preset-minify": "canary",
     "cross-env": "^5.2.0",
+    "node-sass": "^4.9.3",
     "rimraf": "^2.6.2",
     "watch": "^1.0.2"
   }

@@ -30,4 +30,5 @@ public/
 .eslintrc.json
 oldIndex.html
 .npmrc
+*.critical.html
 Building
