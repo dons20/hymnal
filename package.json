@@ -36,6 +36,7 @@
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.7.0",
     "babel-preset-minify": "canary",
+    "browser-sync": "^2.24.7",
     "cross-env": "^5.2.0",
     "node-sass": "^4.9.3",
     "rimraf": "^2.6.2",
