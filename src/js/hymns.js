@@ -1,7 +1,8 @@
 let toc = document.getElementById('toc'),
 	song = document.getElementById('song'),
 	back = document.getElementById('back'),
-	modal = document.getElementById('overlay'),
+	overlay = document.getElementById('overlay'),
+	modal = document.getElementById('modal'),
 	modalClose = modal.querySelector('.close'),
 	refresh = document.getElementById('refresh'),
 	modalBody = document.getElementById('modalBody');
@@ -18,7 +19,7 @@ document.addEventListener('keyup', (e) => {
 	if (e.which == 27) modalClose.click();
 });
 
-modal.addEventListener('click', () => {
+overlay.addEventListener('click', () => {
 	showModal(false);
 });
 
@@ -56,6 +57,7 @@ function populateNav() {
  * Displays songs depending on filter
  */
 function showRecords(filter) {
+	showModal(true);
 	while (modalBody.firstChild) {
 		modalBody.removeChild(modalBody.firstChild);
 	}
@@ -121,14 +123,15 @@ function showRecords(filter) {
 			item.appendChild(number);
 		}
 	}
-	showModal(true);
 }
 
 function showModal(state) {
 	if (state) {
 		modal.classList.add('active');
+		overlay.classList.add('active');
 	} else {
 		modal.classList.remove('active');
+		overlay.classList.remove('active');
 	}
 }
 
