@@ -3,16 +3,16 @@ let toc = document.getElementById('toc'),
 	back = document.getElementById('back'),
 	overlay = document.getElementById('overlay'),
 	modal = document.getElementById('modal'),
-	modalClose = modal.querySelector('.close'),
+	modalClose = modal.getElementsByClassName('modal__close')[0],
 	refresh = document.getElementById('refresh'),
+	navbar = document.getElementById('navbar'),
 	modalBody = document.getElementById('modalBody');
 
-let navigation = [],
-	songArray = [];
+let songArray = [];
 
 /* Start Point */
-populateNav();
 initializeSongs();
+populateNav();
 
 //Hide modal on Esc
 document.addEventListener('keyup', (e) => {
@@ -26,6 +26,13 @@ overlay.addEventListener('click', () => {
 modalClose.addEventListener('click', () => {
 	showModal(false);
 });
+
+modalBody.addEventListener('click', (e) => {
+	if (e.target.classList.contains('modal__item')) {
+		let i = modal.querySelector('.modal__num').innerText;
+		showSong(i);
+	}
+}, false);
 
 back.addEventListener('click', () => {
 	toc.removeAttribute('hidden');
@@ -42,15 +49,14 @@ refresh.addEventListener('click', () => {
  *	Adds click listeners to spans in contents
  */
 function populateNav() {
-	navigation = toc.querySelectorAll('span');
-	for (let i = 0; i < navigation.length; i++) {
-		navigation[i].addEventListener('click', function() {
-			let filter = this.innerText;
+	navbar.addEventListener('click', (e) => {
+		if (e.target.classList.contains('content__nav-span')) {
+			let filter = e.target.innerText;
 			filter = filter.replace(/-/g, ' ');
-			filter = filter.split(' ');
+			filter = filter.split(/\s+/);
 			showRecords(filter);
-		});
-	}
+		}
+	}, false);
 }
 
 /**
@@ -61,39 +67,32 @@ function showRecords(filter) {
 	while (modalBody.firstChild) {
 		modalBody.removeChild(modalBody.firstChild);
 	}
+	console.log(filter);
 	if (filter[0] === 'All') {
 		let totalFilter = songArray.length;
 		//Display song titles by numbers
 		for (let i = 0; i < totalFilter; i++) {
 			let item = document.createElement('div');
 			let number = document.createElement('span');
-			number.classList.add('num');
+			number.classList.add('modal__num');
 			number.innerText = i + 1;
-			item.appendChild(number);
-			item.onclick = (function(j) {
-				return function() {
-					showSong(j);
-				};
-			})(i);
+			item.insertAdjacentElement('beforeend', number);
+			item.classList.add('modal__item');
 			item.innerText = songArray[i].title;
-			modalBody.append(item);
-			item.appendChild(number);
+			modalBody.insertAdjacentElement('beforeend', item);
+			item.insertAdjacentElement('beforeend', number);
 		}
 	} else if (Number.isInteger(Number.parseInt(filter[0]))) {
 		for (let i = Number.parseInt(filter[0]) - 1; i < Number.parseInt(filter[1]); i++) {
 			let item = document.createElement('div');
 			let number = document.createElement('span');
-			number.classList.add('num');
+			number.classList.add('modal__num');
 			number.innerText = i + 1;
-			item.appendChild(number);
-			item.onclick = (function(j) {
-				return function() {
-					showSong(j);
-				};
-			})(i);
+			item.insertAdjacentElement('beforeend', number);
+			item.classList.add('modal__item');
 			item.innerText = songArray[i].title;
-			modalBody.append(item);
-			item.appendChild(number);
+			modalBody.insertAdjacentElement('beforeend', item);
+			item.insertAdjacentElement('beforeend', number);
 		}
 	} else {
 		//Display song titles by letter
@@ -111,27 +110,23 @@ function showRecords(filter) {
 		for (let i = 0; i < array.length; i++) {
 			let item = document.createElement('div');
 			let number = document.createElement('span');
-			number.classList += 'num';
+			number.classList.add('modal__num');
 			number.innerText = array[i][1] + 1;
-			item.onclick = (function(j) {
-				return function() {
-					showSong(array[j][1]);
-				};
-			})(i);
+			item.classList.add('modal__item');
 			item.innerText = array[i][0];
-			modalBody.append(item);
-			item.appendChild(number);
+			modalBody.insertAdjacentElement('beforeend', item);
+			item.insertAdjacentElement('beforeend', number);
 		}
 	}
 }
 
 function showModal(state) {
 	if (state) {
-		modal.classList.add('active');
-		overlay.classList.add('active');
+		modal.classList.add('modal--active');
+		overlay.classList.add('overlay--active');
 	} else {
-		modal.classList.remove('active');
-		overlay.classList.remove('active');
+		modal.classList.remove('modal--active');
+		overlay.classList.remove('overlay--active');
 	}
 }
 
@@ -232,13 +227,6 @@ function cleanupString(string) {
 }
 
 /**
- * Checks for empty string
- */
-/* function isEmpty(str) {
-	return !str || 0 === str.length;
-} */
-
-/**
  * Loads JSON info into local storage and populates songArray
  */
 async function initializeSongs() {
@@ -249,6 +237,59 @@ async function initializeSongs() {
 		await createSongs();
 	}
 	songArray = await pullFromStorage();
+	await createDOM();
+
+	function createDOM() {
+		return new Promise((resolve) => {
+			let startingLetters = [];
+			let songArrayCopy = songArray.slice();
+			let elementArray = [];
+
+			for (let i = 0; i < 26; i++) {
+				startingLetters.push(String.fromCharCode('A'.charCodeAt() + i));
+			}
+			//Display all songs
+			elementArray.push(addElement('All'));
+			appendElements(elementArray);
+			elementArray = [];
+
+			//Display song per letter
+			for (let k = 0; k < startingLetters.length; k++) {
+				if (songArray.some(ele => ele.title.charAt(0) === startingLetters[k])) {
+					elementArray.push(addElement(startingLetters[k]));
+				}
+			}
+			appendElements(elementArray);
+			elementArray = [];
+
+			//Display song per number
+			for (let i = 0, l = Math.floor(songArray.length / 100), max = null; i <= l; i++) {
+				max = songArrayCopy.length > 100 ? 99 : songArrayCopy.length - 1;
+				elementArray.push(addElement(`${songArrayCopy[0].number} - ${songArrayCopy[max].number}`));
+				songArrayCopy.splice(0, max + 1);
+			}
+			appendElements(elementArray);
+			elementArray = [];
+			
+			resolve();
+		});
+	}
+
+	function addElement(value) {
+		let navSpan = document.createElement('span');
+		navSpan.classList.add('content__nav-span');
+		navSpan.innerText = value;
+		return navSpan;
+	}
+
+	function appendElements(elements) {
+		let navItem = document.createElement('div');
+		navItem.classList.add('content__nav-item');
+		for (let x of elements) {
+			navItem.appendChild(x);
+		}
+		navbar.insertAdjacentElement('beforeend', navItem);
+	}
 
 	function pullFromStorage() {
 		return new Promise((resolve) => {
