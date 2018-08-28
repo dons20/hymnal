@@ -16,7 +16,7 @@
     "compile-modern-js": "echo Building ES6+ Files... && cross-env BABEL_ENV=modern babel src/js/hymns.js | tee docs/js/hymns.min.js > src/js/hymns.min.js",
     "compile-legacy-js": "echo Building ES5 Files... && cross-env BABEL_ENV=legacy babel src/js/hymns.js | tee docs/js/hymns.legacy.min.js > src/js/hymns.legacy.min.js",
     "build": "echo Building Source Files... && npm run compile-sass && npm run compile-modern-js && npm run compile-legacy-js",
-    "serve": "ws -d docs -z --https",
+    "serve": "ws -d docs -z -o --https",
     "rebuild": "npm run clean && npm run build"
   },
   "repository": {
