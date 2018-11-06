@@ -1,14 +1,16 @@
 import React, { Component } from 'react';
-import Nav from '../Nav/Nav';
+import BottomNav from '../components/BottomNav/BottomNav'
+import Nav from '../components/Nav/Nav';
 import './App.scss';
 
 class App extends Component {
   render() {
     return (
       <div className="App">
-        <header className="App-body">
+        <section className="App-body">
           <Nav />
-        </header>
+          <BottomNav />
+        </section>
       </div>
     );
   }

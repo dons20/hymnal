@@ -20,17 +20,12 @@ const styles = {
 };
 
 class SwipeableTemporaryDrawer extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props);
-    this.classes = props;
-    this.iOS = process.browser && /iPad|iPhone|iPod/.test(navigator.userAgent);
+    this.state = { left: false };
   }
 
-  state = {
-    left: false
-  };
-
-  toggleDrawer = (side, open) => () => {
+  toggleDrawer(side, open) {
     this.setState({
       [side]: open,
     });
@@ -38,14 +33,17 @@ class SwipeableTemporaryDrawer extends React.Component {
 
   componentDidMount() {
     // Child passes its method to the parent
-    this.props.shareMethods(this.toggleDrawer.bind(this))
+    this.props.shareMethods(this.toggleDrawer.bind(this));
   }
 
   render() {
+    const { classes } = this.props;
+    let iOS = process.browser && /iPad|iPhone|iPod/.test(navigator.userAgent);
+
     const sideList = (
-      <div className={this.classes.list}>
+      <div className={classes.list}>
         <List>
-          {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
+          {['Index', 'Favourites', 'Search'].map((text, index) => (
             <ListItem button key={text}>
               <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
               <ListItemText primary={text} />
@@ -54,7 +52,7 @@ class SwipeableTemporaryDrawer extends React.Component {
         </List>
         <Divider />
         <List>
-          {['All mail', 'Trash', 'Spam'].map((text, index) => (
+          {['Settings', 'About'].map((text, index) => (
             <ListItem button key={text}>
               <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
               <ListItemText primary={text} />
@@ -67,16 +65,16 @@ class SwipeableTemporaryDrawer extends React.Component {
     return (
       
       <div>
-        <SwipeableDrawer disableBackdropTransition={!this.iOS} disableDiscovery={this.iOS}
+        <SwipeableDrawer disableBackdropTransition={!iOS} disableDiscovery={iOS}
           open={this.state.left}
-          onClose={this.toggleDrawer('left', false)}
-          onOpen={this.toggleDrawer('left', true)}
+          onClose={() => this.toggleDrawer('left', false)}
+          onOpen={() => this.toggleDrawer('left', true)}
         >
           <div
             tabIndex={0}
             role="button"
-            onClick={this.toggleDrawer('left', false)}
-            onKeyDown={this.toggleDrawer('left', false)}
+            onClick={() => this.toggleDrawer('left', false)}
+            onKeyDown={() => this.toggleDrawer('left', false)}
           >
             {sideList}
           </div>

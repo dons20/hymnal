@@ -22,7 +22,7 @@ const styles = theme => ({
     marginLeft: -12,
     marginRight: 20,
   },
-  title: {
+  h6: {
     display: 'none',
     [theme.breakpoints.up('sm')]: {
       display: 'block',
@@ -74,9 +74,11 @@ const styles = theme => ({
 function Nav(props) {
     const { classes } = props;
 
-    function acceptMethods(handleDrawer) {
+    window.__MUI_USE_NEXT_TYPOGRAPHY_VARIANTS__ = true;
+
+    function acceptMethods(toggleDrawer) {
       // Parent stores the method that the child passed
-      classes.handleDrawer = handleDrawer;
+      classes.toggleDrawer = toggleDrawer;
     };
 
     
@@ -84,10 +86,10 @@ function Nav(props) {
         <div className={classes.root}>
             <AppBar position="static">
             <Toolbar>
-                <IconButton className={classes.menuButton} color="inherit" aria-label="Open drawer" onClick={() => classes.handleDrawer('left', true)}>
+                <IconButton className={classes.menuButton} color="inherit" aria-label="Open drawer" onClick={() => classes.toggleDrawer('left', true)}>
                 <MenuIcon />
                 </IconButton>
-                <Typography className={classes.title} variant="h6" color="inherit" noWrap>
+                <Typography className={classes.h6} variant="h6" color="inherit" noWrap>
                 Hymnal PWA
                 </Typography>
                 <div className={classes.grow} />
