@@ -6,10 +6,11 @@ import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import InputBase from '@material-ui/core/InputBase';
 import { fade } from '@material-ui/core/styles/colorManipulator';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles, withTheme } from '@material-ui/core/styles';
 import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
 import Drawer from '../Drawer/Drawer';
+import Logo from '../../logo.png';
 
 const styles = theme => ({
   root: {
@@ -19,12 +20,23 @@ const styles = theme => ({
     flexGrow: 1,
   },
   menuButton: {
-    marginLeft: -12,
-    marginRight: 20,
+    display: 'none',
+    [theme.breakpoints.up('sm')]: {
+      display: 'block',
+      marginLeft: 20,
+      marginRight: 0,
+    }
+  },
+  logo: {
+    height: 'auto',
+    maxHeight: '50px',
+    [theme.breakpoints.down('sm')]: {
+      display: 'none',
+    },
   },
   h6: {
     display: 'none',
-    [theme.breakpoints.up('sm')]: {
+    [theme.breakpoints.up('md')]: {
       display: 'block',
     },
   },
@@ -63,16 +75,19 @@ const styles = theme => ({
     transition: theme.transitions.create('width'),
     width: '100%',
     [theme.breakpoints.up('sm')]: {
-      width: 120,
+      width: 200,
       '&:focus': {
-        width: 200,
+        width: 300,
       },
     },
   },
+  colorPrimary: {
+    backgroundColor: theme.primary
+  }
 });
 
 function Nav(props) {
-    const { classes } = props;
+    const { classes, theme } = props;
 
     window.__MUI_USE_NEXT_TYPOGRAPHY_VARIANTS__ = true;
 
@@ -84,13 +99,11 @@ function Nav(props) {
     
     return (
         <div className={classes.root}>
-            <AppBar position="static">
+            <AppBar position="static" classes={{colorPrimary: theme.primary}} color="primary">
             <Toolbar>
-                <IconButton className={classes.menuButton} color="inherit" aria-label="Open drawer" onClick={() => classes.toggleDrawer('left', true)}>
-                <MenuIcon />
-                </IconButton>
+                <img className={classes.logo} src={Logo} alt="Logo"/> 
                 <Typography className={classes.h6} variant="h6" color="inherit" noWrap>
-                Hymnal PWA
+                  Hymnal PWA
                 </Typography>
                 <div className={classes.grow} />
                 <div className={classes.search}>
@@ -105,6 +118,9 @@ function Nav(props) {
                     }}
                 />
                 </div>
+                <IconButton className={classes.menuButton} color="inherit" aria-label="Open drawer" onClick={() => classes.toggleDrawer('left', true)}>
+                  <MenuIcon />
+                </IconButton>
             </Toolbar>
             </AppBar>
             <Drawer shareMethods={acceptMethods} />
@@ -114,6 +130,7 @@ function Nav(props) {
 
 Nav.propTypes = {
   classes: PropTypes.object.isRequired,
+  theme: PropTypes.object.isRequired
 };
 
-export default withStyles(styles)(Nav);
+export default withTheme()(withStyles(styles)(Nav));

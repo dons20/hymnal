@@ -9,13 +9,15 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import InboxIcon from '@material-ui/icons/MoveToInbox';
 import MailIcon from '@material-ui/icons/Mail';
+import Logo from '../../logo.png';
 
 const styles = {
   list: {
     width: 250,
   },
-  fullList: {
-    width: 'auto',
+  logo: {
+    height: 'auto',
+    maxHeight: '50px',
   },
 };
 
@@ -42,6 +44,13 @@ class SwipeableTemporaryDrawer extends React.Component {
 
     const sideList = (
       <div className={classes.list}>
+        <List gutterBottom>
+            <ListItem>
+              <ListItemIcon><img className={classes.logo} src={Logo} alt="Logo"/> </ListItemIcon>
+              <ListItemText primary="Hymnal PWA" />
+            </ListItem>
+        </List>
+        <Divider />
         <List>
           {['Index', 'Favourites', 'Search'].map((text, index) => (
             <ListItem button key={text}>
