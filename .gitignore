@@ -29,7 +29,6 @@ public/
 # Local config files
 .vscode/
 .eslintrc.json
-oldIndex.html
 .npmrc
 *.critical.html
 old.html
