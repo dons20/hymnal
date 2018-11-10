@@ -23,9 +23,6 @@ Thumbs.db
 node_modules/
 reports/
 
-# Brunch output folder.
-public/
-
 # Local config files
 .vscode/
 .eslintrc.json
