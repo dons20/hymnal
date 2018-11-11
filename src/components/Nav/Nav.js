@@ -23,13 +23,14 @@ const styles = theme => ({
     display: 'none',
     [theme.breakpoints.up('sm')]: {
       display: 'block',
-      marginLeft: 20,
-      marginRight: 0,
+      marginLeft: -12,
+      marginRight: 20,
     }
   },
   logo: {
     height: 'auto',
     maxHeight: '50px',
+    marginRight: 10,
     [theme.breakpoints.down('sm')]: {
       display: 'none',
     },
@@ -66,6 +67,7 @@ const styles = theme => ({
   inputRoot: {
     color: 'inherit',
     width: '100%',
+    display: 'flex',
   },
   inputInput: {
     paddingTop: theme.spacing.unit,
@@ -81,13 +83,10 @@ const styles = theme => ({
       },
     },
   },
-  colorPrimary: {
-    backgroundColor: theme.primary
-  }
 });
 
 function Nav(props) {
-    const { classes, theme } = props;
+    const { classes } = props;
 
     window.__MUI_USE_NEXT_TYPOGRAPHY_VARIANTS__ = true;
 
@@ -99,8 +98,11 @@ function Nav(props) {
     
     return (
         <div className={classes.root}>
-            <AppBar position="static" classes={{colorPrimary: theme.primary}} color="primary">
+            <AppBar position="static" color="primary">
             <Toolbar>
+                <IconButton className={classes.menuButton} color="inherit" aria-label="Open drawer" onClick={() => classes.toggleDrawer('left', true)}>
+                  <MenuIcon />
+                </IconButton>
                 <img className={classes.logo} src={Logo} alt="Logo"/> 
                 <Typography className={classes.h6} variant="h6" color="inherit" noWrap>
                   Hymnal PWA
@@ -118,9 +120,6 @@ function Nav(props) {
                     }}
                 />
                 </div>
-                <IconButton className={classes.menuButton} color="inherit" aria-label="Open drawer" onClick={() => classes.toggleDrawer('left', true)}>
-                  <MenuIcon />
-                </IconButton>
             </Toolbar>
             </AppBar>
             <Drawer shareMethods={acceptMethods} />

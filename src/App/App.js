@@ -1,25 +1,20 @@
 import React, { Component } from 'react';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import BottomNav from '../components/BottomNav/BottomNav';
-import HomeScreen from '../components/Home/home';
-import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import HomeScreen from '../components/Home/Home';
 import Nav from '../components/Nav/Nav';
 import Index from '../components/Index';
 import './App.scss';
 
-const theme = createMuiTheme({
-	primary: { main: '#0277BD' },
-  	secondary: { main: '#66BB6A' }
-});
 class App extends Component {
 	constructor() {
 		super();
 		
 		this.pages = {
-			HOME: 'home',
-			INDEX: 'index',
-			FAVOURITES: 'favourites',
-			SETTINGS: 'settings'
+			HOME: 'Home',
+			INDEX: 'Index',
+			FAVOURITES: 'Favourites',
+			SETTINGS: 'Settings'
 		};
 
 		this.state = {
@@ -64,16 +59,17 @@ class App extends Component {
 		const { width } = this.state;
 		const isMobile = width <= 960;
 		return (
-			<MuiThemeProvider theme={theme}>
-				<div className="App">
-					<CssBaseline />
-					<section className="App-body">
-						<Nav />
-						{this.getComponent()}
-						{isMobile ? <BottomNav /> : null}
-					</section>
-				</div>
-			</MuiThemeProvider>
+			<div className="App">
+				<CssBaseline />
+				<section className="App-body">
+					{/* Header */}
+					<Nav />
+					{/* Main */}
+					{this.getComponent()}
+					{/* Bottom Navigation on mobile */}
+					{isMobile ? <BottomNav /> : null}
+				</section>
+			</div>
 		);
 	}
 }
