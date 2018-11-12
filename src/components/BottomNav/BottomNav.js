@@ -14,7 +14,7 @@ const styles = theme => ({
     [theme.breakpoints.down('sm')]: {
         bottom: 0,
         display: 'flex',
-        position: 'fixed',
+        position: 'sticky',
         width: '100%'
     }
   },

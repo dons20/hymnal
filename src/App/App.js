@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import BottomNav from '../components/BottomNav/BottomNav';
-import HomeScreen from '../components/Home/Home';
-import Nav from '../components/Nav/Nav';
-import Index from '../components/Index';
-import './App.scss';
+import Nav from '../components/TopNav/TopNav';
+import styles from './App.module.scss';
+import Index from '../pages/Index/Index';
+import HomePage from '../pages/Home/Home';
 
 class App extends Component {
 	constructor() {
@@ -35,11 +35,18 @@ class App extends Component {
 		this.setState({ width: window.innerWidth });
 	};
 
+	changePage(page) {
+		this.setState({ currentPage: page});
+	}
+
 	getComponent() {
 		let component = null;
 		switch (this.state.currentPage) {
 			case this.pages.HOME:
-				component = <HomeScreen />;
+				component = <HomePage 
+								navigate={this.changePage.bind(this)} 
+								pages={this.pages}>
+							</HomePage>;
 				break;
 			case this.pages.INDEX:
 				component = <Index />;
@@ -59,13 +66,15 @@ class App extends Component {
 		const { width } = this.state;
 		const isMobile = width <= 960;
 		return (
-			<div className="App">
+			<div className={styles.app}>
 				<CssBaseline />
-				<section className="App-body">
+				<section className={styles.app_body}>
 					{/* Header */}
 					<Nav />
-					{/* Main */}
-					{this.getComponent()}
+					<main className={styles.app_inner}>
+						{/* Main */}
+						{this.getComponent()}
+					</main>
 					{/* Bottom Navigation on mobile */}
 					{isMobile ? <BottomNav /> : null}
 				</section>

@@ -52,7 +52,7 @@ class SwipeableTemporaryDrawer extends React.Component {
         </List>
         <Divider />
         <List>
-          {['Index', 'Favourites', 'Search'].map((text, index) => (
+          {['Index', 'Favourites', 'History'].map((text, index) => (
             <ListItem button key={text}>
               <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
               <ListItemText primary={text} />

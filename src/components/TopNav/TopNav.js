@@ -21,7 +21,7 @@ const styles = theme => ({
   },
   menuButton: {
     display: 'none',
-    [theme.breakpoints.up('sm')]: {
+    [theme.breakpoints.up('md')]: {
       display: 'block',
       marginLeft: -12,
       marginRight: 20,
@@ -31,13 +31,13 @@ const styles = theme => ({
     height: 'auto',
     maxHeight: '50px',
     marginRight: 10,
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('xs')]: {
       display: 'none',
     },
   },
   h6: {
     display: 'none',
-    [theme.breakpoints.up('md')]: {
+    [theme.breakpoints.up('sm')]: {
       display: 'block',
     },
   },
@@ -87,8 +87,6 @@ const styles = theme => ({
 
 function Nav(props) {
     const { classes } = props;
-
-    window.__MUI_USE_NEXT_TYPOGRAPHY_VARIANTS__ = true;
 
     function acceptMethods(toggleDrawer) {
       // Parent stores the method that the child passed
