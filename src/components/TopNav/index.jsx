@@ -9,7 +9,7 @@ import { fade } from '@material-ui/core/styles/colorManipulator';
 import { withStyles, withTheme } from '@material-ui/core/styles';
 import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
-import Drawer from '../Drawer/Drawer';
+import Drawer from '../Drawer';
 import Logo from '../../logo.png';
 
 const styles = theme => ({
