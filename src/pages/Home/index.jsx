@@ -50,7 +50,7 @@ function HomeScreen (props) {
 
 	return (
 		<MainContext.Consumer>
-			{({pages, dispatch}) => 
+			{(state) => 
 				<Fragment>
 				<Paper className={classes.root} elevation={3}>
 					<Typography className={classes.heading} variant="h4">
@@ -83,7 +83,7 @@ function HomeScreen (props) {
 									variant="outlined" 
 									color="primary" 
 									className={classes.action} 
-									onClick={() => dispatch({ page: pages.INDEX })}>
+									onClick={() => { state.dispatch(state.pages.INDEX) }}>
 									View Songs
 								</Button>
 							</CardActions>
@@ -104,7 +104,14 @@ function HomeScreen (props) {
 								</Typography>
 							</CardContent>
 							<CardActions>
-								<Button size="small" variant="outlined" color="secondary" className={classes.action}>View Favourites</Button>
+								<Button 
+									size="small" 
+									variant="outlined" 
+									color="secondary" 
+									className={classes.action}
+									onClick={() => { state.dispatch(state.pages.FAVOURITES) }}>
+									View Favourites
+								</Button>
 							</CardActions>
 						</Card>
 						<Card className={classes.card}>
@@ -123,7 +130,14 @@ function HomeScreen (props) {
 								</Typography>
 							</CardContent>
 							<CardActions>
-								<Button size="small" variant="outlined" color="secondary" disabled className={classes.action}>View History</Button>
+								<Button 
+									size="small" 
+									variant="outlined" 
+									color="secondary" 
+									className={classes.action}
+									onClick={() => { state.dispatch(state.pages.HISTORY) }}>
+									View History
+								</Button>
 							</CardActions>
 						</Card>
 					</div>

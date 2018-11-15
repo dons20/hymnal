@@ -7,24 +7,24 @@ import { Redirect } from 'react-router-dom';
 
 export const MainContext = React.createContext();
 
-const reducer = (action) => {
-	return <Redirect to={action.page} />
-}
-
 class App extends Component {
 	state = {
 		width: window.innerWidth,
-		activePage: '/',
+		path: '/',
 		pages: {
 			HOME: '/',
 			INDEX: '/index',
 			FAVOURITES: '/favourites',
+			HISTORY: '/history',
 			SETTINGS: '/settings'
 		},
-		dispatch: action => {
-			console.log(action);
-			reducer(action);
-		}
+		navigate: false,
+		dispatch: (path) => {
+			this.setState({ 
+				navigate: !this.navigate,
+				path: path,
+			})
+		},
 	}
 
 	componentWillMount() {
@@ -40,8 +40,14 @@ class App extends Component {
 	}
 
 	render() {
-		const { width } = this.state;
+		const { width, navigate } = this.state;
 		const isMobile = width <= 960;
+
+		if (navigate) {
+			this.setState({ navigate: false });
+			return <Redirect to={this.state.path} push={true} />
+		}
+
 		return (
 			<div className={styles.app}>
 				<CssBaseline />
