@@ -13,7 +13,7 @@ class App extends Component {
 		path: '/',
 		pages: {
 			HOME: '/',
-			INDEX: '/index',
+			INDEX: '/songs',
 			FAVOURITES: '/favourites',
 			HISTORY: '/history',
 			SETTINGS: '/settings'
@@ -53,12 +53,9 @@ class App extends Component {
 				<CssBaseline />
 				<MainContext.Provider value={this.state}>
 					<section className={styles.app_body}>
-						{/* Header */}
 						<Nav />
 						
-						{/* Main */}
 						<main className={styles.app_inner}>
-							{/* this.getComponent() */}
 							{this.props.children}
 						</main>
 						

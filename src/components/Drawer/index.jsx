@@ -44,9 +44,11 @@ class SwipeableTemporaryDrawer extends React.Component {
 
     const sideList = (
       <div className={classes.list}>
-        <List gutterBottom>
+        <List>
             <ListItem>
-              <ListItemIcon><img className={classes.logo} src={Logo} alt="Logo"/> </ListItemIcon>
+              <ListItemIcon>
+                {<img className={classes.logo} src={Logo} alt="Logo" />} 
+              </ListItemIcon>
               <ListItemText primary="Hymnal PWA" />
             </ListItem>
         </List>
