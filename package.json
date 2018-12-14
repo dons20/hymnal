@@ -1,45 +1,36 @@
 {
   "name": "hymnal",
-  "version": "1.0.0",
-  "description": "An offline-capable hymnal with search",
-  "main": "index.html",
-  "directories": {
-    "doc": "docs"
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@material-ui/core": "^3.4.0",
+    "@material-ui/icons": "^3.0.1",
+    "node-sass": "^4.10.0",
+    "react": "^16.6.0",
+    "react-dom": "^16.6.0",
+    "react-junctions": "^0.5.0",
+    "react-scripts": "2.1.1",
+    "react-router-dom": "^4.3.1"
   },
+  "homepage": "./",
   "scripts": {
-    "clean": "rimraf docs/* && echo Purging old files...",
-    "prebuild": "echo Creating Directories... && mkdirp docs/js docs/css docs/img && npm run copyIndex && npm run copyIMG && npm run copyJS && echo Finished",
-    "copyIndex": "(ROBOCOPY src docs index.html) ^& IF %ERRORLEVEL% LSS 8 SET ERRORLEVEL = 0",
-    "copyIMG": "(ROBOCOPY src/img docs/img) ^& IF %ERRORLEVEL% LSS 8 SET ERRORLEVEL = 0",
-    "copyJS": "(ROBOCOPY src/js docs/js elasticlunr.min.js songs.json) ^& IF %ERRORLEVEL% LSS 8 SET ERRORLEVEL = 0",
-    "compile-sass": "echo Building and Minifying CSS... && node-sass --output-style compressed src/css/styles.scss | tee docs/css/styles.min.css > src/css/styles.min.css",
-    "compile-modern-js": "echo Building ES6+ Files... && cross-env BABEL_ENV=modern babel src/js/hymns.js | tee docs/js/hymns.min.js > src/js/hymns.min.js",
-    "compile-legacy-js": "echo Building ES5 Files... && cross-env BABEL_ENV=legacy babel src/js/hymns.js | tee docs/js/hymns.legacy.min.js > src/js/hymns.legacy.min.js",
-    "build": "echo Building Source Files... && npm run compile-sass && npm run compile-modern-js && npm run compile-legacy-js",
-    "serve": "ws -d docs -z -o --https",
-    "rebuild": "npm run clean && npm run build"
+    "https": "set HTTPS=true&&npm start",
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "buildCache": "react-scripts build && sw-precache --config=sw-precache-config.js",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/dons20/hymnal.git"
+  "eslintConfig": {
+    "extends": "react-app"
   },
-  "keywords": [
-    "hymnal"
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
   ],
-  "author": "Keno Clayton",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/dons20/hymnal/issues"
-  },
-  "homepage": "https://github.com/dons20/hymnal#readme",
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-preset-env": "^1.7.0",
-    "babel-preset-minify": "canary",
-    "browser-sync": "^2.24.7",
-    "cross-env": "^5.2.0",
-    "node-sass": "^4.9.3",
-    "rimraf": "^2.6.2",
-    "watch": "^1.0.2"
+    "sw-precache": "^5.2.1"
   }
 }
