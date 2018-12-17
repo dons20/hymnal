@@ -19,6 +19,9 @@ const styles = (theme) => ({
 		height: '100%',
 		justifyContent: 'center',
 	},
+	hr: {
+		width: '25%',
+	},
 	heading: {
 		color: '#FFF',
     },
@@ -96,12 +99,17 @@ function PictureHeader(props) {
                     onLoad={(e) => update(e.target)} 
                 />
                 <div className={classes.hCont}>
-                    <Typography className={classes.heading} variant="h4">
-                        {props.title}
-                    </Typography>
-                    <Typography className={classes.heading} variant="h6">
-                        {props.subtitle}
-                    </Typography>
+                    { props.title && 
+                        <Typography className={classes.heading} variant="h4">
+                            {props.title}
+                        </Typography>
+					}
+					<hr className={classes.hr} />
+                    { props.subtitle &&
+                        <Typography className={classes.heading} variant="h6">
+                            {props.subtitle}
+                        </Typography>
+                    }
                 </div>
             </div>
         </Paper>

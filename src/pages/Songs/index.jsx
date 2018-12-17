@@ -1,6 +1,9 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, Suspense } from 'react';
 import PropTypes from 'prop-types';
-import { Paper, withStyles } from '@material-ui/core';
+import { MainContext } from '../../App';
+import { withStyles } from '@material-ui/core';
+
+const SongList = React.lazy(() => import('../../components/SongList'));
 
 const styles = (theme) => ({
 	root: {
@@ -14,20 +17,32 @@ const styles = (theme) => ({
     },
 });
 
-function Listing (props) {
-    const { classes } = props;
-    
-    return ( 
-        <Fragment>
-            <Paper className={classes.root}>
-                Index Page
-            </Paper>
-        </Fragment>
-    );
+class Listing extends React.Component {
+    componentDidMount() {
+        let state = this.context;
+
+        state.setTitle("List of Songs");
+        state.setSubtitle("");
+    }
+
+    render() {    
+        return ( 
+            <Fragment>
+                <div>
+                    Song page...
+                    <Suspense fallback={<Fragment>Loading Songs...</Fragment>} >
+                        <SongList />
+                    </Suspense>
+                </div>
+            </Fragment>
+        );
+    }
 }
 
 Listing.propTypes = {
 	classes: PropTypes.object.isRequired
 };
+
+Listing.contextType = MainContext;
  
 export default withStyles(styles)(Listing);

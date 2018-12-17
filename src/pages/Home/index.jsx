@@ -1,10 +1,8 @@
 import PropTypes from 'prop-types';
-import React, { Fragment, Suspense } from 'react';
+import React, { Fragment, Component } from 'react';
 import { MainContext } from '../../App';
 import { withStyles } from '@material-ui/core/styles';
 import { Typography, Card, CardContent, CardActions, CardMedia, Button } from '@material-ui/core';
-
-const PictureHeader = React.lazy(() => import('../../components/PictureHeader'));
 
 const styles = (theme) => ({
 	root: {
@@ -63,110 +61,115 @@ const styles = (theme) => ({
 	},
 });
 
-function HomeScreen (props) {
-	const { classes } = props;
+class HomeScreen extends Component {
+	componentDidMount() {
+        let state = this.context;
 
-	return (
-		<MainContext.Consumer>
-			{state => 
-				<Fragment>
-					<Suspense fallback={<Fragment>Loading...</Fragment>}>
-						<PictureHeader 
-							title={"Hymns for All Times"}
-							subtitle={"Song Book"}
-						/>
-					</Suspense>
-					<div className={classes.wrapper}>
-						<div className={classes.grid}>
-							<Card className={classes.card}>
-								<CardMedia 
-									component="img"
-									className={classes.media}
-									src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mOUWH9lHgAEvQI7iIz1fQAAAABJRU5ErkJggg=="
-									title="Placeholder"
-								/>
-								<CardContent>
-									<Typography variant="h5" component="h2" className={classes.pos}>
-										Songs
-									</Typography>
-									<Typography component="p">
-										View a listing of all songs
-									</Typography>
-								</CardContent>
-								<CardActions>
-									<Button 
-										size="small" 
-										variant="outlined" 
-										color="primary" 
-										className={classes.action} 
-										onClick={() => { state.dispatch(state.pages.INDEX) }}>
-										View Songs
-									</Button>
-								</CardActions>
-							</Card>
-							<Card className={classes.card}>
-								<CardMedia 
-									component="img"
-									className={classes.media}
-									src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mO8oiYxDwAEmgGyAOwzCAAAAABJRU5ErkJggg=="
-									title="Placeholder"
-								/>
-								<CardContent>
-									<Typography variant="h5" component="h2" className={classes.pos}>
-										Favourites
-									</Typography>
-									<Typography component="p">
-										View your favourite songs here!
-									</Typography>
-								</CardContent>
-								<CardActions>
-									<Button 
-										size="small" 
-										variant="outlined" 
-										color="secondary" 
-										className={classes.action}
-										onClick={() => { state.dispatch(state.pages.FAVOURITES) }}>
-										View Favourites
-									</Button>
-								</CardActions>
-							</Card>
-							<Card className={classes.card}>
-								<CardMedia 
-									component="img"
-									className={classes.media}
-									src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNUlLgyDwADHAGth3cp9QAAAABJRU5ErkJggg=="
-									title="Placeholder"
-								/>
-								<CardContent>
-									<Typography variant="h5" component="h2" className={classes.pos}>
-										History
-									</Typography>
-									<Typography component="p">
-										Previously viewed songs
-									</Typography>
-								</CardContent>
-								<CardActions>
-									<Button 
-										size="small" 
-										variant="outlined" 
-										color="secondary" 
-										className={classes.action}
-										onClick={() => { state.dispatch(state.pages.HISTORY) }}>
-										View History
-									</Button>
-								</CardActions>
-							</Card>
+        state.setTitle("Hymns for All Times");
+		state.setSubtitle("Song Book");
+    }
+
+	render() {
+		const { classes } = this.props;
+
+		return (
+			<MainContext.Consumer>
+				{state => 
+					<Fragment>
+						<div className={classes.wrapper}>
+							<div className={classes.grid}>
+								<Card className={classes.card}>
+									<CardMedia 
+										component="img"
+										className={classes.media}
+										src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mOUWH9lHgAEvQI7iIz1fQAAAABJRU5ErkJggg=="
+										title="Placeholder"
+									/>
+									<CardContent>
+										<Typography variant="h5" component="h2" className={classes.pos}>
+											Songs
+										</Typography>
+										<Typography component="p">
+											View a listing of all songs
+										</Typography>
+									</CardContent>
+									<CardActions>
+										<Button 
+											size="small" 
+											variant="outlined" 
+											color="primary" 
+											className={classes.action} 
+											onClick={() => { state.changePath(state.pages.INDEX) }}>
+											View Songs
+										</Button>
+									</CardActions>
+								</Card>
+								<Card className={classes.card}>
+									<CardMedia 
+										component="img"
+										className={classes.media}
+										src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mO8oiYxDwAEmgGyAOwzCAAAAABJRU5ErkJggg=="
+										title="Placeholder"
+									/>
+									<CardContent>
+										<Typography variant="h5" component="h2" className={classes.pos}>
+											Favourites
+										</Typography>
+										<Typography component="p">
+											View your favourite songs here!
+										</Typography>
+									</CardContent>
+									<CardActions>
+										<Button 
+											size="small" 
+											variant="outlined" 
+											color="secondary" 
+											className={classes.action}
+											onClick={() => { state.changePath(state.pages.FAVOURITES) }}>
+											View Favourites
+										</Button>
+									</CardActions>
+								</Card>
+								<Card className={classes.card}>
+									<CardMedia 
+										component="img"
+										className={classes.media}
+										src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNUlLgyDwADHAGth3cp9QAAAABJRU5ErkJggg=="
+										title="Placeholder"
+									/>
+									<CardContent>
+										<Typography variant="h5" component="h2" className={classes.pos}>
+											History
+										</Typography>
+										<Typography component="p">
+											Previously viewed songs
+										</Typography>
+									</CardContent>
+									<CardActions>
+										<Button 
+											size="small" 
+											variant="outlined" 
+											color="secondary" 
+											className={classes.action}
+											onClick={() => { state.changePath(state.pages.HISTORY) }}>
+											View History
+										</Button>
+									</CardActions>
+								</Card>
+							</div>
 						</div>
-					</div>
-				</Fragment>
-			}
-		</MainContext.Consumer>
-		
-	);
+					</Fragment>
+				}
+			</MainContext.Consumer>
+			
+		);
+	}
 }
 
 HomeScreen.propTypes = {
 	classes: PropTypes.object.isRequired
 };
+
+HomeScreen.contextType = MainContext;
 
 export default withStyles(styles)(HomeScreen);

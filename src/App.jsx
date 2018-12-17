@@ -1,9 +1,11 @@
-import React, { Component } from 'react';
+import React, { Component, Suspense } from 'react';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import BottomNav from './components/BottomNav';
 import Nav from './components/TopNav';
 import styles from './App.module.scss';
 import { Redirect } from 'react-router-dom';
+
+const PictureHeader = React.lazy(() => import('./components/PictureHeader'));
 
 export const MainContext = React.createContext();
 
@@ -18,13 +20,33 @@ class App extends Component {
 			HISTORY: '/history',
 			SETTINGS: '/settings'
 		},
+		title: '',
+		subtitle: '',
 		navigate: false,
-		dispatch: (path) => {
-			this.setState({ 
-				navigate: !this.navigate,
-				path: path,
-			})
+		setTitle: (title) => {
+			this.setTitle(title);
 		},
+		setSubtitle: (subtitle) => {
+			this.setSubtitle(subtitle);
+		},
+		changePath: (path) => {
+			this.changePath(path);
+		},
+	}
+
+	changePath(path) {
+		this.setState({ 
+			navigate: !this.navigate,
+			path: path,
+		})
+	}
+
+	setTitle(title) {
+		this.setState({title: title});
+	}
+
+	setSubtitle(subtitle) {
+		this.setState({subtitle: subtitle});
 	}
 
 	componentWillMount() {
@@ -56,6 +78,12 @@ class App extends Component {
 						<Nav />
 						
 						<main className={styles.app_inner}>
+							<Suspense fallback={<div>Loading...</div>}>
+								<PictureHeader 
+									title={this.state.title}
+									subtitle={this.state.subtitle}
+								/>
+							</Suspense>
 							{this.props.children}
 						</main>
 						
