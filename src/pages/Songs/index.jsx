@@ -9,12 +9,16 @@ const styles = (theme) => ({
 	root: {
 		...theme.mixins.gutters(),
 		backgroundColor: theme.palette.primary.light,
-		color: '#FFF',
+		color: '#111',
 		paddingTop: theme.spacing.unit * 2,
 		paddingBottom: theme.spacing.unit * 2,
 		marginTop: theme.spacing.unit * 2,
 		marginBottom: theme.spacing.unit * 2
     },
+    header: {
+        color: '#111',
+        fontSize: 24
+    }
 });
 
 class Listing extends React.Component {
@@ -26,15 +30,14 @@ class Listing extends React.Component {
     }
 
     render() {    
+        const {classes} = this.props;
         return ( 
-            <Fragment>
-                <div>
-                    Song page...
-                    <Suspense fallback={<Fragment>Loading Songs...</Fragment>} >
-                        <SongList />
-                    </Suspense>
-                </div>
-            </Fragment>
+            <div>
+                <h1 className={classes.header}>Song page...</h1>
+                <Suspense fallback={<Fragment>Loading Songs...</Fragment>} >
+                    <SongList />
+                </Suspense>
+            </div>
         );
     }
 }

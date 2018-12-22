@@ -1,5 +1,8 @@
 import React, { Fragment, Component } from 'react';
 import { get, set } from 'idb-keyval';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
 
 const Song = {
     number: Number,
@@ -14,6 +17,9 @@ class SongList extends Component {
     constructor(props) {
         super(props);
         this.songs = [Song];
+        this.state = {
+            songList: [<ListItem key={1} />]
+        };
     }
 
     async checkDB() {
@@ -30,7 +36,7 @@ class SongList extends Component {
 
     async loadSongsFromJSON() {
         let songsJSON = await this.loadData();
-        set('songs', JSON.stringify(songsJSON));
+        set('songs', songsJSON);
         this.songs = this.cleanupStrings(songsJSON);
     }
 
@@ -77,22 +83,32 @@ class SongList extends Component {
 
     async componentDidMount() {
         console.group("%cLoading Songs from database", "color: #d8001c; font-size: large;");
-        if (this.checkDB()) {
+        let result = await this.checkDB();
+        
+        if (result) {
             let songStorage = await get('songs');
             let parsed = JSON.parse(songStorage);
             this.songs = this.cleanupStrings(parsed);
         } else {
             this.loadSongsFromJSON();
         }
-
-
         console.groupEnd();
+
+        this.setState({songList: this.songs.map(e => 
+            <ListItem 
+                button
+                key={e.number.toString()} >
+              <ListItemText primary={e.title} />
+            </ListItem>
+        )});
     }
     
     render() {
         return ( 
             <Fragment>
-
+                 <List component="nav">
+                    {this.state.songList}
+                </List>
             </Fragment>
         );
     }
