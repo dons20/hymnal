@@ -38,6 +38,14 @@ class SongList extends Component {
         let songsJSON = await this.loadData();
         set('songs', songsJSON);
         this.songs = this.cleanupStrings(songsJSON);
+
+        this.setState({songList: this.songs.map(e => 
+            <ListItem 
+                button
+                key={e.number.toString()} >
+              <ListItemText primary={e.title} />
+            </ListItem>
+        )});
     }
 
     loadData() {
@@ -88,25 +96,25 @@ class SongList extends Component {
         if (result) {
             let songStorage = await get('songs');
             this.songs = this.cleanupStrings(songStorage);
+            this.setState({songList: this.songs.map(e => 
+                <ListItem 
+                    button
+                    key={e.number.toString()} >
+                  <ListItemText primary={e.title} />
+                </ListItem>
+            )});
         } else {
             this.loadSongsFromJSON();
         }
         console.groupEnd();
-
-        this.setState({songList: this.songs.map(e => 
-            <ListItem 
-                button
-                key={e.number.toString()} >
-              <ListItemText primary={e.title} />
-            </ListItem>
-        )});
     }
     
     render() {
         return ( 
             <Fragment>
                  <List component="nav">
-                    {this.state.songList}
+                    {this.state.songList.length > 1 && 
+                        this.state.songList}
                 </List>
             </Fragment>
         );
