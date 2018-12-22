@@ -87,8 +87,7 @@ class SongList extends Component {
         
         if (result) {
             let songStorage = await get('songs');
-            let parsed = JSON.parse(songStorage);
-            this.songs = this.cleanupStrings(parsed);
+            this.songs = this.cleanupStrings(songStorage);
         } else {
             this.loadSongsFromJSON();
         }

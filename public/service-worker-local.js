@@ -15,6 +15,7 @@ var urlsToCache = [
 
 //Cache Files on first load
 self.addEventListener('install', function(event) {
+	if (e.request.cache === 'only-if-cached' && e.request.mode !== 'same-origin') return;
 	event.waitUntil(
 		caches.open(CACHE_NAME).then(function(cache) {
 			// Open a cache and cache our files
@@ -26,7 +27,7 @@ self.addEventListener('install', function(event) {
 //Serve cached data
 self.addEventListener('fetch', function(event) {
 	console.log(event.request.url);
-
+	if (e.request.cache === 'only-if-cached' && e.request.mode !== 'same-origin') return;
 	event.respondWith(
 		caches.match(event.request).then(function(response) {
 			return response || fetch(event.request);
