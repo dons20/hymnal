@@ -15,7 +15,6 @@ var urlsToCache = [
 
 //Cache Files on first load
 self.addEventListener('install', function(e) {
-	//if (e.request.cache === 'only-if-cached' && e.request.mode !== 'same-origin') return;
 	e.waitUntil(
 		caches.open(CACHE_NAME).then(function(cache) {
 			// Open a cache and cache our files

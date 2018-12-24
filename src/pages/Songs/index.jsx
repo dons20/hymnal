@@ -8,12 +8,13 @@ const SongList = React.lazy(() => import('../../components/SongList'));
 const styles = (theme) => ({
 	root: {
 		...theme.mixins.gutters(),
-		backgroundColor: theme.palette.primary.light,
-		color: '#111',
+        color: '#111',
+        height: '60vh',
 		paddingTop: theme.spacing.unit * 2,
 		paddingBottom: theme.spacing.unit * 2,
 		marginTop: theme.spacing.unit * 2,
-		marginBottom: theme.spacing.unit * 2
+        marginBottom: theme.spacing.unit * 2,
+        overflowY: 'scroll'
     },
     header: {
         color: '#111',
@@ -32,7 +33,7 @@ class Listing extends React.Component {
     render() {    
         const {classes} = this.props;
         return ( 
-            <div>
+            <div className={classes.root}>
                 <h1 className={classes.header}>Song page...</h1>
                 <Suspense fallback={<Fragment>Loading Songs...</Fragment>} >
                     <SongList />

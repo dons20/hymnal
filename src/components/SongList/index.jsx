@@ -1,5 +1,7 @@
-import React, { Fragment, Component } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { get, set } from 'idb-keyval';
+import { withStyles } from '@material-ui/core';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -12,13 +14,39 @@ const Song = {
     author: String,
 }
 
+const styles = () => ({
+	container: {
+        width: '60%',
+        margin: 'auto',
+    },
+    grid: {
+        display: 'grid',
+        gridTemplateRows: 'repeat(6, 50px)',
+        gridTemplateColumns: '25% 25% 25% 25%',
+    },
+	menuOpt: {
+        alignItems: 'center',
+        cursor: 'pointer',
+        display: 'flex',
+        justifyContent: 'center',
+        transition: 'background 0.1s ease-in-out',
+        willChange: 'background',
+        '&:hover': {
+            background: 'rgba(0,0,0,0.1)'
+        },
+    },
+});
+
 class SongList extends Component {
 
     constructor(props) {
         super(props);
-        this.songs = [Song];
         this.state = {
-            songList: [<ListItem key={1} />]
+            nowShowing: '',
+            songList: Array(Song),
+            letters: Array(String),
+            numbers: Array(Number),
+            filteredList: Array(<ListItem key={1} />)
         };
     }
 
@@ -37,15 +65,7 @@ class SongList extends Component {
     async loadSongsFromJSON() {
         let songsJSON = await this.loadData();
         set('songs', songsJSON);
-        this.songs = this.cleanupStrings(songsJSON);
-
-        this.setState({songList: this.songs.map(e => 
-            <ListItem 
-                button
-                key={e.number.toString()} >
-              <ListItemText primary={e.title} />
-            </ListItem>
-        )});
+        this.setState({songList: this.cleanupStrings(songsJSON)});
     }
 
     loadData() {
@@ -61,6 +81,19 @@ class SongList extends Component {
 		}).catch((err) => {
 			console.error(err);
 		});
+    }
+
+    createMenu() {
+        const {songList} = this.state;
+        return new Promise(resolve => {
+            let characters = [],
+                numbers = [];
+            for (let i = 0; i < songList.length; i++) {
+                characters.push(songList[i].title.charAt(0));
+                numbers.push(songList[i].number);
+            }
+            resolve(String.prototype.concat(...new Set(characters)));
+        })
     }
 
     cleanupStrings(songs) {
@@ -90,35 +123,67 @@ class SongList extends Component {
     }
 
     async componentDidMount() {
-        console.group("%cLoading Songs from database", "color: #d8001c; font-size: large;");
+        console.log("%cLoading Songs from database", "color: #d8001c; font-size: large; font-weight: bold");
         let result = await this.checkDB();
         
         if (result) {
             let songStorage = await get('songs');
-            this.songs = this.cleanupStrings(songStorage);
-            this.setState({songList: this.songs.map(e => 
+            this.setState({songList: this.cleanupStrings(songStorage)});
+        } else {
+            await this.loadSongsFromJSON();
+        }
+
+        let letters = await this.createMenu();
+        this.setState({letters: letters.replace(/\W/, '').split('').sort()});
+    }
+
+    filterSongs(type, value) {
+        if (type === 'range') {
+
+        } else if (type === 'letter') {
+            let filteredSongs = this.state.songList.filter(song => song.title.charAt(0) === value);
+            this.setState({filteredList: filteredSongs.map(e => 
                 <ListItem 
                     button
                     key={e.number.toString()} >
                   <ListItemText primary={e.title} />
                 </ListItem>
             )});
+            this.setState({nowShowing: "songs"});
         } else {
-            this.loadSongsFromJSON();
+            return null;
         }
-        console.groupEnd();
     }
     
     render() {
+        const { letters, nowShowing, filteredList } = this.state;
+        const { classes } = this.props;
         return ( 
-            <Fragment>
-                 <List component="nav">
-                    {this.state.songList.length > 1 && 
-                        this.state.songList}
-                </List>
-            </Fragment>
+            <List 
+                component="div"
+                className={[classes.container, nowShowing === "" ? classes.grid : '']}
+            >
+                {letters.length > 1 && nowShowing === "" &&
+                    letters.map(letter => 
+                        <div 
+                            className={classes.menuOpt}
+                            onClick={() => this.filterSongs('letter', letter)}
+                            key={letter}
+                        >
+                            {letter}
+                        </div> 
+                    )
+                }
+                {nowShowing === "songs" &&
+                    filteredList
+                }
+            </List>
         );
     }
 }
+
+SongList.propTypes = {
+	classes: PropTypes.object.isRequired
+};
  
-export default SongList;
+export default withStyles(styles)(SongList);
