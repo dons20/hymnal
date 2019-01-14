@@ -1,10 +1,9 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { get, set } from 'idb-keyval';
 import { withStyles } from '@material-ui/core';
+import { FixedSizeList } from 'react-window';
 import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
 
 const Song = {
     number: Number,
@@ -46,7 +45,7 @@ class SongList extends Component {
             songList: Array(Song),
             letters: Array(String),
             numbers: Array(Number),
-            filteredList: Array(<ListItem key={1} />)
+            filteredList: Array(<div key={1} />)
         };
     }
 
@@ -142,14 +141,16 @@ class SongList extends Component {
 
         } else if (type === 'letter') {
             let filteredSongs = this.state.songList.filter(song => song.title.charAt(0) === value);
-            this.setState({filteredList: filteredSongs.map(e => 
-                <ListItem 
-                    button
-                    key={e.number.toString()} >
-                  <ListItemText primary={e.title} />
-                </ListItem>
-            )});
-            this.setState({nowShowing: "songs"});
+            this.setState({
+                filteredList: filteredSongs.map(e => 
+                    <div 
+                        
+                        key={e.number.toString()} >
+                        <div>{e.title}</div>
+                    </div>
+                ), 
+                nowShowing: "songs"
+            });
         } else {
             return null;
         }
@@ -158,26 +159,41 @@ class SongList extends Component {
     render() {
         const { letters, nowShowing, filteredList } = this.state;
         const { classes } = this.props;
+        let FL = null;
+        if (filteredList.length > 1 && !FL) FL = () => (filteredList);
+
         return ( 
-            <List 
-                component="div"
-                className={[classes.container, nowShowing === "" ? classes.grid : '']}
-            >
-                {letters.length > 1 && nowShowing === "" &&
-                    letters.map(letter => 
-                        <div 
-                            className={classes.menuOpt}
-                            onClick={() => this.filterSongs('letter', letter)}
-                            key={letter}
-                        >
-                            {letter}
-                        </div> 
-                    )
+            <Fragment>
+                {nowShowing === '' && 
+                    <List 
+                        component="div"
+                        className={`${classes.container} ${classes.grid}`}
+                    >
+                        {letters.length > 1 && nowShowing === "" &&
+                            letters.map(letter => 
+                                <div 
+                                    className={classes.menuOpt}
+                                    onClick={() => this.filterSongs('letter', letter)}
+                                    key={letter}
+                                >
+                                    {letter}
+                                </div> 
+                            )
+                        }
+                    </List>
                 }
                 {nowShowing === "songs" &&
-                    filteredList
+                    <FixedSizeList 
+                        height={300}
+                        itemCount={filteredList.length}
+                        itemSize={100}
+                        width={'50%'}
+                        className={classes.container}
+                    >
+                        {FL}
+                    </FixedSizeList>
                 }
-            </List>
+            </Fragment>
         );
     }
 }
