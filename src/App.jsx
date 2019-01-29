@@ -7,6 +7,14 @@ import { Redirect } from 'react-router-dom';
 
 const PictureHeader = React.lazy(() => import('./components/PictureHeader'));
 
+const Song = {
+	number: Number,
+	title: String,
+	verse: Array(String),
+	chorus: String,
+	author: String
+  };
+
 export const MainContext = React.createContext();
 
 class App extends Component {
@@ -22,12 +30,13 @@ class App extends Component {
 		},
 		title: '',
 		subtitle: '',
+		activeIndex: 0,
 		navigate: false,
-		setTitle: (title) => {
-			this.setTitle(title);
-		},
-		setSubtitle: (subtitle) => {
-			this.setSubtitle(subtitle);
+		songDisplay: "",
+		songList: Array(Song),
+		filteredList: Array(<div key={1} />),
+		setProp: (prop, value) => {
+			this.setProp(prop, value);
 		},
 		changePath: (path) => {
 			this.changePath(path);
@@ -41,12 +50,8 @@ class App extends Component {
 		})
 	}
 
-	setTitle(title) {
-		this.setState({title: title});
-	}
-
-	setSubtitle(subtitle) {
-		this.setState({subtitle: subtitle});
+	setProp(props) {
+		this.setState({...props});
 	}
 
 	componentWillMount() {

@@ -8,8 +8,7 @@ const imgPath = process.env.PUBLIC_URL + '/rainbow/';
 const styles = (theme) => ({
 	root: {
 		backgroundColor: theme.palette.primary.light,
-		color: '#FFF',
-		marginBottom: theme.spacing.unit * 2
+		color: '#FFF'
 	},
 	hCont: {
 		alignItems: 'center',

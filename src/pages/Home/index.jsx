@@ -63,10 +63,11 @@ const styles = (theme) => ({
 
 class HomeScreen extends Component {
 	componentDidMount() {
-        let state = this.context;
-
-        state.setTitle("Hymns for All Times");
-		state.setSubtitle("Song Book");
+		let ctx = this.context;
+        ctx.setProp({
+            title: "Hymns for All Times",
+            subtitle: 'Song Book'
+        });
     }
 
 	render() {
