@@ -86,7 +86,6 @@ class SongList extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            letters: Array(String),
             numbers: Array(Number),
             letterRow: Array(<div key={1} />),
             songBody: Array(<div key={1} />)
@@ -97,11 +96,9 @@ class SongList extends Component {
         this.filterSongs = this.filterSongs.bind(this);
     }
 
+    /** Checks if songs have already been stored */
     async checkDB() {
-        console.log(
-            `%cChecking if songs exist already`,
-            "color: #b70018; font-size: medium;"
-        );
+        console.log(`%cChecking if songs exist already`, "color: #b70018; font-size: medium;");
         let songStorage = await get("songs");
         if (songStorage !== undefined) {
             console.log(
@@ -117,33 +114,32 @@ class SongList extends Component {
         return false;
     }
 
-    async loadSongsFromJSON() {
-        let songsJSON = await this.loadData();
+    /** Loads songs from JSON and stores them locally */
+    loadSongsFromJSON() {
         let { setProp } = this.context;
-        set("songs", songsJSON);
-        setProp("songList", this.cleanupStrings(songsJSON));
+        this.fetchSongs().then(json => {
+            setProp({ songList: this.cleanupStrings(json), listLoaded: true });
+            set("songs", json);
+        });
     }
 
-    loadData() {
+    /** Fetches song database and returns it for parsing */
+    fetchSongs() {
         return new Promise(async resolve => {
             let url = process.env.PUBLIC_URL + "/songs.json";
             let response = await fetch(url);
             if (response.ok) {
-                console.log(
-                    `%cLoading from "${url}"`,
-                    "color: #b70018; font-size: medium;"
-                );
+                console.log(`%cLoading from "${url}"`, "color: #b70018; font-size: medium;");
                 resolve(response.json());
             } else {
-                throw Object.assign(
-                    new Error(`File "${url}" not found on server!`)
-                );
+                throw Object.assign(new Error(`File "${url}" not found on server!`));
             }
         }).catch(err => {
             console.error(err);
         });
     }
 
+    /** Generates a menu from all available letters and numbers */
     createMenu() {
         const { songList } = this.context;
         return new Promise(resolve => {
@@ -157,6 +153,10 @@ class SongList extends Component {
         });
     }
 
+    /**
+     * Iterates over song array to make strings readable
+     * @param {import('../../App').SongType} songs
+     */
     cleanupStrings(songs) {
         let obj = songs;
         for (let i = 0; i < obj.length; i++) {
@@ -175,6 +175,10 @@ class SongList extends Component {
         return obj;
     }
 
+    /**
+     * Removes unnecessary characters and spaces from string
+     * @param {string} string
+     */
     replaceString(string) {
         let newString = string
             .replace(/\*/g, "")
@@ -206,78 +210,74 @@ class SongList extends Component {
         });
     }
 
-    async componentDidMount() {
-        const { classes } = this.props;
-
+    componentDidMount() {
         console.log(
             "%cLoading Songs from database",
             "color: #d8001c; font-size: large; font-weight: bold"
         );
-        let result = await this.checkDB();
-
-        if (result) {
-            let songStorage = await get("songs");
-            let { setProp } = this.context;
-            setProp({ songList: this.cleanupStrings(songStorage) });
-        } else {
-            await this.loadSongsFromJSON();
-        }
-
-        let letters = await this.createMenu();
-        await this.setState({
-            letters: letters
-                .replace(/\W/, "")
-                .split("")
-                .sort()
-        });
-
-        await this.setState({
-            letterRow: this.state.letters.map(letter => (
-                <div
-                    className={classes.menuOpt}
-                    onClick={() => this.filterSongs("letter", letter)}
-                    key={letter}
-                >
-                    {letter}
-                </div>
-            ))
+        this.checkDB().then(async res => {
+            if (res) {
+                let songStorage = await get("songs");
+                let { setProp } = this.context;
+                setProp({ songList: this.cleanupStrings(songStorage), listLoaded: true });
+            } else {
+                this.loadSongsFromJSON();
+            }
         });
     }
 
     componentDidUpdate() {
-        const { activeIndex, filteredList, songDisplay } = this.context;
+        const { activeIndex, filteredList, songDisplay, listLoaded } = this.context;
         if (songDisplay === "fView" && this.state.songBody.length <= 1) {
-            const newBody = filteredList[activeIndex].verse.map(
-                (verse, index) => {
-                    if (index === 1) {
-                        return (
-                            <Fragment key={index}>
-                                <div>{filteredList[activeIndex].chorus}</div>
-                                <div>{verse}</div>
-                            </Fragment>
-                        );
-                    }
-                    return <div key={index}>{verse}</div>;
+            const newBody = filteredList[activeIndex].verse.map((verse, index) => {
+                if (index === 1) {
+                    return (
+                        <Fragment key={index}>
+                            <div>{filteredList[activeIndex].chorus}</div>
+                            <div>{verse}</div>
+                        </Fragment>
+                    );
                 }
-            );
+                return <div key={index}>{verse}</div>;
+            });
             this.setState({ songBody: newBody });
+        }
+
+        if (listLoaded && this.state.letterRow.length <= 1) {
+            const { classes } = this.props;
+
+            this.createMenu().then(val => {
+                let letters = val
+                    .replace(/\W/, "")
+                    .split("")
+                    .sort();
+                this.setState({
+                    letterRow: letters.map(letter => (
+                        <div
+                            className={classes.menuOpt}
+                            onClick={() => this.filterSongs("letter", letter)}
+                            key={letter}
+                        >
+                            {letter}
+                        </div>
+                    ))
+                });
+            });
         }
     }
 
     render() {
-        const { letters, letterRow, songBody } = this.state;
-        const { activeIndex, filteredList, songDisplay } = this.context;
+        const { letterRow, songBody } = this.state;
+        const { activeIndex, filteredList, songDisplay, listLoaded } = this.context;
         const { classes } = this.props;
         const itemData = { filteredList, display: this.displaySong, classes };
 
         return (
             <Fragment>
-                {songDisplay === "" && (
-                    <List
-                        component="div"
-                        className={`${classes.container} ${classes.grid}`}
-                    >
-                        {letters.length > 1 && songDisplay === "" && letterRow}
+                {!listLoaded && <div>Replace me with loading icon</div>}
+                {songDisplay === "" && listLoaded && (
+                    <List component="div" className={`${classes.container} ${classes.grid}`}>
+                        {songDisplay === "" && letterRow}
                     </List>
                 )}
                 {songDisplay === "list" && (
@@ -306,9 +306,7 @@ class SongList extends Component {
                         )}
                     </Fragment>
                 )}
-                {songDisplay === "dView" && (
-                    <div>{filteredList[activeIndex].title}</div>
-                )}
+                {songDisplay === "dView" && <div>{filteredList[activeIndex].title}</div>}
             </Fragment>
         );
     }

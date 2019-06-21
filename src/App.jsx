@@ -15,6 +15,8 @@ const Song = {
     author: String
 };
 
+export const SongType = Song;
+
 export const MainContext = React.createContext();
 
 class App extends Component {
@@ -34,9 +36,10 @@ class App extends Component {
         navigate: false,
         songDisplay: "",
         songList: Array(Song),
+        listLoaded: false,
         filteredList: Array(<div key={1} />),
-        setProp: (prop, value) => {
-            this.setProp(prop, value);
+        setProp: props => {
+            this.setState({ ...props });
         },
         changePath: path => {
             this.changePath(path);
@@ -48,10 +51,6 @@ class App extends Component {
             navigate: !this.navigate,
             path: path
         });
-    }
-
-    setProp(props) {
-        this.setState({ ...props });
     }
 
     componentWillMount() {

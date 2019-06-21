@@ -1,77 +1,77 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-import { Typography, Paper } from '@material-ui/core';
+import React from "react";
+import PropTypes from "prop-types";
+import { withStyles } from "@material-ui/core/styles";
+import { Typography, Paper } from "@material-ui/core";
 
-const imgPath = process.env.PUBLIC_URL + '/rainbow/';
+const imgPath = process.env.PUBLIC_URL + "/rainbow/";
 
-const styles = (theme) => ({
-	root: {
-		backgroundColor: theme.palette.primary.light,
-		color: '#FFF'
-	},
-	hCont: {
-		alignItems: 'center',
-		backgroundColor: 'rgba(0, 12, 23, 0.63)',
-		display: 'flex',
-		flexDirection: 'column',
-		height: '100%',
-		justifyContent: 'center',
-	},
-	hr: {
-		width: '25%',
-	},
-	heading: {
-		color: '#FFF',
+const styles = theme => ({
+    root: {
+        backgroundColor: theme.palette.primary.light,
+        color: "#FFF"
+    },
+    hCont: {
+        alignItems: "center",
+        backgroundColor: "rgba(0, 12, 23, 0.63)",
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+        justifyContent: "center"
+    },
+    hr: {
+        width: "25%"
+    },
+    heading: {
+        color: "#FFF"
     },
     card: {
-		margin: `${theme.spacing.unit * 2}px auto`,
-		minWidth: 250,
-		width: 'calc(1/3*100% - (1 - 1/3)*10px)',
+        margin: `${theme.spacing(2)}px auto`,
+        minWidth: 250,
+        width: "calc(1/3*100% - (1 - 1/3)*10px)"
     },
-	media: {
-		height: 150
-	},
-	title: {
-        fontSize: 14,
+    media: {
+        height: 150
     },
-	pos: {
-        marginBottom: 12,
-	},
-	grid: {
-		display: 'grid',
-		gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-		gridGap: '30px',
-	},
-	wrapper: {
-		margin: '0 auto',
-		width: '90%',
-	},
-	action: {
-		marginLeft: 'auto',
-	},
-	bgImgCont: {
-		backgroundSize: 'cover',
-		backgroundPosition: 'bottom center',
-		backgroundRepeat: 'no-repeat',
-		display: 'block',
-		height: '25vh',
-		position: 'relative',
-		width: '100%',
-	},
-	bgImg: {
-		display: 'none',
-	},
+    title: {
+        fontSize: 14
+    },
+    pos: {
+        marginBottom: 12
+    },
+    grid: {
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+        gridGap: "30px"
+    },
+    wrapper: {
+        margin: "0 auto",
+        width: "90%"
+    },
+    action: {
+        marginLeft: "auto"
+    },
+    bgImgCont: {
+        backgroundSize: "cover",
+        backgroundPosition: "bottom center",
+        backgroundRepeat: "no-repeat",
+        display: "block",
+        height: "25vh",
+        position: "relative",
+        width: "100%"
+    },
+    bgImg: {
+        display: "none"
+    }
 });
 
 function PictureHeader(props) {
     const { classes } = props;
     let img = null,
-		src = '';
+        src = "";
 
-	function update (e) {
-		img = e;
-        let thisSrc = img.getAttribute('src');
+    function update(e) {
+        img = e;
+        let thisSrc = img.getAttribute("src");
         if (src !== thisSrc) {
             src = thisSrc;
             img.parentElement.style.backgroundImage = `url("${src}")`;
@@ -95,28 +95,28 @@ function PictureHeader(props) {
                     src={`${imgPath}rainbow_rg388g_c_scale,w_1400.jpg`}
                     alt="Rainbow Background"
                     className={classes.bgImg}
-                    onLoad={(e) => update(e.target)} 
+                    onLoad={e => update(e.target)}
                 />
                 <div className={classes.hCont}>
-                    { props.title && 
+                    {props.title && (
                         <Typography className={classes.heading} variant="h4">
                             {props.title}
                         </Typography>
-					}
-					<hr className={classes.hr} />
-                    { props.subtitle &&
+                    )}
+                    <hr className={classes.hr} />
+                    {props.subtitle && (
                         <Typography className={classes.heading} variant="h6">
                             {props.subtitle}
                         </Typography>
-                    }
+                    )}
                 </div>
             </div>
         </Paper>
-    )
+    );
 }
 
 PictureHeader.propTypes = {
-	classes: PropTypes.object.isRequired
+    classes: PropTypes.object.isRequired
 };
 
 export default withStyles(styles)(PictureHeader);

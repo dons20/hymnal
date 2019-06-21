@@ -14,8 +14,8 @@ const styles = theme => ({
         flex: "1",
         flexDirection: "column",
         justifyContent: "center",
-        paddingTop: theme.spacing.unit * 2,
-        paddingBottom: theme.spacing.unit * 2,
+        paddingTop: theme.spacing(2),
+        paddingBottom: theme.spacing(2),
         overflowY: "auto"
     },
     header: {
