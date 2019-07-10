@@ -5,33 +5,68 @@ import { MainContext } from "../../App";
 import { withStyles } from "@material-ui/core";
 import { FixedSizeList } from "react-window";
 import List from "@material-ui/core/List";
+import blue from "@material-ui/core/colors/blue";
+import AutoSizer from "react-virtualized-auto-sizer";
 
-const styles = () => ({
+/** @param {import('@material-ui/core').Theme} theme */
+const styles = theme => ({
     container: {
-        height: "55vh",
-        maxWidth: "800px",
-        margin: "auto"
+        //height: "55vh",
+        maxWidth: "1200px",
+        margin: "0 auto"
     },
     grid: {
         display: "grid",
-        gridTemplateRows: "repeat(6, 1fr)",
-        gridTemplateColumns: "25% 25% 25% 25%",
+        gridAutoRows: "80px",
+        gridTemplateColumns: "repeat(2, minmax(60px, 1fr))",
+        gridGap: "10px",
         width: "100%"
+    },
+    listItem: {
+        cursor: "pointer",
+        display: "grid",
+        gridTemplateColumns: "25% 1fr",
+        textAlign: "left",
+        transition: "background 0.1s ease-in-out",
+        userSelect: "none",
+        willChange: "background",
+        "&:hover": {
+            background: "rgba(0,0,0,0.1)"
+        }
+    },
+    listItemEven: {
+        background: blue[50]
+    },
+    listItemOdd: {
+        background: "white"
     },
     listTitle: {
         alignItems: "center",
         display: "flex",
         padding: "0 20px"
     },
+    listSwitcher: {
+        backgroundColor: "rgba(255,255,255,1)",
+        border: 0,
+        borderRadius: "5px",
+        boxShadow: "0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)",
+        fontSize: "1.3rem",
+        padding: theme.spacing(2),
+        width: "100%"
+    },
     menuOpt: {
         alignItems: "center",
+        background: "rgba(255,255,255,1)",
+        boxShadow: "0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)",
         cursor: "pointer",
         display: "flex",
+        fontSize: "2rem",
         justifyContent: "center",
-        transition: "background 0.1s ease-in-out",
-        willChange: "background",
+        transition: "background 0.1s ease-in-out, box-shadow 0.3s cubic-bezier(.25,.8,.25,1)",
+        willChange: "background, box-shadow",
         "&:hover": {
-            background: "rgba(0,0,0,0.1)"
+            background: "rgba(0,0,0,0.05)",
+            boxShadow: "0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23)"
         }
     },
     songBody: {
@@ -51,16 +86,10 @@ const styles = () => ({
         gridTemplateColumns: "1fr 3fr",
         justifyItems: "left"
     },
-    songList: {
-        cursor: "pointer",
-        display: "grid",
-        gridTemplateColumns: "25% 1fr",
-        textAlign: "left",
-        transition: "background 0.1s ease-in-out",
-        userSelect: "none",
-        willChange: "background",
-        "&:hover": {
-            background: "rgba(0,0,0,0.1)"
+    "@media (min-width: 425px)": {
+        grid: {
+            gridTemplateRows: "repeat(auto-fit, 1fr)",
+            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))"
         }
     }
 });
@@ -73,7 +102,9 @@ const Row = memo(({ data, index, style }) => {
         <div
             key={song.number}
             onClick={() => display(index)}
-            className={classes.songList}
+            className={`${classes.listItem} ${
+                index % 2 ? classes.listItemOdd : classes.listItemEven
+            }`}
             style={style}
         >
             <div className={classes.listTitle}>#{song.number}</div>
@@ -86,14 +117,16 @@ class SongList extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            numbers: Array(Number),
+            listSortByLetters: true,
             letterRow: Array(<div key={1} />),
+            numbers: Array(Number),
             songBody: Array(<div key={1} />)
         };
         this.displaySong = this.displaySong.bind(this);
         this.loadSongsFromJSON = this.loadSongsFromJSON.bind(this);
         this.createMenu = this.createMenu.bind(this);
         this.filterSongs = this.filterSongs.bind(this);
+        this.changeActiveNav = this.changeActiveNav.bind(this);
     }
 
     /** Checks if songs have already been stored */
@@ -149,7 +182,7 @@ class SongList extends Component {
                 characters.push(songList[i].title.charAt(0));
                 numbers.push(songList[i].number);
             }
-            resolve(String.prototype.concat(...new Set(characters)));
+            resolve({ letters: String.prototype.concat(...new Set(characters)), numbers: numbers });
         });
     }
 
@@ -187,21 +220,34 @@ class SongList extends Component {
         return newString;
     }
 
+    /**
+     * Filters list of songs by criteria
+     * @param {String} type
+     * @param {String} value
+     */
     filterSongs(type, value) {
-        if (type === "range") {
-        } else if (type === "letter") {
-            let filteredSongs = this.context.songList.filter(
-                song => song.title.charAt(0) === value
+        let filteredSongs;
+        if (type === "number") {
+            filteredSongs = this.context.songList.filter(song => song.number === value);
+        } else if (type === "numRange") {
+            filteredSongs = this.context.songList.filter(
+                song =>
+                    Number.parseInt(song.number) >= value[0] &&
+                    Number.parseInt(song.number) <= value[1]
             );
-            this.context.setProp({
-                filteredList: filteredSongs,
-                songDisplay: "list"
-            });
+            console.log(this.context.songList);
+        } else if (type === "letter") {
+            filteredSongs = this.context.songList.filter(song => song.title.charAt(0) === value);
         } else {
             return null;
         }
+        this.context.setProp({
+            filteredList: filteredSongs,
+            songDisplay: "list"
+        });
     }
 
+    /** Displays a song at specified index */
     displaySong(index) {
         this.context.setProp({
             title: this.context.filteredList[index].title,
@@ -210,6 +256,14 @@ class SongList extends Component {
         });
     }
 
+    /** Swaps between letter sort and number sort */
+    changeActiveNav() {
+        this.setState({
+            listSortByLetters: !this.state.listSortByLetters
+        });
+    }
+
+    /** Triggers loading of songs from database on component mount */
     componentDidMount() {
         console.log(
             "%cLoading Songs from database",
@@ -226,6 +280,7 @@ class SongList extends Component {
         });
     }
 
+    /** Handles changes to the active display when component updates */
     componentDidUpdate() {
         const { activeIndex, filteredList, songDisplay, listLoaded } = this.context;
         if (songDisplay === "fView" && this.state.songBody.length <= 1) {
@@ -247,10 +302,19 @@ class SongList extends Component {
             const { classes } = this.props;
 
             this.createMenu().then(val => {
-                let letters = val
+                let letters = val.letters
                     .replace(/\W/, "")
                     .split("")
                     .sort();
+                let numbers = [];
+                for (let i = 0; i < val.numbers.length; i += 100) {
+                    numbers.push(val.numbers.slice(i, i + 100));
+                }
+
+                let finalNumbers = numbers.map(n => {
+                    return [n[0], n[n.length - 1]];
+                });
+
                 this.setState({
                     letterRow: letters.map(letter => (
                         <div
@@ -260,6 +324,15 @@ class SongList extends Component {
                         >
                             {letter}
                         </div>
+                    )),
+                    numbers: finalNumbers.map(num => (
+                        <div
+                            className={classes.menuOpt}
+                            onClick={() => this.filterSongs("numRange", [num[0], num[1]])}
+                            key={num[0]}
+                        >
+                            {num[0]} - {num[1]}
+                        </div>
                     ))
                 });
             });
@@ -267,7 +340,7 @@ class SongList extends Component {
     }
 
     render() {
-        const { letterRow, songBody } = this.state;
+        const { letterRow, numbers, songBody, listSortByLetters } = this.state;
         const { activeIndex, filteredList, songDisplay, listLoaded } = this.context;
         const { classes } = this.props;
         const itemData = { filteredList, display: this.displaySong, classes };
@@ -276,21 +349,34 @@ class SongList extends Component {
             <Fragment>
                 {!listLoaded && <div>Replace me with loading icon</div>}
                 {songDisplay === "" && listLoaded && (
-                    <List component="div" className={`${classes.container} ${classes.grid}`}>
-                        {songDisplay === "" && letterRow}
-                    </List>
+                    <>
+                        <button
+                            type="button"
+                            onClick={this.changeActiveNav}
+                            className={classes.listSwitcher}
+                        >
+                            {listSortByLetters ? "Switch to Numbers" : "Switch to Letters"}
+                        </button>
+                        <List component="div" className={`${classes.container} ${classes.grid}`}>
+                            {listSortByLetters ? letterRow : numbers}
+                        </List>
+                    </>
                 )}
                 {songDisplay === "list" && (
-                    <FixedSizeList
-                        height={500}
-                        itemCount={filteredList.length}
-                        itemData={itemData}
-                        itemSize={60}
-                        width={"100%"}
-                        className={classes.container}
-                    >
-                        {Row}
-                    </FixedSizeList>
+                    <AutoSizer>
+                        {({ height, width }) => (
+                            <FixedSizeList
+                                height={height}
+                                itemCount={filteredList.length}
+                                itemData={itemData}
+                                itemSize={60}
+                                width={width}
+                                className={classes.container}
+                            >
+                                {Row}
+                            </FixedSizeList>
+                        )}
+                    </AutoSizer>
                 )}
                 {songDisplay === "fView" && (
                     <Fragment>

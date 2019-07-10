@@ -8,7 +8,10 @@ const imgPath = process.env.PUBLIC_URL + "/rainbow/";
 const styles = theme => ({
     root: {
         backgroundColor: theme.palette.primary.light,
-        color: "#FFF"
+        color: "#FFF",
+        // position: "sticky",
+        // top: 0,
+        zIndex: 100
     },
     hCont: {
         alignItems: "center",
@@ -18,11 +21,12 @@ const styles = theme => ({
         height: "100%",
         justifyContent: "center"
     },
-    hr: {
-        width: "25%"
-    },
     heading: {
-        color: "#FFF"
+        color: "#FFF",
+        margin: 10,
+        paddingBottom: 10,
+        borderBottom: "1px solid white",
+        textAlign: "center"
     },
     card: {
         margin: `${theme.spacing(2)}px auto`,
@@ -55,7 +59,7 @@ const styles = theme => ({
         backgroundPosition: "bottom center",
         backgroundRepeat: "no-repeat",
         display: "block",
-        height: "25vh",
+        height: "100%",
         position: "relative",
         width: "100%"
     },
@@ -103,7 +107,6 @@ function PictureHeader(props) {
                             {props.title}
                         </Typography>
                     )}
-                    <hr className={classes.hr} />
                     {props.subtitle && (
                         <Typography className={classes.heading} variant="h6">
                             {props.subtitle}

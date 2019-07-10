@@ -61,6 +61,12 @@ class App extends Component {
         window.removeEventListener("resize", this.handleWindowSizeChange);
     }
 
+    componentDidUpdate() {
+        if (this.state.navigate === true) {
+            this.setState({ navigate: false });
+        }
+    }
+
     handleWindowSizeChange = () => {
         this.setState({ width: window.innerWidth });
     };
@@ -70,7 +76,6 @@ class App extends Component {
         const isMobile = width <= 960;
 
         if (navigate) {
-            this.setState({ navigate: false });
             return <Redirect to={this.state.path} push={true} />;
         }
 
@@ -91,8 +96,7 @@ class App extends Component {
                             {this.props.children}
                         </main>
 
-                        {/* Bottom Navigation on mobile */}
-                        {isMobile ? <BottomNav /> : null}
+                        {/* Bottom Navigation on mobile */ isMobile ? <BottomNav /> : null}
                     </section>
                 </MainContext.Provider>
             </div>

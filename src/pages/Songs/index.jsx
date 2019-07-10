@@ -8,15 +8,15 @@ const SongList = React.lazy(() => import("../../components/SongList"));
 const styles = theme => ({
     root: {
         ...theme.mixins.gutters(),
-        alignItems: "center",
         color: "#111",
         display: "flex",
         flex: "1",
         flexDirection: "column",
-        justifyContent: "center",
+        justifyContent: "flex-start",
         paddingTop: theme.spacing(2),
         paddingBottom: theme.spacing(2),
-        overflowY: "auto"
+        overflowY: "auto",
+        minHeight: "90vh"
     },
     header: {
         color: "#111",
