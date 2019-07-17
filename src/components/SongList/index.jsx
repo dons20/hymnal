@@ -4,26 +4,27 @@ import { get, set } from "idb-keyval";
 import { MainContext } from "../../App";
 import { withStyles } from "@material-ui/core";
 import List from "@material-ui/core/List";
-import Blue from "@material-ui/core/colors/blue";
-import Green from "@material-ui/core/colors/green";
 
 /** @param {import('@material-ui/core').Theme} theme */
 const styles = theme => ({
     container: {
         //height: "55vh",
+        //backgroundColor: "#fff",
         display: "grid",
-        gridAutoRows: "100px",
-        maxWidth: "1200px",
+        gridAutoRows: 100,
+        gridRowGap: 1,
+        maxWidth: 1200,
         margin: "0 auto"
     },
     grid: {
         display: "grid",
-        gridAutoRows: "80px",
+        gridAutoRows: 80,
         gridTemplateColumns: "repeat(2, minmax(60px, 1fr))",
-        gridGap: "10px",
+        gridGap: 10,
         width: "100%"
     },
     listItem: {
+        boxShadow: "0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)",
         cursor: "pointer",
         display: "grid",
         gridTemplateColumns: "25% 1fr",
@@ -32,7 +33,7 @@ const styles = theme => ({
         userSelect: "none",
         willChange: "background",
         "&:after": {
-            content: "",
+            content: '"',
             position: "absolute",
             bottom: 0,
             left: 0,
@@ -42,7 +43,7 @@ const styles = theme => ({
         }
     },
     listItemEven: {
-        background: Blue[50]
+        background: theme.palette.primary[100]
     },
     listItemOdd: {
         background: "white"
@@ -53,7 +54,7 @@ const styles = theme => ({
         padding: "0 20px"
     },
     listSwitcher: {
-        backgroundColor: Green[300],
+        backgroundColor: theme.palette.secondary[300],
         border: 0,
         boxShadow: "0 3px 6px rgba(0,0,0,0.12), 0 3px 6px rgba(0,0,0,0.24)",
         fontSize: "1.3rem",
@@ -114,6 +115,7 @@ class SongList extends Component {
         super(props);
         this.state = {
             listSortByLetters: true,
+            listSortAlphabetical: false,
             letterRow: Array(<div key={1} />),
             numbers: Array(Number),
             songBody: Array(<div key={1} />)
@@ -123,6 +125,7 @@ class SongList extends Component {
         this.createMenu = this.createMenu.bind(this);
         this.filterSongs = this.filterSongs.bind(this);
         this.changeActiveNav = this.changeActiveNav.bind(this);
+        this.swapListFilter = this.swapListFilter.bind(this);
     }
 
     /** Checks if songs have already been stored */
@@ -130,16 +133,10 @@ class SongList extends Component {
         console.log(`%cChecking if songs exist already`, "color: #b70018; font-size: medium;");
         let songStorage = await get("songs");
         if (songStorage !== undefined) {
-            console.log(
-                `%cSongs found! Attempting to load...`,
-                "color: #b70018; font-size: medium;"
-            );
+            console.log(`%cSongs found! Attempting to load...`, "color: #b70018; font-size: medium;");
             return true;
         }
-        console.log(
-            `%cNo database entry found, will parse json...`,
-            "color: #b70018; font-size: medium;"
-        );
+        console.log(`%cNo database entry found, will parse json...`, "color: #b70018; font-size: medium;");
         return false;
     }
 
@@ -227,9 +224,7 @@ class SongList extends Component {
             filteredSongs = this.context.songList.filter(song => song.number === value);
         } else if (type === "numRange") {
             filteredSongs = this.context.songList.filter(
-                song =>
-                    Number.parseInt(song.number) >= value[0] &&
-                    Number.parseInt(song.number) <= value[1]
+                song => Number.parseInt(song.number) >= value[0] && Number.parseInt(song.number) <= value[1]
             );
         } else if (type === "letter") {
             filteredSongs = this.context.songList.filter(song => song.title.charAt(0) === value);
@@ -242,13 +237,25 @@ class SongList extends Component {
         });
     }
 
-    /** Displays a song at specified index */
-    displaySong(index) {
-        this.context.setProp({
-            title: this.context.filteredList[index].title,
-            songDisplay: "fView",
-            activeIndex: index
-        });
+    /**
+     * Displays a song at specified index
+     * @param {Number} index
+     * @param {Boolean} filtered
+     */
+    displaySong(index, filtered) {
+        if (filtered) {
+            this.context.setProp({
+                title: this.context.filteredList[index].title,
+                songDisplay: "fView",
+                activeIndex: index
+            });
+        } else {
+            this.context.setProp({
+                title: this.context.songList[index].title,
+                songDisplay: "dView",
+                activeIndex: index
+            });
+        }
     }
 
     /** Swaps between letter sort and number sort */
@@ -258,36 +265,73 @@ class SongList extends Component {
         });
     }
 
+    /** Swaps between numerical and alphabetical sort */
+    swapListFilter(isAlphabetical) {
+        const { filteredList, setProp } = this.context;
+        if (isAlphabetical) {
+            setProp({
+                filteredList: [...filteredList].sort((a, b) => {
+                    return (a.title > b.title) - (a.title < b.title);
+                })
+            });
+        } else {
+            setProp({
+                filteredList: [...filteredList].sort((a, b) => {
+                    return parseInt(a.number) - parseInt(b.number);
+                })
+            });
+        }
+        this.setState({ listSortAlphabetical: isAlphabetical });
+    }
+
     /** Triggers loading of songs from database on component mount */
     componentDidMount() {
-        if (this.context.songList.length > 1) {
-            this.context.setProp({ listLoaded: true });
-        } else {
-            console.log(
-                "%cLoading Songs from database",
-                "color: #d8001c; font-size: large; font-weight: bold"
-            );
-            this.checkDB().then(async res => {
-                if (res) {
-                    let songStorage = await get("songs");
-                    let { setProp } = this.context;
-                    setProp({ songList: this.cleanupStrings(songStorage), listLoaded: true });
-                } else {
-                    this.loadSongsFromJSON();
-                }
-            });
+        if (this.context.songList.length <= 1) {
+            console.log("%cLoading Songs from database", "color: #d8001c; font-size: large; font-weight: bold");
+            this.checkDB()
+                .then(async res => {
+                    if (res) {
+                        let songStorage = await get("songs");
+                        let { setProp } = this.context;
+                        setProp({ songList: this.cleanupStrings(songStorage), listLoaded: true });
+                    } else {
+                        this.loadSongsFromJSON();
+                    }
+                })
+                .finally(() => {
+                    if (this.props.id && this.props.id > 0 && this.props.id < this.context.songList.length)
+                        this.displaySong(this.props.id - 1, false);
+                });
         }
     }
 
     /** Handles changes to the active display when component updates */
     componentDidUpdate() {
-        const { activeIndex, filteredList, songDisplay, listLoaded } = this.context;
+        const { activeIndex, filteredList, songList, songDisplay, listLoaded } = this.context;
+
+        /** Handles filtered song navigation */
         if (songDisplay === "fView" && this.state.songBody.length <= 1) {
             const newBody = filteredList[activeIndex].verse.map((verse, index) => {
                 if (index === 1) {
                     return (
                         <Fragment key={index}>
                             <div>{filteredList[activeIndex].chorus}</div>
+                            <div>{verse}</div>
+                        </Fragment>
+                    );
+                }
+                return <div key={index}>{verse}</div>;
+            });
+            this.setState({ songBody: newBody });
+        }
+
+        /** Handles unfiltered song navigation */
+        if (songDisplay === "dView" && this.state.songBody.length <= 1) {
+            const newBody = songList[activeIndex].verse.map((verse, index) => {
+                if (index === 1) {
+                    return (
+                        <Fragment key={index}>
+                            <div>{songList[activeIndex].chorus}</div>
                             <div>{verse}</div>
                         </Fragment>
                     );
@@ -339,8 +383,8 @@ class SongList extends Component {
     }
 
     render() {
-        const { letterRow, numbers, songBody, listSortByLetters } = this.state;
-        const { activeIndex, filteredList, songDisplay, listLoaded } = this.context;
+        const { letterRow, numbers, songBody, listSortByLetters, listSortAlphabetical } = this.state;
+        const { activeIndex, filteredList, songDisplay, listLoaded, songList } = this.context;
         const { classes } = this.props;
 
         return (
@@ -348,11 +392,7 @@ class SongList extends Component {
                 {!listLoaded && <div>Replace me with loading icon</div>}
                 {songDisplay === "" && listLoaded && (
                     <>
-                        <button
-                            type="button"
-                            onClick={this.changeActiveNav}
-                            className={classes.listSwitcher}
-                        >
+                        <button type="button" onClick={this.changeActiveNav} className={classes.listSwitcher}>
                             {listSortByLetters ? "Filter by Numbers" : "Filter by Letters"}
                         </button>
                         <List component="div" className={`${classes.container} ${classes.grid}`}>
@@ -362,10 +402,19 @@ class SongList extends Component {
                 )}
                 {songDisplay === "list" && (
                     <List component="div" className={classes.container}>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                this.swapListFilter(!listSortAlphabetical);
+                            }}
+                            className={classes.listSwitcher}
+                        >
+                            {listSortAlphabetical ? "Sort Alphabetically" : "Sort Numerically"}
+                        </button>
                         {filteredList.map((song, index) => (
                             <div
                                 key={song.number}
-                                onClick={() => this.displaySong(index)}
+                                onClick={() => this.displaySong(index, true)}
                                 className={`${classes.listItem} ${
                                     index % 2 ? classes.listItemOdd : classes.listItemEven
                                 }`}
@@ -384,13 +433,22 @@ class SongList extends Component {
                         </div>
                         <div className={classes.songBody}>{songBody}</div>
                         {filteredList[activeIndex].author && (
-                            <div className={classes.songFooter}>
-                                {filteredList[activeIndex].author}
-                            </div>
+                            <div className={classes.songFooter}>{filteredList[activeIndex].author}</div>
                         )}
                     </div>
                 )}
-                {songDisplay === "dView" && <div>{filteredList[activeIndex].title}</div>}
+                {songDisplay === "dView" && (
+                    <div className={classes.songContainer}>
+                        <div className={classes.songHeader}>
+                            <div>{songList[activeIndex].number}</div>
+                            <div>{songList[activeIndex].title}</div>
+                        </div>
+                        <div className={classes.songBody}>{songBody}</div>
+                        {songList[activeIndex].author && (
+                            <div className={classes.songFooter}>{songList[activeIndex].author}</div>
+                        )}
+                    </div>
+                )}
             </Fragment>
         );
     }

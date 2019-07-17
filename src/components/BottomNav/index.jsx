@@ -4,44 +4,61 @@ import theme from "../../theme.js";
 import { makeStyles } from "@material-ui/core/styles";
 import BottomNavigation from "@material-ui/core/BottomNavigation";
 import BottomNavigationAction from "@material-ui/core/BottomNavigationAction";
-import FolderIcon from "@material-ui/icons/Folder";
-import RestoreIcon from "@material-ui/icons/Restore";
-import FavoriteIcon from "@material-ui/icons/Favorite";
-import LocationOnIcon from "@material-ui/icons/LocationOn";
+import HomeIcon from "@material-ui/icons/Home";
+import IndexIcon from "@material-ui/icons/LibraryBooksOutlined";
+import FavoritesIcon from "@material-ui/icons/Favorite";
+import SettingsIcon from "@material-ui/icons/Settings";
 
 const useStyles = makeStyles({
+    "@keyframes slideDown": {
+        from: {
+            transform: "translateY(0%)"
+        },
+        to: {
+            transform: "translateY(100%)"
+        }
+    },
     root: {
         display: "none",
         [theme.breakpoints.down("sm")]: {
             bottom: 0,
             display: "flex",
             position: "sticky",
-            transition: "transform 0.3s ease-out",
             willChange: "transform",
             width: "100%"
         }
     },
-    hide: {
-        transform: "translateY(100%)"
+    showing: {
+        animation: "$slideDown 0.3s ease-out reverse"
+    },
+    hiding: {
+        animation: "$slideDown 0.3s ease-out"
+    },
+    hidden: {
+        transform: "translateY(0)",
+        position: "relative"
     }
 });
 
 function LabelBottomNavigation(props) {
     const scrollPos = useRef(0);
-    const { shouldForceShow } = props;
     const classes = useStyles(props);
     const context = useContext(MainContext);
     const [value, setValue] = useState("");
-    const [shouldHide, setShouldHide] = useState(false);
-
-    const handleChange = value => {
-        setValue(value);
-    };
+    const [hidden, setHidden] = useState(false);
+    const [showing, setShowing] = useState(false);
+    const [hiding, setHiding] = useState(false);
 
     useEffect(() => {
         const handleScroll = () => {
-            if (document.body.getBoundingClientRect().top > scrollPos.current) setShouldHide(false);
-            else setShouldHide(true);
+            //Handle navbar transitioning between showing/hiding/hidden states when scrolling
+            if (document.body.getBoundingClientRect().top > scrollPos.current) {
+                setHiding(false);
+                setHidden(false);
+                if (hidden) setShowing(true);
+            } else {
+                if (!hidden) setHiding(true);
+            }
 
             // saves the new position for iteration.
             scrollPos.current = document.body.getBoundingClientRect().top;
@@ -49,45 +66,59 @@ function LabelBottomNavigation(props) {
 
         window.addEventListener("scroll", handleScroll);
         return () => window.removeEventListener("scroll", handleScroll);
-    }, []);
+    }, [hidden]);
 
     useEffect(() => {
+        //Syncs currently selected tab with active url path
         if (context.path.startsWith(value)) {
             setValue(context.path);
         }
+    }, [value, context]);
 
-        if (shouldForceShow) setShouldHide(false);
-    }, [shouldForceShow, value, context]);
+    function handleChange(_event, newValue) {
+        setValue(newValue);
+    }
+
+    function handleTabClicks(toPage) {
+        if (toPage !== value) context.changePath(toPage);
+    }
 
     return (
         <BottomNavigation
             value={value}
             onChange={handleChange}
-            className={`${classes.root}${shouldHide ? " " + classes.hide : ""}`}
+            className={`${classes.root}${hiding ? " " + classes.hiding : ""}${hidden ? " " + classes.hidden : ""}${
+                showing ? " " + classes.showing : ""
+            }`}
+            onAnimationEnd={() => {
+                if (hiding) setHidden(true);
+                setHiding(false);
+                if (showing) setShowing(false);
+            }}
         >
             <BottomNavigationAction
                 label="Home"
                 value={context.pages.HOME}
-                icon={<RestoreIcon />}
-                onClick={() => context.changePath(context.pages.HOME)}
+                icon={<HomeIcon />}
+                onClick={() => handleTabClicks(context.pages.HOME)}
             />
             <BottomNavigationAction
                 label="Index"
                 value={context.pages.INDEX}
-                icon={<FavoriteIcon />}
-                onClick={() => context.changePath(context.pages.INDEX)}
+                icon={<IndexIcon />}
+                onClick={() => handleTabClicks(context.pages.INDEX)}
             />
             <BottomNavigationAction
                 label="Favourites"
                 value={context.pages.FAVOURITES}
-                icon={<LocationOnIcon />}
-                onClick={() => context.changePath(context.pages.FAVOURITES)}
+                icon={<FavoritesIcon />}
+                onClick={() => handleTabClicks(context.pages.FAVOURITES)}
             />
             <BottomNavigationAction
                 label="Settings"
                 value={context.pages.HISTORY}
-                icon={<FolderIcon />}
-                onClick={() => context.changePath(context.pages.HISTORY)}
+                icon={<SettingsIcon />}
+                onClick={() => handleTabClicks(context.pages.HISTORY)}
             />
         </BottomNavigation>
     );

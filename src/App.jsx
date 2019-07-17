@@ -49,7 +49,8 @@ class App extends Component {
     changePath(path) {
         this.setState({
             navigate: !this.navigate,
-            path: path
+            path: path,
+            songDisplay: ""
         });
     }
 
@@ -88,10 +89,7 @@ class App extends Component {
 
                         <main className={styles.app_inner}>
                             <Suspense fallback={<div>Loading...</div>}>
-                                <PictureHeader
-                                    title={this.state.title}
-                                    subtitle={this.state.subtitle}
-                                />
+                                <PictureHeader title={this.state.title} subtitle={this.state.subtitle} />
                             </Suspense>
                             {this.props.children}
                         </main>
