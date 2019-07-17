@@ -8,7 +8,12 @@ const Routes = () => (
     <App>
         <Switch>
             <Route exact path="/" render={() => <Home />} />
-            <Route path="/songs" render={() => <Songs />} />
+            <Route
+                path={["/songs", "/songs/:id"]}
+                //render={({ match }) => <Songs x={match} />}
+                component={Songs}
+                exact
+            />
             <Route render={() => <Redirect to="/" />} />
         </Switch>
     </App>

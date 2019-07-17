@@ -1,17 +1,18 @@
-import React, { Component, Fragment, memo } from "react";
+import React, { Component, Fragment } from "react";
 import PropTypes from "prop-types";
 import { get, set } from "idb-keyval";
 import { MainContext } from "../../App";
 import { withStyles } from "@material-ui/core";
-import { FixedSizeList } from "react-window";
 import List from "@material-ui/core/List";
-import blue from "@material-ui/core/colors/blue";
-import AutoSizer from "react-virtualized-auto-sizer";
+import Blue from "@material-ui/core/colors/blue";
+import Green from "@material-ui/core/colors/green";
 
 /** @param {import('@material-ui/core').Theme} theme */
 const styles = theme => ({
     container: {
         //height: "55vh",
+        display: "grid",
+        gridAutoRows: "100px",
         maxWidth: "1200px",
         margin: "0 auto"
     },
@@ -30,12 +31,18 @@ const styles = theme => ({
         transition: "background 0.1s ease-in-out",
         userSelect: "none",
         willChange: "background",
-        "&:hover": {
-            background: "rgba(0,0,0,0.1)"
+        "&:after": {
+            content: "",
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            width: "100%",
+            height: 10,
+            backgroundColor: "#f4f4f4"
         }
     },
     listItemEven: {
-        background: blue[50]
+        background: Blue[50]
     },
     listItemOdd: {
         background: "white"
@@ -46,10 +53,9 @@ const styles = theme => ({
         padding: "0 20px"
     },
     listSwitcher: {
-        backgroundColor: "rgba(255,255,255,1)",
+        backgroundColor: Green[300],
         border: 0,
-        borderRadius: "5px",
-        boxShadow: "0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)",
+        boxShadow: "0 3px 6px rgba(0,0,0,0.12), 0 3px 6px rgba(0,0,0,0.24)",
         fontSize: "1.3rem",
         padding: theme.spacing(2),
         width: "100%"
@@ -68,6 +74,10 @@ const styles = theme => ({
             background: "rgba(0,0,0,0.05)",
             boxShadow: "0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23)"
         }
+    },
+    songContainer: {
+        backgroundColor: "rgba(255,255,255,1)",
+        padding: 15
     },
     songBody: {
         display: "grid",
@@ -90,27 +100,13 @@ const styles = theme => ({
         grid: {
             gridTemplateRows: "repeat(auto-fit, 1fr)",
             gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))"
+        },
+        listItem: {
+            "&:hover": {
+                background: "rgba(0,0,0,0.1)"
+            }
         }
     }
-});
-
-const Row = memo(({ data, index, style }) => {
-    const { filteredList, display, classes } = data;
-    const song = filteredList[index];
-
-    return (
-        <div
-            key={song.number}
-            onClick={() => display(index)}
-            className={`${classes.listItem} ${
-                index % 2 ? classes.listItemOdd : classes.listItemEven
-            }`}
-            style={style}
-        >
-            <div className={classes.listTitle}>#{song.number}</div>
-            <div className={classes.listTitle}>{song.title}</div>
-        </div>
-    );
 });
 
 class SongList extends Component {
@@ -235,7 +231,6 @@ class SongList extends Component {
                     Number.parseInt(song.number) >= value[0] &&
                     Number.parseInt(song.number) <= value[1]
             );
-            console.log(this.context.songList);
         } else if (type === "letter") {
             filteredSongs = this.context.songList.filter(song => song.title.charAt(0) === value);
         } else {
@@ -265,19 +260,23 @@ class SongList extends Component {
 
     /** Triggers loading of songs from database on component mount */
     componentDidMount() {
-        console.log(
-            "%cLoading Songs from database",
-            "color: #d8001c; font-size: large; font-weight: bold"
-        );
-        this.checkDB().then(async res => {
-            if (res) {
-                let songStorage = await get("songs");
-                let { setProp } = this.context;
-                setProp({ songList: this.cleanupStrings(songStorage), listLoaded: true });
-            } else {
-                this.loadSongsFromJSON();
-            }
-        });
+        if (this.context.songList.length > 1) {
+            this.context.setProp({ listLoaded: true });
+        } else {
+            console.log(
+                "%cLoading Songs from database",
+                "color: #d8001c; font-size: large; font-weight: bold"
+            );
+            this.checkDB().then(async res => {
+                if (res) {
+                    let songStorage = await get("songs");
+                    let { setProp } = this.context;
+                    setProp({ songList: this.cleanupStrings(songStorage), listLoaded: true });
+                } else {
+                    this.loadSongsFromJSON();
+                }
+            });
+        }
     }
 
     /** Handles changes to the active display when component updates */
@@ -343,7 +342,6 @@ class SongList extends Component {
         const { letterRow, numbers, songBody, listSortByLetters } = this.state;
         const { activeIndex, filteredList, songDisplay, listLoaded } = this.context;
         const { classes } = this.props;
-        const itemData = { filteredList, display: this.displaySong, classes };
 
         return (
             <Fragment>
@@ -355,7 +353,7 @@ class SongList extends Component {
                             onClick={this.changeActiveNav}
                             className={classes.listSwitcher}
                         >
-                            {listSortByLetters ? "Switch to Numbers" : "Switch to Letters"}
+                            {listSortByLetters ? "Filter by Numbers" : "Filter by Letters"}
                         </button>
                         <List component="div" className={`${classes.container} ${classes.grid}`}>
                             {listSortByLetters ? letterRow : numbers}
@@ -363,23 +361,23 @@ class SongList extends Component {
                     </>
                 )}
                 {songDisplay === "list" && (
-                    <AutoSizer>
-                        {({ height, width }) => (
-                            <FixedSizeList
-                                height={height}
-                                itemCount={filteredList.length}
-                                itemData={itemData}
-                                itemSize={60}
-                                width={width}
-                                className={classes.container}
+                    <List component="div" className={classes.container}>
+                        {filteredList.map((song, index) => (
+                            <div
+                                key={song.number}
+                                onClick={() => this.displaySong(index)}
+                                className={`${classes.listItem} ${
+                                    index % 2 ? classes.listItemOdd : classes.listItemEven
+                                }`}
                             >
-                                {Row}
-                            </FixedSizeList>
-                        )}
-                    </AutoSizer>
+                                <div className={classes.listTitle}>#{song.number}</div>
+                                <div className={classes.listTitle}>{song.title}</div>
+                            </div>
+                        ))}
+                    </List>
                 )}
                 {songDisplay === "fView" && (
-                    <Fragment>
+                    <div className={classes.songContainer}>
                         <div className={classes.songHeader}>
                             <div>{filteredList[activeIndex].number}</div>
                             <div>{filteredList[activeIndex].title}</div>
@@ -390,7 +388,7 @@ class SongList extends Component {
                                 {filteredList[activeIndex].author}
                             </div>
                         )}
-                    </Fragment>
+                    </div>
                 )}
                 {songDisplay === "dView" && <div>{filteredList[activeIndex].title}</div>}
             </Fragment>

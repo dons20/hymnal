@@ -1,22 +1,17 @@
-import React, { Fragment, Suspense } from "react";
-import PropTypes from "prop-types";
+import React, { Fragment, Suspense, useEffect, useContext, useRef } from "react";
 import { MainContext } from "../../App";
-import { withStyles } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core";
 
 const SongList = React.lazy(() => import("../../components/SongList"));
 
-const styles = theme => ({
+const useStyles = makeStyles({
     root: {
-        ...theme.mixins.gutters(),
         color: "#111",
         display: "flex",
         flex: "1",
         flexDirection: "column",
         justifyContent: "flex-start",
-        paddingTop: theme.spacing(2),
-        paddingBottom: theme.spacing(2),
-        overflowY: "auto",
-        minHeight: "90vh"
+        overflowY: "auto"
     },
     header: {
         color: "#111",
@@ -24,31 +19,28 @@ const styles = theme => ({
     }
 });
 
-class Listing extends React.Component {
-    componentDidMount() {
-        let ctx = this.context;
-        ctx.setProp({
-            title: "List of Songs",
-            subtitle: ""
-        });
-    }
+function Listing(props) {
+    const { url } = props.match;
+    const { id } = props.match.params;
+    const classes = useStyles(props);
+    const context = useContext(MainContext);
+    const contextRef = useRef(context);
 
-    render() {
-        const { classes } = this.props;
-        return (
-            <div className={classes.root}>
-                <Suspense fallback={<Fragment>Loading Songs...</Fragment>}>
-                    <SongList />
-                </Suspense>
-            </div>
-        );
-    }
+    useEffect(() => {
+        contextRef.current.setProp({
+            title: "List of Songs",
+            subtitle: "",
+            path: url
+        });
+    }, [url]);
+
+    return (
+        <div className={classes.root}>
+            <Suspense fallback={<Fragment>Loading Songs...</Fragment>}>
+                <SongList id={id} />
+            </Suspense>
+        </div>
+    );
 }
 
-Listing.propTypes = {
-    classes: PropTypes.object.isRequired
-};
-
-Listing.contextType = MainContext;
-
-export default withStyles(styles)(Listing);
+export default Listing;
