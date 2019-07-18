@@ -412,7 +412,7 @@ class SongList extends Component {
                             }}
                             className={classes.listSwitcher}
                         >
-                            {listSortAlphabetical ? "Sort Alphabetically" : "Sort Numerically"}
+                            {listSortAlphabetical ? "Sort Numerically" : "Sort Alphabetically"}
                         </button>
                         <List component="div" className={classes.container}>
                             {filteredList.map((song, index) => (
