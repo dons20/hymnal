@@ -11,10 +11,11 @@ const styles = theme => ({
         //height: "55vh",
         //backgroundColor: "#fff",
         display: "grid",
-        gridAutoRows: 100,
-        gridRowGap: 1,
+        gridAutoRows: 80,
         maxWidth: 1200,
-        margin: "0 auto"
+        margin: "0 auto",
+        paddingTop: 0,
+        paddingBottom: 0
     },
     grid: {
         display: "grid",
@@ -43,7 +44,7 @@ const styles = theme => ({
         }
     },
     listItemEven: {
-        background: theme.palette.primary[100]
+        background: "white"
     },
     listItemOdd: {
         background: "white"
@@ -54,9 +55,10 @@ const styles = theme => ({
         padding: "0 20px"
     },
     listSwitcher: {
-        backgroundColor: theme.palette.secondary[300],
+        backgroundColor: theme.palette.primary.A400,
         border: 0,
-        boxShadow: "0 3px 6px rgba(0,0,0,0.12), 0 3px 6px rgba(0,0,0,0.24)",
+        boxShadow: "0 3px 6px rgba(41, 121, 240, 0.12), 0 3px 6px rgba(41, 121, 240, 0.24)",
+        color: theme.palette.secondary.contrastText,
         fontSize: "1.3rem",
         padding: theme.spacing(2),
         width: "100%"
@@ -78,6 +80,7 @@ const styles = theme => ({
     },
     songContainer: {
         backgroundColor: "rgba(255,255,255,1)",
+        height: "100%",
         padding: 15
     },
     songBody: {
@@ -94,8 +97,8 @@ const styles = theme => ({
         alignContent: "center",
         display: "grid",
         fontWeight: "bold",
-        gridTemplateColumns: "1fr 3fr",
-        justifyItems: "left"
+        justifyItems: "center",
+        gridTemplateRows: "auto auto"
     },
     "@media (min-width: 425px)": {
         grid: {
@@ -401,7 +404,7 @@ class SongList extends Component {
                     </>
                 )}
                 {songDisplay === "list" && (
-                    <List component="div" className={classes.container}>
+                    <Fragment>
                         <button
                             type="button"
                             onClick={() => {
@@ -411,19 +414,21 @@ class SongList extends Component {
                         >
                             {listSortAlphabetical ? "Sort Alphabetically" : "Sort Numerically"}
                         </button>
-                        {filteredList.map((song, index) => (
-                            <div
-                                key={song.number}
-                                onClick={() => this.displaySong(index, true)}
-                                className={`${classes.listItem} ${
-                                    index % 2 ? classes.listItemOdd : classes.listItemEven
-                                }`}
-                            >
-                                <div className={classes.listTitle}>#{song.number}</div>
-                                <div className={classes.listTitle}>{song.title}</div>
-                            </div>
-                        ))}
-                    </List>
+                        <List component="div" className={classes.container}>
+                            {filteredList.map((song, index) => (
+                                <div
+                                    key={song.number}
+                                    onClick={() => this.displaySong(index, true)}
+                                    className={`${classes.listItem} ${
+                                        index % 2 ? classes.listItemOdd : classes.listItemEven
+                                    }`}
+                                >
+                                    <div className={classes.listTitle}>#{song.number}</div>
+                                    <div className={classes.listTitle}>{song.title}</div>
+                                </div>
+                            ))}
+                        </List>
+                    </Fragment>
                 )}
                 {songDisplay === "fView" && (
                     <div className={classes.songContainer}>
