@@ -3,19 +3,17 @@ import PropTypes from "prop-types";
 import { get, set } from "idb-keyval";
 import { MainContext } from "../../App";
 import { withStyles } from "@material-ui/core";
+import Loader from "react-loader-spinner";
 import List from "@material-ui/core/List";
 
 /** @param {import('@material-ui/core').Theme} theme */
 const styles = theme => ({
     container: {
-        //height: "55vh",
-        //backgroundColor: "#fff",
         display: "grid",
         gridAutoRows: 80,
         maxWidth: 1200,
         margin: "0 auto",
-        paddingTop: 0,
-        paddingBottom: 0
+        padding: "10px 0"
     },
     grid: {
         display: "grid",
@@ -62,6 +60,12 @@ const styles = theme => ({
         fontSize: "1.3rem",
         padding: theme.spacing(2),
         width: "100%"
+    },
+    loader: {
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100%"
     },
     menuOpt: {
         alignItems: "center",
@@ -158,10 +162,9 @@ class SongList extends Component {
             let url = process.env.PUBLIC_URL + "/songs.json";
             let response = await fetch(url);
             if (response.ok) {
-                console.log(`%cLoading from "${url}"`, "color: #b70018; font-size: medium;");
                 resolve(response.json());
             } else {
-                throw Object.assign(new Error(`File "${url}" not found on server!`));
+                throw Object.assign(new Error(`File not found on server!`));
             }
         }).catch(err => {
             console.error(err);
@@ -392,16 +395,22 @@ class SongList extends Component {
 
         return (
             <Fragment>
-                {!listLoaded && <div>Replace me with loading icon</div>}
+                {!listLoaded && (
+                    <div className={classes.loader}>
+                        <Loader type="Oval" color="blue" height="100" width="100" />
+                    </div>
+                )}
                 {songDisplay === "" && listLoaded && (
-                    <>
-                        <button type="button" onClick={this.changeActiveNav} className={classes.listSwitcher}>
-                            {listSortByLetters ? "Filter by Numbers" : "Filter by Letters"}
-                        </button>
+                    <Fragment>
+                        <div className={classes.utilityHeader}>
+                            <button type="button" onClick={this.changeActiveNav} className={classes.listSwitcher}>
+                                {listSortByLetters ? "Filter by Numbers" : "Filter by Letters"}
+                            </button>
+                        </div>
                         <List component="div" className={`${classes.container} ${classes.grid}`}>
                             {listSortByLetters ? letterRow : numbers}
                         </List>
-                    </>
+                    </Fragment>
                 )}
                 {songDisplay === "list" && (
                     <Fragment>

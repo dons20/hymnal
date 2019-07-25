@@ -32,7 +32,7 @@ const useStyles = makeStyles({
         animation: "$slideDown 0.3s ease-out reverse"
     },
     hiding: {
-        animation: "$slideDown 0.3s ease-out"
+        animation: "$slideDown 0.1s ease-out"
     },
     hidden: {
         transform: "translateY(0)",
@@ -70,10 +70,14 @@ function LabelBottomNavigation(props) {
 
     useEffect(() => {
         //Syncs currently selected tab with active url path
-        if (context.path.startsWith(value)) {
-            setValue(context.path);
+        let match = "";
+        for (let key in context.pages) {
+            if (context.path.startsWith(context.pages[key])) {
+                match = context.pages[key];
+            }
         }
-    }, [value, context]);
+        setValue(match);
+    }, [context]);
 
     function handleChange(_event, newValue) {
         setValue(newValue);

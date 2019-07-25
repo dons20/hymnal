@@ -87,16 +87,10 @@ class HomeScreen extends Component {
                                         title="Placeholder"
                                     />
                                     <CardContent>
-                                        <Typography
-                                            variant="h5"
-                                            component="h2"
-                                            className={classes.pos}
-                                        >
+                                        <Typography variant="h5" component="h2" className={classes.pos}>
                                             Songs
                                         </Typography>
-                                        <Typography component="p">
-                                            View a listing of all songs
-                                        </Typography>
+                                        <Typography component="p">View a listing of all songs</Typography>
                                     </CardContent>
                                     <CardActions>
                                         <Button
@@ -120,16 +114,10 @@ class HomeScreen extends Component {
                                         title="Placeholder"
                                     />
                                     <CardContent>
-                                        <Typography
-                                            variant="h5"
-                                            component="h2"
-                                            className={classes.pos}
-                                        >
+                                        <Typography variant="h5" component="h2" className={classes.pos}>
                                             Favourites
                                         </Typography>
-                                        <Typography component="p">
-                                            View your favourite songs here!
-                                        </Typography>
+                                        <Typography component="p">View your favourite songs here!</Typography>
                                     </CardContent>
                                     <CardActions>
                                         <Button
@@ -142,39 +130,6 @@ class HomeScreen extends Component {
                                             }}
                                         >
                                             View Favourites
-                                        </Button>
-                                    </CardActions>
-                                </Card>
-                                <Card className={classes.card}>
-                                    <CardMedia
-                                        component="img"
-                                        className={classes.media}
-                                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNUlLgyDwADHAGth3cp9QAAAABJRU5ErkJggg=="
-                                        title="Placeholder"
-                                    />
-                                    <CardContent>
-                                        <Typography
-                                            variant="h5"
-                                            component="h2"
-                                            className={classes.pos}
-                                        >
-                                            History
-                                        </Typography>
-                                        <Typography component="p">
-                                            Previously viewed songs
-                                        </Typography>
-                                    </CardContent>
-                                    <CardActions>
-                                        <Button
-                                            size="small"
-                                            variant="outlined"
-                                            color="secondary"
-                                            className={classes.action}
-                                            onClick={() => {
-                                                state.changePath(state.pages.HISTORY);
-                                            }}
-                                        >
-                                            View History
                                         </Button>
                                     </CardActions>
                                 </Card>
