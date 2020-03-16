@@ -1,105 +1,83 @@
-import React, { Component, Suspense } from "react";
-import CssBaseline from "@material-ui/core/CssBaseline";
+import React, { Suspense, useReducer, useEffect } from "react";
 import BottomNav from "./components/BottomNav";
-import Nav from "./components/TopNav";
 import styles from "./App.module.scss";
-import { Redirect } from "react-router-dom";
+import Header from "./pages/Header";
+import { useSongLoader } from "./components/CustomHooks";
 
 const PictureHeader = React.lazy(() => import("./components/PictureHeader"));
 
-const Song = {
-    number: Number,
-    title: String,
-    verse: Array(String),
-    chorus: String,
-    author: String
+const pages = {
+    HOME: "/",
+    INDEX: "/songs",
+    FAVOURITES: "/favourites",
+    HISTORY: "/history",
+    SETTINGS: "/settings"
 };
 
-export const SongType = Song;
+const initialAppState = {
+    title: "",
+    subtitle: "",
+    activeIndex: 0,
+    songDisplay: "",
+    listLoaded: false,
+    width: window.innerWidth,
+    filteredList: Array(<div key={1} />)
+};
 
-export const MainContext = React.createContext();
+/**
+ * @param {initialAppState} state
+ * @param {{ payload: Object }} action
+ */
+function reducer(state, action) {
+    switch (action.type) {
+        case "setTitle":
+            return { title: action.payload };
+        case "setSubtitle":
+            return { subtitle: action.payload };
+        case "setWidth":
+            return { width: action.payload };
+        default:
+            throw new Error(`Invalid Action Specified: ${action.payload}`);
+    }
+}
 
-class App extends Component {
-    state = {
-        width: window.innerWidth,
-        path: "/",
-        pages: {
-            HOME: "/",
-            INDEX: "/songs",
-            FAVOURITES: "/favourites",
-            HISTORY: "/history",
-            SETTINGS: "/settings"
-        },
-        title: "",
-        subtitle: "",
-        activeIndex: 0,
-        navigate: false,
-        songDisplay: "",
-        songList: Array(Song),
-        listLoaded: false,
-        filteredList: Array(<div key={1} />),
-        setProp: props => {
-            this.setState({ ...props });
-        },
-        changePath: path => {
-            this.changePath(path);
-        }
-    };
+export const MainContext = React.createContext(initialAppState);
 
-    changePath(path) {
-        this.setState({
-            navigate: !this.navigate,
-            path: path,
-            songDisplay: ""
-        });
+function App({ children }) {
+    const [state, dispatch] = useReducer(reducer, initialAppState);
+    const songs = useSongLoader();
+
+    function handleWindowSizeChange() {
+        dispatch({ type: "setWidth", width: window.innerWidth });
     }
 
-    componentWillMount() {
-        window.addEventListener("resize", this.handleWindowSizeChange);
-    }
+    useEffect(() => {
+        window.addEventListener("resize", handleWindowSizeChange);
+        return function cleanup() {
+            window.removeEventListener("resize", handleWindowSizeChange);
+        };
+    });
 
-    componentWillUnmount() {
-        window.removeEventListener("resize", this.handleWindowSizeChange);
-    }
+    const { width } = state;
+    const isMobile = width <= 960;
 
-    componentDidUpdate() {
-        if (this.state.navigate === true) {
-            this.setState({ navigate: false });
-        }
-    }
+    return (
+        <div className={styles.root}>
+            <MainContext.Provider value={{ ...state, dispatch, songs, pages }}>
+                <section className={styles.app_body}>
+                    <Header />
+                    <main className={styles.app_inner}>
+                        <Suspense fallback={<div>Loading...</div>}>
+                            <PictureHeader title={state.title} subtitle={state.subtitle} />
+                        </Suspense>
+                        {children}
+                    </main>
 
-    handleWindowSizeChange = () => {
-        this.setState({ width: window.innerWidth });
-    };
-
-    render() {
-        const { width, navigate } = this.state;
-        const isMobile = width <= 960;
-
-        if (navigate) {
-            return <Redirect to={this.state.path} push={true} />;
-        }
-
-        return (
-            <div className={styles.app}>
-                <CssBaseline />
-                <MainContext.Provider value={this.state}>
-                    <section className={styles.app_body}>
-                        <Nav />
-
-                        <main className={styles.app_inner}>
-                            <Suspense fallback={<div>Loading...</div>}>
-                                <PictureHeader title={this.state.title} subtitle={this.state.subtitle} />
-                            </Suspense>
-                            {this.props.children}
-                        </main>
-
-                        {/* Bottom Navigation on mobile */ isMobile ? <BottomNav /> : null}
-                    </section>
-                </MainContext.Provider>
-            </div>
-        );
-    }
+                    {/* Bottom Navigation on mobile */ isMobile ? <BottomNav /> : null}
+                </section>
+            </MainContext.Provider>
+        </div>
+    );
 }
 
 export default App;

@@ -1,0 +1,13 @@
+.listing {
+    color: #111;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: flex-start;
+    overflow-y: auto;
+
+    & .header {
+        color: "#111";
+        font-size: 24;
+    }
+}

@@ -1,63 +1,27 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
+import { useLocation, useHistory } from "react-router-dom";
 import { MainContext } from "../../App";
-import theme from "../../theme.js";
-import { makeStyles } from "@material-ui/core/styles";
-import BottomNavigation from "@material-ui/core/BottomNavigation";
-import BottomNavigationAction from "@material-ui/core/BottomNavigationAction";
-import HomeIcon from "@material-ui/icons/Home";
-import IndexIcon from "@material-ui/icons/LibraryBooksOutlined";
-import FavoritesIcon from "@material-ui/icons/Favorite";
-import SettingsIcon from "@material-ui/icons/Settings";
+import { Affix } from "antd";
+import { TabBar } from "antd-mobile";
+import { BookOutlined, HomeOutlined, StarOutlined, SettingOutlined } from "@ant-design/icons";
+import "./BottomNav.scss";
 
-const useStyles = makeStyles({
-    "@keyframes slideDown": {
-        from: {
-            transform: "translateY(0%)"
-        },
-        to: {
-            transform: "translateY(100%)"
-        }
-    },
-    root: {
-        display: "none",
-        [theme.breakpoints.down("sm")]: {
-            bottom: 0,
-            display: "flex",
-            position: "sticky",
-            willChange: "transform",
-            width: "100%"
-        }
-    },
-    showing: {
-        animation: "$slideDown 0.3s ease-out reverse"
-    },
-    hiding: {
-        animation: "$slideDown 0.1s ease-out"
-    },
-    hidden: {
-        transform: "translateY(0)",
-        position: "relative"
-    }
-});
-
-function LabelBottomNavigation(props) {
-    const scrollPos = useRef(0);
-    const classes = useStyles(props);
+function BottomNav() {
     const context = useContext(MainContext);
-    const [value, setValue] = useState("");
+    const { pathname } = useLocation();
+    const history = useHistory();
+    const scrollPos = useRef(0);
+    const [selectedTab, setSelectedTab] = useState(pathname);
     const [hidden, setHidden] = useState(false);
-    const [showing, setShowing] = useState(false);
-    const [hiding, setHiding] = useState(false);
 
     useEffect(() => {
         const handleScroll = () => {
+            const top = document.body.getBoundingClientRect().top || window.pageXOffset;
             //Handle navbar transitioning between showing/hiding/hidden states when scrolling
-            if (document.body.getBoundingClientRect().top > scrollPos.current) {
-                setHiding(false);
-                setHidden(false);
-                if (hidden) setShowing(true);
+            if (top - scrollPos.current < 100 && top > scrollPos.current) {
+                setHidden(true);
             } else {
-                if (!hidden) setHiding(true);
+                setHidden(false);
             }
 
             // saves the new position for iteration.
@@ -66,66 +30,65 @@ function LabelBottomNavigation(props) {
 
         window.addEventListener("scroll", handleScroll);
         return () => window.removeEventListener("scroll", handleScroll);
-    }, [hidden]);
+    }, []);
 
     useEffect(() => {
-        //Syncs currently selected tab with active url path
-        let match = "";
-        for (let key in context.pages) {
-            if (context.path.startsWith(context.pages[key])) {
-                match = context.pages[key];
-            }
-        }
-        setValue(match);
-    }, [context]);
+        setSelectedTab(pathname);
+    }, [pathname]);
 
-    function handleChange(_event, newValue) {
-        setValue(newValue);
-    }
-
-    function handleTabClicks(toPage) {
-        if (toPage !== value) context.changePath(toPage);
+    function handleTabBarPress(page) {
+        history.push(page);
     }
 
     return (
-        <BottomNavigation
-            value={value}
-            onChange={handleChange}
-            className={`${classes.root}${hiding ? " " + classes.hiding : ""}${hidden ? " " + classes.hidden : ""}${
-                showing ? " " + classes.showing : ""
-            }`}
-            onAnimationEnd={() => {
-                if (hiding) setHidden(true);
-                setHiding(false);
-                if (showing) setShowing(false);
-            }}
-        >
-            <BottomNavigationAction
-                label="Home"
-                value={context.pages.HOME}
-                icon={<HomeIcon />}
-                onClick={() => handleTabClicks(context.pages.HOME)}
-            />
-            <BottomNavigationAction
-                label="Index"
-                value={context.pages.INDEX}
-                icon={<IndexIcon />}
-                onClick={() => handleTabClicks(context.pages.INDEX)}
-            />
-            <BottomNavigationAction
-                label="Favourites"
-                value={context.pages.FAVOURITES}
-                icon={<FavoritesIcon />}
-                onClick={() => handleTabClicks(context.pages.FAVOURITES)}
-            />
-            <BottomNavigationAction
-                label="Settings"
-                value={context.pages.HISTORY}
-                icon={<SettingsIcon />}
-                onClick={() => handleTabClicks(context.pages.HISTORY)}
-            />
-        </BottomNavigation>
+        <Affix offsetBottom={0}>
+            <TabBar
+                barTintColor="white"
+                unselectedTintColor="#949494"
+                tintColor="#33A3F4"
+                className="tab-bar"
+                hidden={hidden}
+            >
+                <TabBar.Item
+                    title="Home"
+                    key="Home"
+                    selected={selectedTab === "/home"}
+                    icon={<HomeOutlined />}
+                    selectedIcon={<HomeOutlined />}
+                    value={context.pages.HOME}
+                    onPress={() => handleTabBarPress("/home")}
+                    data-seed="logId"
+                />
+                <TabBar.Item
+                    title="Songs"
+                    key="Songs"
+                    selected={selectedTab === "/songs"}
+                    icon={<BookOutlined />}
+                    selectedIcon={<BookOutlined />}
+                    value={context.pages.INDEX}
+                    onPress={() => handleTabBarPress("/songs")}
+                />
+                <TabBar.Item
+                    title="Favourites"
+                    key="Favourites"
+                    selected={selectedTab === "/favourites"}
+                    icon={<StarOutlined />}
+                    selectedIcon={<StarOutlined />}
+                    value={context.pages.FAVOURITES}
+                    onPress={() => handleTabBarPress("/favourites")}
+                />
+                <TabBar.Item
+                    title="Settings"
+                    key="Settings"
+                    selected={selectedTab === "/settings"}
+                    icon={<SettingOutlined />}
+                    selectedIcon={<SettingOutlined />}
+                    value={context.pages.HISTORY}
+                    onPress={() => handleTabBarPress("/settings")}
+                />
+            </TabBar>
+        </Affix>
     );
 }
 
-export default LabelBottomNavigation;
+export default BottomNav;

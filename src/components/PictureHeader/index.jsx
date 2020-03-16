@@ -1,75 +1,11 @@
 import React from "react";
-import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
-import { Typography, Paper } from "@material-ui/core";
+import { Typography } from "antd";
+import "./PictureHeader.scss";
 
+const { Title } = Typography;
 const imgPath = process.env.PUBLIC_URL + "/rainbow/";
 
-const styles = theme => ({
-    root: {
-        backgroundColor: theme.palette.primary.light,
-        color: "#FFF",
-        // position: "sticky",
-        // top: 0,
-        zIndex: 100
-    },
-    hCont: {
-        alignItems: "center",
-        backgroundColor: "rgba(0, 12, 23, 0.63)",
-        display: "flex",
-        flexDirection: "column",
-        height: "100%",
-        justifyContent: "center"
-    },
-    heading: {
-        color: "#FFF",
-        margin: 10,
-        paddingBottom: 10,
-        borderBottom: "1px solid white",
-        textAlign: "center"
-    },
-    card: {
-        margin: `${theme.spacing(2)}px auto`,
-        minWidth: 250,
-        width: "calc(1/3*100% - (1 - 1/3)*10px)"
-    },
-    media: {
-        height: 150
-    },
-    title: {
-        fontSize: 14
-    },
-    pos: {
-        marginBottom: 12
-    },
-    grid: {
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-        gridGap: "30px"
-    },
-    wrapper: {
-        margin: "0 auto",
-        width: "90%"
-    },
-    action: {
-        marginLeft: "auto"
-    },
-    bgImgCont: {
-        backgroundSize: "cover",
-        backgroundPosition: "bottom center",
-        backgroundRepeat: "no-repeat",
-        display: "block",
-        height: "100%",
-        position: "relative",
-        width: "100%"
-    },
-    bgImg: {
-        display: "none"
-    }
-});
-
 function PictureHeader(props) {
-    const { classes } = props;
     let img = null,
         src = "";
 
@@ -83,8 +19,8 @@ function PictureHeader(props) {
     }
 
     return (
-        <Paper className={classes.root} elevation={3}>
-            <div className={classes.bgImgCont}>
+        <div className="picture-header">
+            <div className="bgImgCont">
                 <img
                     sizes="(max-width: 1400px) 100vw, 1400px"
                     srcSet={`
@@ -98,28 +34,24 @@ function PictureHeader(props) {
                     `}
                     src={`${imgPath}rainbow_rg388g_c_scale,w_1400.jpg`}
                     alt="Rainbow Background"
-                    className={classes.bgImg}
+                    className="bgImg"
                     onLoad={e => update(e.target)}
                 />
-                <div className={classes.hCont}>
+                <div className="hCont">
                     {props.title && (
-                        <Typography className={classes.heading} variant="h4">
+                        <Title level={3} className="heading">
                             {props.title}
-                        </Typography>
+                        </Title>
                     )}
                     {props.subtitle && (
-                        <Typography className={classes.heading} variant="h6">
+                        <Title level={4} className="heading">
                             {props.subtitle}
-                        </Typography>
+                        </Title>
                     )}
                 </div>
             </div>
-        </Paper>
+        </div>
     );
 }
 
-PictureHeader.propTypes = {
-    classes: PropTypes.object.isRequired
-};
-
-export default withStyles(styles)(PictureHeader);
+export default PictureHeader;

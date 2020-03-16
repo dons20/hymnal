@@ -1,0 +1,41 @@
+@keyframes slideDown {
+    from {
+        transform: translateY(0%);
+    }
+
+    to {
+        transform: translateY(100%);
+    }
+}
+
+.tab-bar {
+    display: none;
+
+    &.showing {
+        animation: slideDown 0.3s ease-out reverse;
+    }
+
+    &.hiding {
+        animation: slideDown 0.1s ease-out;
+    }
+
+    &.hidden {
+        transform: translateY(0);
+        position: relative;
+    }
+}
+
+@media only screen and (max-width: 400px) {
+    .tab-bar {
+        bottom: 0;
+        display: flex;
+        position: sticky;
+        will-change: transform;
+        width: 100%;
+    }
+}
+
+.am-tab-bar-bar {
+    transition-property: height, bottom;
+    will-change: height, bottom;
+}

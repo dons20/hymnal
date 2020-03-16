@@ -7,14 +7,14 @@ import Songs from "./pages/Songs";
 const Routes = () => (
     <App>
         <Switch>
-            <Route exact path="/" render={() => <Home />} />
+            <Route exact path="/home" render={() => <Home />} />
             <Route
                 path={["/songs", "/songs/:id"]}
                 //render={({ match }) => <Songs x={match} />}
                 component={Songs}
                 exact
             />
-            <Route render={() => <Redirect to="/" />} />
+            <Route render={() => <Redirect to="/home" />} />
         </Switch>
     </App>
 );
