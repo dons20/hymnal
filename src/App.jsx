@@ -49,20 +49,15 @@ function App() {
     const songs = useSongLoader();
 
     function handleWindowSizeChange() {
-        dispatch({ type: "setWidth", width: window.innerWidth });
+        dispatch({ type: "setWidth", payload: document.body.getBoundingClientRect().width });
     }
 
     useEffect(() => {
-        window.addEventListener("resize", handleWindowSizeChange, {
-            capture: false,
-            passive: true
-        });
         window.addEventListener("orientationchange", handleWindowSizeChange, {
             capture: false,
             passive: true
         });
         return function cleanup() {
-            window.removeEventListener("resize", handleWindowSizeChange);
             window.addEventListener("orientationchange", handleWindowSizeChange);
         };
     }, []);

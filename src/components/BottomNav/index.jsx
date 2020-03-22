@@ -38,12 +38,12 @@ function MobileNavBar() {
 
     useScrollPosition(
         ({ prevPos, currPos }) => {
-            const shouldHide = currPos.y < prevPos.y;
+            const shouldHide = currPos.y > prevPos.y;
             if (shouldHide !== hidden) setHidden(shouldHide);
         },
         [hidden],
         false,
-        true,
+        false,
         60
     );
 

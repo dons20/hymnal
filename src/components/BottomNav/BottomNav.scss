@@ -1,4 +1,5 @@
 .am-tab-bar-bar {
+    transform: translateY(0);
     transition-property: transform;
     will-change: transform;
     &-hidden-bottom {
