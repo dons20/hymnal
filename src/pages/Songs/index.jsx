@@ -1,15 +1,25 @@
-import React, { Fragment, Suspense } from "react";
+import React, { Suspense } from "react";
+import { useParams } from "react-router-dom";
+import Helmet from "react-helmet";
 import "./Songs.scss";
 
 const SongList = React.lazy(() => import("../../components/SongList"));
 
-function Listing(props) {
-    const { params } = props.match;
-    const { id } = params;
+function Listing() {
+    const { id } = useParams();
+
+    const meta = {
+        title: "Song Book",
+        page: "Index"
+    };
 
     return (
         <div className="listing">
-            <Suspense fallback={<Fragment>Loading Songs...</Fragment>}>
+            <Helmet>
+                <title>{`Hymns | ${meta.page}`}</title>
+            </Helmet>
+
+            <Suspense fallback={<>Loading Songs...</>}>
                 <SongList id={id} />
             </Suspense>
         </div>

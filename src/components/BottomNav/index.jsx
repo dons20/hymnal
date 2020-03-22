@@ -1,94 +1,76 @@
-import React, { useState, useEffect, useRef, useContext } from "react";
+import React, { useState } from "react";
 import { useLocation, useHistory } from "react-router-dom";
-import { MainContext } from "../../App";
-import { Affix } from "antd";
-import { TabBar } from "antd-mobile";
+import { useScrollPosition } from "../CustomHooks";
 import { BookOutlined, HomeOutlined, StarOutlined, SettingOutlined } from "@ant-design/icons";
 import "./BottomNav.scss";
 
-function BottomNav() {
-    const context = useContext(MainContext);
+function MobileNavBar() {
     const { pathname } = useLocation();
     const history = useHistory();
-    const scrollPos = useRef(0);
-    const [selectedTab, setSelectedTab] = useState(pathname);
     const [hidden, setHidden] = useState(false);
 
-    useEffect(() => {
-        const handleScroll = () => {
-            const top = document.body.getBoundingClientRect().top || window.pageXOffset;
-            //Handle navbar transitioning between showing/hiding/hidden states when scrolling
-            if (top - scrollPos.current < 100 && top > scrollPos.current) {
-                setHidden(true);
-            } else {
-                setHidden(false);
-            }
+    const barColor = "white",
+        unselectedTintColor = "#949494",
+        tintColor = "#33A3F4";
 
-            // saves the new position for iteration.
-            scrollPos.current = document.body.getBoundingClientRect().top;
-        };
+    const tabValues = [
+        {
+            title: "Home",
+            url: "/home",
+            icon: <HomeOutlined />
+        },
+        {
+            title: "Songs",
+            url: "/songs",
+            icon: <BookOutlined />
+        },
+        {
+            title: "Favourites",
+            url: "/favourites",
+            icon: <StarOutlined />
+        },
+        {
+            title: "Settings",
+            url: "/settings",
+            icon: <SettingOutlined />
+        }
+    ];
 
-        window.addEventListener("scroll", handleScroll);
-        return () => window.removeEventListener("scroll", handleScroll);
-    }, []);
+    useScrollPosition(
+        ({ prevPos, currPos }) => {
+            const shouldHide = currPos.y < prevPos.y;
+            if (shouldHide !== hidden) setHidden(shouldHide);
+        },
+        [hidden],
+        false,
+        true,
+        60
+    );
 
-    useEffect(() => {
-        setSelectedTab(pathname);
-    }, [pathname]);
-
-    function handleTabBarPress(page) {
-        history.push(page);
+    /**
+     * @param {{ currentTarget: import("react").DOMElement }} e
+     */
+    function handleTabBarPress({ currentTarget }) {
+        const url = currentTarget.getAttribute("data-url");
+        history.push(url);
     }
 
     return (
-        <Affix offsetBottom={0}>
-            <TabBar
-                barTintColor="white"
-                unselectedTintColor="#949494"
-                tintColor="#33A3F4"
-                className="tab-bar"
-                hidden={hidden}
-            >
-                <TabBar.Item
-                    title="Home"
-                    key="Home"
-                    selected={selectedTab === "/home"}
-                    icon={<HomeOutlined />}
-                    selectedIcon={<HomeOutlined />}
-                    value={context.pages.HOME}
-                    onPress={() => handleTabBarPress("/home")}
-                    data-seed="logId"
-                />
-                <TabBar.Item
-                    title="Songs"
-                    key="Songs"
-                    selected={selectedTab === "/songs"}
-                    icon={<BookOutlined />}
-                    selectedIcon={<BookOutlined />}
-                    value={context.pages.INDEX}
-                    onPress={() => handleTabBarPress("/songs")}
-                />
-                <TabBar.Item
-                    title="Favourites"
-                    key="Favourites"
-                    selected={selectedTab === "/favourites"}
-                    icon={<StarOutlined />}
-                    selectedIcon={<StarOutlined />}
-                    value={context.pages.FAVOURITES}
-                    onPress={() => handleTabBarPress("/favourites")}
-                />
-                <TabBar.Item
-                    title="Settings"
-                    key="Settings"
-                    selected={selectedTab === "/settings"}
-                    icon={<SettingOutlined />}
-                    selectedIcon={<SettingOutlined />}
-                    value={context.pages.HISTORY}
-                    onPress={() => handleTabBarPress("/settings")}
-                />
-            </TabBar>
-        </Affix>
+        <div className={`bottom-nav${hidden ? " --hidden" : ""}`} style={{ background: barColor }}>
+            {tabValues.map(tab => (
+                <div
+                    style={pathname === tab.url ? { color: tintColor } : { color: unselectedTintColor }}
+                    className="nav-item"
+                    onClick={handleTabBarPress}
+                    data-url={tab.url}
+                    key={tab.title}
+                >
+                    {tab.icon}
+                    {tab.title}
+                </div>
+            ))}
+        </div>
     );
 }
 
-export default BottomNav;
+export default MobileNavBar;

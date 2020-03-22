@@ -1,41 +1,43 @@
-@keyframes slideDown {
-    from {
-        transform: translateY(0%);
-    }
-
-    to {
+.am-tab-bar-bar {
+    transition-property: transform;
+    will-change: transform;
+    &-hidden-bottom {
+        bottom: initial;
+        height: initial;
         transform: translateY(100%);
     }
 }
 
-.tab-bar {
-    display: none;
-
-    &.showing {
-        animation: slideDown 0.3s ease-out reverse;
-    }
-
-    &.hiding {
-        animation: slideDown 0.1s ease-out;
-    }
-
-    &.hidden {
-        transform: translateY(0);
-        position: relative;
-    }
+.am-tabs-content-wrap {
+    min-height: 0;
 }
 
-@media only screen and (max-width: 400px) {
-    .tab-bar {
-        bottom: 0;
+.bottom-nav {
+    border-top: 1px solid #ddd;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    padding: 0.6rem 0;
+
+    bottom: 0;
+    max-height: 60px;
+    position: fixed;
+    transition: transform 0.3s ease-in;
+    will-change: transform;
+    width: 100%;
+    z-index: 100;
+
+    &.--hidden {
+        transform: translateY(100%);
+    }
+
+    & .nav-item {
         display: flex;
-        position: sticky;
-        will-change: transform;
-        width: 100%;
-    }
-}
+        flex-direction: column;
+        align-items: center;
+        font-size: 0.8rem;
 
-.am-tab-bar-bar {
-    transition-property: height, bottom;
-    will-change: height, bottom;
+        & > .anticon {
+            font-size: 1.4rem;
+        }
+    }
 }

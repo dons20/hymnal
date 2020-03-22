@@ -1,8 +1,9 @@
 import React, { Suspense, useReducer, useEffect } from "react";
+import { Route, Switch, Redirect } from "react-router-dom";
+import { useSongLoader } from "./components/CustomHooks";
+import { Header, Home, Songs, Settings } from "./pages";
 import BottomNav from "./components/BottomNav";
 import styles from "./App.module.scss";
-import Header from "./pages/Header";
-import { useSongLoader } from "./components/CustomHooks";
 
 const PictureHeader = React.lazy(() => import("./components/PictureHeader"));
 
@@ -20,15 +21,15 @@ const initialAppState = {
     activeIndex: 0,
     songDisplay: "",
     listLoaded: false,
-    width: window.innerWidth,
+    width: document.body.getBoundingClientRect().width,
     filteredList: Array(<div key={1} />)
 };
 
 /**
- * @param {initialAppState} state
+ * @param {initialAppState} _state
  * @param {{ payload: Object }} action
  */
-function reducer(state, action) {
+function reducer(_state, action) {
     switch (action.type) {
         case "setTitle":
             return { title: action.payload };
@@ -43,7 +44,7 @@ function reducer(state, action) {
 
 export const MainContext = React.createContext(initialAppState);
 
-function App({ children }) {
+function App() {
     const [state, dispatch] = useReducer(reducer, initialAppState);
     const songs = useSongLoader();
 
@@ -52,11 +53,19 @@ function App({ children }) {
     }
 
     useEffect(() => {
-        window.addEventListener("resize", handleWindowSizeChange);
+        window.addEventListener("resize", handleWindowSizeChange, {
+            capture: false,
+            passive: true
+        });
+        window.addEventListener("orientationchange", handleWindowSizeChange, {
+            capture: false,
+            passive: true
+        });
         return function cleanup() {
             window.removeEventListener("resize", handleWindowSizeChange);
+            window.addEventListener("orientationchange", handleWindowSizeChange);
         };
-    });
+    }, []);
 
     const { width } = state;
     const isMobile = width <= 960;
@@ -70,7 +79,17 @@ function App({ children }) {
                         <Suspense fallback={<div>Loading...</div>}>
                             <PictureHeader title={state.title} subtitle={state.subtitle} />
                         </Suspense>
-                        {children}
+
+                        <div className={styles.wrapper}>
+                            <Switch>
+                                <Route exact path="/home" component={Home} />
+                                <Route exact path={["/songs", "/songs/:id"]} component={Songs} />
+                                <Route path="settings" component={Settings} />
+                                <Route>
+                                    <Redirect to="/home" />} />
+                                </Route>
+                            </Switch>
+                        </div>
                     </main>
 
                     {/* Bottom Navigation on mobile */ isMobile ? <BottomNav /> : null}

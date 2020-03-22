@@ -7,11 +7,15 @@ function Header() {
     const history = useHistory();
     const location = useLocation();
 
+    function back() {
+        history.goBack();
+    }
+
     return (
         <PageHeader
             className="page-header"
             title="Hymns for All Times"
-            onBack={location.pathname === "/home" ? null : () => history.goBack()}
+            onBack={location.pathname === "/home" ? null : back}
             extra={
                 <AutoComplete className="search" dropdownMatchSelectWidth={252}>
                     <Input.Search size="large" placeholder="Search songs..." enterButton />
