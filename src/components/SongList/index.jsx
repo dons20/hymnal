@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useMemo, useCallback } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import { MainContext } from "../../App";
 import { Helmet } from "react-helmet";
@@ -6,11 +6,11 @@ import { Spin, List } from "antd";
 import "./SongList.scss";
 
 /** FA Images */
-import SortAlphaDown from "../../img/sort-alpha-down-solid.svg";
-import SortAlphaDownAlt from "../../img/sort-alpha-down-alt-solid.svg";
-import SortNumericDown from "../../img/sort-numeric-down-solid.svg";
-import SortNumericDownAlt from "../../img/sort-numeric-down-alt-solid.svg";
-import Filter from "../../img/filter-solid.svg";
+import { ReactComponent as Filter } from "../../img/filter-solid.svg";
+import { ReactComponent as SortAlphaDown } from "../../img/sort-alpha-down-solid.svg";
+import { ReactComponent as SortAlphaDownAlt } from "../../img/sort-alpha-down-alt-solid.svg";
+import { ReactComponent as SortNumericDown } from "../../img/sort-numeric-down-solid.svg";
+import { ReactComponent as SortNumericDownAlt } from "../../img/sort-numeric-down-alt-solid.svg";
 
 const meta = {
     title: "Song List",
@@ -24,62 +24,179 @@ function SongList() {
     const { songs, dispatch } = useContext(MainContext);
 
     /** Local State to handle list behaviour */
+    const [rawList, setRawList] = useState(songs);
+    const [filteredList, setFilteredList] = useState([]);
+    const [sortDescending, setSortDescending] = useState(true);
+    const [filterByLetters, setFilterByLetters] = useState(true);
     const [shouldFilterList, setShouldFilterList] = useState(true);
     const [showFilteredList, setShowFilteredList] = useState(false);
-    const [filterByLetters, setFilterByLetters] = useState(true);
-    const [sortAlphabetical, setSortAlphabetical] = useState(false);
-    const [letterRow, setLetterRow] = useState(Array(<div key={1} />));
+    const [sortAlphabetical, setSortAlphabetical] = useState(true);
     const [numbers, setNumbers] = useState(Array(<div key={1} />));
-    const [filteredList, setFilteredList] = useState([]);
+    const [letters, setLetters] = useState(Array(<div key={1} />));
 
-    /**
-     * Displays a song at specified index
-     * @param {MouseEventInit&{ currentTarget: { getAttribute: (arg0: string) => String; }; }} e
-     */
-    function displaySong(e) {
-        const songID = e?.currentTarget?.getAttribute("data-song-id");
-        history.push(`${path}/${songID}`);
+    const memoizedDisplaySong = useCallback(
+        e => {
+            /**
+             * Displays a song at specified index
+             * @param {MouseEventInit&{ currentTarget: { getAttribute: (arg0: string) => String; }; }} e
+             */
+            function displaySong(e) {
+                const songID = e?.currentTarget?.getAttribute("data-song-id");
+                history.push(`${path}/${songID}`);
+            }
+
+            displaySong(e);
+        },
+        [history, path]
+    );
+
+    /** Memoized JSX Output */
+    const filteredJSX = useMemo(
+        () =>
+            filteredList.map(song => (
+                <div key={song.number} data-song-id={song.number} onClick={memoizedDisplaySong} className="listItem">
+                    <div className="listNumber">#{song.number}</div>
+                    <div className="listTitle">{song.title}</div>
+                </div>
+            )),
+        [filteredList, memoizedDisplaySong]
+    );
+    const unfilteredJSX = useMemo(
+        () =>
+            rawList.map(song => (
+                <div key={song.number} data-song-id={song.number} onClick={memoizedDisplaySong} className="listItem">
+                    <div className="listNumber">#{song.number}</div>
+                    <div className="listTitle">{song.title}</div>
+                </div>
+            )),
+        [rawList, memoizedDisplaySong]
+    );
+
+    function handleNumericSort() {
+        if (!sortAlphabetical) {
+            setSortDescending(!sortDescending);
+            sortList(false);
+
+            if (!showFilteredList) {
+                if (sortDescending) {
+                    numbers.sort((a, b) => parseInt(a.props["data-value"]) - parseInt(b.props["data-value"]));
+                } else {
+                    numbers.sort((a, b) => parseInt(b.props["data-value"]) - parseInt(a.props["data-value"]));
+                }
+            }
+        } else {
+            setSortAlphabetical(false);
+            setFilterByLetters(false);
+
+            if (!showFilteredList) {
+                if (sortDescending) {
+                    numbers.sort((a, b) => parseInt(a.props["data-value"]) - parseInt(b.props["data-value"]));
+                } else {
+                    numbers.sort((a, b) => parseInt(b.props["data-value"]) - parseInt(a.props["data-value"]));
+                }
+            }
+        }
     }
 
+    function handleNumericFilter() {
+        setSortDescending(!sortDescending);
+        filterList(false);
+    }
+
+    function handleAlphaSort() {
+        if (sortAlphabetical) {
+            setSortDescending(!sortDescending);
+            sortList(true);
+
+            if (!showFilteredList) {
+                if (sortDescending) {
+                    letters.sort((a, b) => b.props["data-value"].localeCompare(a.props["data-value"]));
+                } else {
+                    letters.sort((a, b) => a.props["data-value"].localeCompare(b.props["data-value"]));
+                }
+            }
+        } else {
+            setSortAlphabetical(true);
+            setFilterByLetters(true);
+
+            if (!showFilteredList) {
+                if (sortDescending) {
+                    letters.sort((a, b) => a.props["data-value"].localeCompare(b.props["data-value"]));
+                } else {
+                    letters.sort((a, b) => b.props["data-value"].localeCompare(a.props["data-value"]));
+                }
+            }
+        }
+    }
+
+    function handleAlphaFilter() {
+        setSortDescending(!sortDescending);
+        filterList(true);
+    }
+
+    /** Swaps between filtered and unfiltered list displays */
     function toggleFilteredList() {
         setShouldFilterList(!shouldFilterList);
         setShowFilteredList(!showFilteredList);
     }
 
     /** Swaps between numerical and alphabetical filters */
-    function swapListFilter() {
-        if (filterByLetters) {
-            setFilteredList(
-                [...filteredList].sort((a, b) => {
-                    return parseInt(a.number) - parseInt(b.number);
-                })
-            );
-        } else {
+    function filterList(shouldFilterAlpha = filterByLetters) {
+        if (shouldFilterAlpha) {
             setFilteredList(
                 [...filteredList].sort((a, b) => {
                     return a.title.localeCompare(b.title);
                 })
             );
+        } else {
+            setFilteredList(
+                [...filteredList].sort((a, b) => {
+                    return parseInt(a.number) - parseInt(b.number);
+                })
+            );
         }
-        setFilterByLetters(!filterByLetters);
+        setFilterByLetters(shouldFilterAlpha);
     }
 
     /** Swaps between numerical and alphabetical sorting of the filtered lists */
-    function swapListSorting() {
-        if (sortAlphabetical) {
-            setFilteredList(
-                [...filteredList].sort((a, b) => {
-                    return parseInt(a.number) - parseInt(b.number);
-                })
-            );
+    function sortList(shouldSortAlpha = sortAlphabetical) {
+        let callback = null;
+        if (showFilteredList) {
+            callback = setFilteredList;
         } else {
-            setFilteredList(
-                [...filteredList].sort((a, b) => {
-                    return a.title.localeCompare(b.title);
-                })
-            );
+            callback = setRawList;
         }
-        setSortAlphabetical(!sortAlphabetical);
+
+        if (shouldSortAlpha) {
+            if (sortDescending) {
+                callback(list =>
+                    [...list].sort((a, b) => {
+                        return a.title.localeCompare(b.title);
+                    })
+                );
+            } else {
+                callback(list =>
+                    [...list].sort((a, b) => {
+                        return b.title.localeCompare(a.title);
+                    })
+                );
+            }
+        } else {
+            if (sortDescending) {
+                callback(list =>
+                    [...list].sort((a, b) => {
+                        return parseInt(a.number) - parseInt(b.number);
+                    })
+                );
+            } else {
+                callback(list =>
+                    [...list].sort((a, b) => {
+                        return parseInt(b.number) - parseInt(a.number);
+                    })
+                );
+            }
+        }
+        setSortAlphabetical(shouldSortAlpha);
     }
 
     /** Shows the filtered list based on selection */
@@ -125,7 +242,7 @@ function SongList() {
             changeActiveNav();
         }
 
-        if (songs.length > 1 && letterRow.length <= 1) {
+        if (songs.length > 1 && letters.length <= 1) {
             createMenu().then(val => {
                 let letters = val.letters
                     .replace(/\W/, "")
@@ -140,23 +257,33 @@ function SongList() {
                     return [n[0], n[n.length - 1]];
                 });
 
-                setLetterRow(
+                setLetters(
                     letters.map(letter => (
-                        <div className="menuOpt" onClick={() => filterSongs("letters", letter)} key={letter}>
+                        <div
+                            className="menuOpt"
+                            onClick={() => filterSongs("letters", letter)}
+                            key={letter}
+                            data-value={letter}
+                        >
                             {letter}
                         </div>
                     ))
                 );
                 setNumbers(
                     finalNumbers.map(num => (
-                        <div className="menuOpt" onClick={() => filterSongs("range", [num[0], num[1]])} key={num[0]}>
+                        <div
+                            className="menuOpt"
+                            onClick={() => filterSongs("range", [num[0], num[1]])}
+                            key={num[0]}
+                            data-value={num[0]}
+                        >
                             {num[0]} - {num[1]}
                         </div>
                     ))
                 );
             });
         }
-    }, [songs, letterRow.length]);
+    }, [songs, letters.length]);
 
     useEffect(() => {
         dispatch({ type: "setTitle", payload: meta.page });
@@ -169,66 +296,57 @@ function SongList() {
                     <Spin size="large" />
                 </div>
             )}
-            {songs?.length > 1 && !showFilteredList && (
+            {songs?.length > 1 && (
                 <>
                     <Helmet>
                         <title>{`Hymns | ${meta.title}`}</title>
                     </Helmet>
                     <div className="utilityHeader">
                         <button type="button" className="listSwitcher" onClick={toggleFilteredList}>
-                            {<img src={Filter} alt="Filter icon" className={shouldFilterList ? "active" : ""} />}
+                            {<Filter title="Filter icon" className={shouldFilterList ? "active" : ""} />}
                         </button>
-                        <button type="button" className="listSwitcher" onClick={swapListFilter}>
-                            {filterByLetters ? (
-                                <img src={SortNumericDown} alt="Sort Numeric descending icon" />
+                        <button
+                            type="button"
+                            className="listSwitcher"
+                            onClick={showFilteredList ? handleAlphaFilter : handleAlphaSort}
+                        >
+                            {sortDescending ? (
+                                <SortAlphaDown
+                                    title="Sort Alphabetically descending icon"
+                                    className={sortAlphabetical ? "active" : ""}
+                                />
                             ) : (
-                                <img src={SortAlphaDown} alt="Sort Alphabetically descending icon" />
+                                <SortAlphaDownAlt
+                                    title="Sort Alphabetically ascending icon"
+                                    className={sortAlphabetical ? "active" : ""}
+                                />
+                            )}
+                        </button>
+                        <button
+                            type="button"
+                            className="listSwitcher"
+                            onClick={showFilteredList ? handleNumericFilter : handleNumericSort}
+                        >
+                            {sortDescending ? (
+                                <SortNumericDown
+                                    title="Sort Numeric descending icon"
+                                    className={sortAlphabetical ? "" : "active"}
+                                />
+                            ) : (
+                                <SortNumericDownAlt
+                                    title="Sort Numeric ascending icon"
+                                    className={sortAlphabetical ? "" : "active"}
+                                />
                             )}
                         </button>
                     </div>
-                    <List>{filterByLetters ? letterRow : numbers}</List>
-                </>
-            )}
-            {songs?.length > 1 && showFilteredList && (
-                <>
-                    <div className="utilityHeader">
-                        <button type="button" className="listSwitcher" onClick={toggleFilteredList}>
-                            {<img src={Filter} alt="Filter icon" className={shouldFilterList ? "active" : ""} />}
-                        </button>
-                        <button type="button" onClick={swapListSorting} className="listSwitcher">
-                            {sortAlphabetical ? (
-                                <img src={SortNumericDown} alt="Sort Numeric descending icon" />
-                            ) : (
-                                <img src={SortAlphaDown} alt="Sort Alphabetically descending icon" />
-                            )}
-                        </button>
-                    </div>
-                    <List>
-                        {shouldFilterList &&
-                            filteredList.map(song => (
-                                <div
-                                    key={song.number}
-                                    data-song-id={song.number}
-                                    onClick={displaySong}
-                                    className="listItem"
-                                >
-                                    <div className="listTitle">#{song.number}</div>
-                                    <div className="listTitle">{song.title}</div>
-                                </div>
-                            ))}
-                        {!shouldFilterList &&
-                            songs.map(song => (
-                                <div
-                                    key={song.number}
-                                    data-song-id={song.number}
-                                    onClick={displaySong}
-                                    className="listItem"
-                                >
-                                    <div className="listTitle">#{song.number}</div>
-                                    <div className="listTitle">{song.title}</div>
-                                </div>
-                            ))}
-                    </List>
+                    {!showFilteredList && <List>{filterByLetters ? letters : numbers}</List>}
+                    {showFilteredList && (
+                        <List>
+                            {shouldFilterList && filteredJSX}
+                            {!shouldFilterList && unfilteredJSX}
+                        </List>
+                    )}
                 </>
             )}
         </>

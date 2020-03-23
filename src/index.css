@@ -3,6 +3,8 @@
     --body-font: "Noto Sans", sans-serif;
     --primary-color: #1890ff;
     --accent-color: #0e66b9;
+    --dim-color: #0e66b9;
+    --dark-neutral-color: #444444;
 }
 
 body {
