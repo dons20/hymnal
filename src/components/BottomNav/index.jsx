@@ -4,6 +4,16 @@ import { useScrollPosition } from "../CustomHooks";
 import { BookOutlined, HomeOutlined, StarOutlined, SettingOutlined } from "@ant-design/icons";
 import "./BottomNav.scss";
 
+const scrollHeight = Math.max(
+        document.body.scrollHeight,
+        document.documentElement.scrollHeight,
+        document.body.offsetHeight,
+        document.documentElement.offsetHeight,
+        document.body.clientHeight,
+        document.documentElement.clientHeight
+    ),
+    offsetShow = scrollHeight - 80;
+
 function MobileNavBar() {
     const { pathname } = useLocation();
     const history = useHistory();
@@ -36,19 +46,25 @@ function MobileNavBar() {
         }
     ];
 
+    /**
+     * Implements hide on scroll down, show on scroll up
+     * Will show if near the end of the page
+     */
     useScrollPosition(
         ({ prevPos, currPos }) => {
-            const shouldHide = currPos.y > prevPos.y;
-            if (shouldHide !== hidden) setHidden(shouldHide);
+            const shouldHide = currPos.y < prevPos.y;
+            const belowThreshold = currPos.y > offsetShow;
+            if (shouldHide !== hidden && !belowThreshold) setHidden(shouldHide);
+            else if (belowThreshold) setHidden(false);
         },
         [hidden],
         false,
-        false,
+        true,
         60
     );
 
     /**
-     * @param {{ currentTarget: import("react").DOMElement }} e
+     * @param {MouseEventInit&{ currentTarget: { getAttribute: (arg0: string) => String; }; }} e
      */
     function handleTabBarPress({ currentTarget }) {
         const url = currentTarget.getAttribute("data-url");
@@ -59,7 +75,7 @@ function MobileNavBar() {
         <div className={`bottom-nav${hidden ? " --hidden" : ""}`} style={{ background: barColor }}>
             {tabValues.map(tab => (
                 <div
-                    style={pathname === tab.url ? { color: tintColor } : { color: unselectedTintColor }}
+                    style={pathname.startsWith(tab.url) ? { color: tintColor } : { color: unselectedTintColor }}
                     className="nav-item"
                     onClick={handleTabBarPress}
                     data-url={tab.url}

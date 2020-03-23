@@ -21,8 +21,8 @@
 
     bottom: 0;
     max-height: 60px;
-    position: fixed;
-    transition: transform 0.3s ease-in;
+    position: sticky;
+    transition: transform 0.2s ease-in;
     will-change: transform;
     width: 100%;
     z-index: 100;

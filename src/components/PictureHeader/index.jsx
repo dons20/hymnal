@@ -1,11 +1,14 @@
-import React from "react";
+import React, { useContext } from "react";
+import { MainContext } from "../../App";
 import { Typography } from "antd";
 import "./PictureHeader.scss";
 
 const { Title } = Typography;
 const imgPath = process.env.PUBLIC_URL + "/rainbow/";
 
-function PictureHeader(props) {
+function PictureHeader() {
+    const { meta } = useContext(MainContext);
+
     let img = null,
         src = "";
 
@@ -38,14 +41,14 @@ function PictureHeader(props) {
                     onLoad={e => update(e.target)}
                 />
                 <div className="hCont">
-                    {props.title && (
-                        <Title level={3} className="heading">
-                            {props.title}
+                    {meta.title && (
+                        <Title level={2} className="heading">
+                            {meta.title}
                         </Title>
                     )}
-                    {props.subtitle && (
-                        <Title level={4} className="heading">
-                            {props.subtitle}
+                    {meta.subtitle && (
+                        <Title level={3} className="heading">
+                            {meta.subtitle}
                         </Title>
                     )}
                 </div>

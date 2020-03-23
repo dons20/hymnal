@@ -1,4 +1,4 @@
-.listing {
+.songs {
     & .container {
         display: grid;
         grid-auto-rows: 80;
@@ -16,6 +16,7 @@
     }
 
     & .listItem {
+        background-color: #fff;
         cursor: pointer;
         display: grid;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
@@ -35,77 +36,71 @@
         }
     }
 
-    & .listItemEven {
-        background: white;
-    }
-
-    & .listItemOdd {
-        background: white;
-    }
-
     & .listTitle {
         display: flex;
         padding: 0 20px;
         align-items: center;
     }
 
-    & .listSwitcher {
-        color: #333;
-        width: 100%;
-        border: 0;
-        padding: 2px;
-        font-size: 1.3rem;
-        box-shadow: 0 3px 6px rgba(41, 121, 240, 0.12), 0 3px 6px rgba(41, 121, 240, 0.24);
+    & .utilityHeader {
         background-color: #fff;
+        border-bottom: 1px solid #ddd;
+        color: #333;
+        display: flex;
+        justify-content: center;
+        height: 3rem;
+        font-size: 1.3rem;
+
+        width: 100%;
+
+        & > :last-child {
+            border-right: none;
+        }
+
+        & button {
+            background-color: #fff;
+            border-right: 1px solid #ddd;
+            border: 0;
+            flex: 1 1 100%;
+            height: 100%;
+            padding: 0.5rem;
+        }
+        & img {
+            height: 100%;
+            color: var(--primary-color);
+            &.active {
+                color: var(--accent-color);
+            }
+        }
+    }
+
+    & .listSwitcher {
     }
 
     & .loader {
         height: 100%;
+        width: 100%;
         display: flex;
         align-items: center;
         justify-content: center;
     }
 
     & .menuOpt {
+        align-items: center;
+        background: rgba(255, 255, 255, 1);
+        //box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+        border-bottom: 1px solid #ddd;
         cursor: pointer;
         display: flex;
         font-size: 2rem;
-        background: rgba(255, 255, 255, 1);
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-        transition: background 0.1s ease-in-out, box-shadow 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        align-items: center;
-        will-change: background, box-shadow;
         justify-content: center;
+        padding: 0.6rem 0;
+        transition: background 0.1s ease-in-out, box-shadow 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        will-change: background, box-shadow;
         &:hover {
-            background: rgba(0, 0, 0, 0.05);
+            background: rgba(255, 255, 255, 0.1);
             box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
         }
-    }
-
-    & .songContainer {
-        height: 100%;
-        padding: 15px;
-        background-color: rgba(255, 255, 255, 1);
-    }
-
-    & .songBody {
-        margin: 20px auto;
-        display: grid;
-        white-space: pre-line;
-        grid-row-gap: 20px;
-        grid-template-rows: repeat(auto-fit, minmax(100px, 1fr));
-    }
-
-    & .songFooter {
-        align-self: flex-end;
-    }
-
-    & .songHeader {
-        display: grid;
-        font-weight: bold;
-        align-content: center;
-        justify-items: center;
-        grid-template-rows: auto auto;
     }
 }
 
