@@ -1,10 +1,35 @@
+:root {
+    --header-font: "PT Sans", sans-serif;
+    --body-font: "Noto Sans", sans-serif;
+    --primary-color: #1890ff;
+    --accent-color: #0e66b9;
+    --dim-color: #0e66b9;
+    --dark-neutral-color: #444444;
+}
+
 body {
     margin: 0;
     padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
+    font-family: var(--body-font), -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
         "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--header-font);
+    font-weight: 400;
+}
+
+html,
+body,
+#root {
+    height: auto;
 }
 
 code {
@@ -81,4 +106,8 @@ button:-moz-focusring,
 [type="reset"]:-moz-focusring,
 [type="submit"]:-moz-focusring {
     outline: 1px dotted ButtonText;
+}
+
+.ant-card-head-title {
+    font-weight: bold;
 }

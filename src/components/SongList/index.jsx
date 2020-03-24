@@ -1,477 +1,316 @@
-import React, { Component, Fragment } from "react";
-import PropTypes from "prop-types";
-import { get, set } from "idb-keyval";
+import React, { useState, useEffect, useContext, useMemo, useCallback } from "react";
+import { useHistory, useRouteMatch } from "react-router-dom";
 import { MainContext } from "../../App";
-import { withStyles } from "@material-ui/core";
-import Loader from "react-loader-spinner";
-import List from "@material-ui/core/List";
+import { Helmet } from "react-helmet";
+import { Spin, List } from "antd";
+import "./SongList.scss";
 
-/** @param {import('@material-ui/core').Theme} theme */
-const styles = theme => ({
-    container: {
-        display: "grid",
-        gridAutoRows: 80,
-        maxWidth: 1200,
-        margin: "0 auto",
-        padding: "10px 0"
-    },
-    grid: {
-        display: "grid",
-        gridAutoRows: 80,
-        gridTemplateColumns: "repeat(2, minmax(60px, 1fr))",
-        gridGap: 10,
-        width: "100%"
-    },
-    listItem: {
-        boxShadow: "0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)",
-        cursor: "pointer",
-        display: "grid",
-        gridTemplateColumns: "25% 1fr",
-        textAlign: "left",
-        transition: "background 0.1s ease-in-out",
-        userSelect: "none",
-        willChange: "background",
-        "&:after": {
-            content: '"',
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            width: "100%",
-            height: 10,
-            backgroundColor: "#f4f4f4"
-        }
-    },
-    listItemEven: {
-        background: "white"
-    },
-    listItemOdd: {
-        background: "white"
-    },
-    listTitle: {
-        alignItems: "center",
-        display: "flex",
-        padding: "0 20px"
-    },
-    listSwitcher: {
-        backgroundColor: theme.palette.primary.A400,
-        border: 0,
-        boxShadow: "0 3px 6px rgba(41, 121, 240, 0.12), 0 3px 6px rgba(41, 121, 240, 0.24)",
-        color: theme.palette.secondary.contrastText,
-        fontSize: "1.3rem",
-        padding: theme.spacing(2),
-        width: "100%"
-    },
-    loader: {
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100%"
-    },
-    menuOpt: {
-        alignItems: "center",
-        background: "rgba(255,255,255,1)",
-        boxShadow: "0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)",
-        cursor: "pointer",
-        display: "flex",
-        fontSize: "2rem",
-        justifyContent: "center",
-        transition: "background 0.1s ease-in-out, box-shadow 0.3s cubic-bezier(.25,.8,.25,1)",
-        willChange: "background, box-shadow",
-        "&:hover": {
-            background: "rgba(0,0,0,0.05)",
-            boxShadow: "0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23)"
-        }
-    },
-    songContainer: {
-        backgroundColor: "rgba(255,255,255,1)",
-        height: "100%",
-        padding: 15
-    },
-    songBody: {
-        display: "grid",
-        gridTemplateRows: "repeat(auto-fit, minmax(100px, 1fr))",
-        gridRowGap: "20px",
-        margin: "20px auto",
-        whiteSpace: "pre-line"
-    },
-    songFooter: {
-        alignSelf: "flex-end"
-    },
-    songHeader: {
-        alignContent: "center",
-        display: "grid",
-        fontWeight: "bold",
-        justifyItems: "center",
-        gridTemplateRows: "auto auto"
-    },
-    "@media (min-width: 425px)": {
-        grid: {
-            gridTemplateRows: "repeat(auto-fit, 1fr)",
-            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))"
+/** FA Images */
+import { ReactComponent as Filter } from "../../img/filter-solid.svg";
+import { ReactComponent as ArrowLeft } from "../../img/arrow-left-solid.svg";
+import { ReactComponent as SortAlphaDown } from "../../img/sort-alpha-down-solid.svg";
+import { ReactComponent as SortAlphaDownAlt } from "../../img/sort-alpha-down-alt-solid.svg";
+import { ReactComponent as SortNumericDown } from "../../img/sort-numeric-down-solid.svg";
+import { ReactComponent as SortNumericDownAlt } from "../../img/sort-numeric-down-alt-solid.svg";
+
+const meta = {
+    title: "Song List",
+    page: "List of Hymns"
+};
+
+function SongList() {
+    /** Effects */
+    const history = useHistory();
+    const { path } = useRouteMatch();
+    const { songs, dispatch } = useContext(MainContext);
+
+    /** Local State to handle list behaviour */
+    const [unfiltered, setUnfiltered] = useState([]); // Contains a copy of songs from the context
+    const [filteredList, setFilteredList] = useState([]); // Contains a subset of song list items
+    const [sortDescending, setSortDescending] = useState(true); // Determines sorting direction of lists
+    const [filterByLetters, setFilterByLetters] = useState(true); // Determines filter category; letters or numbers
+    const [shouldFilterList, setShouldFilterList] = useState(true); // Determines if the list should have category filters enabled
+    const [showFilteredList, setShowFilteredList] = useState(false); // Determines if the filtered list should be shown
+    const [sortAlphabetical, setSortAlphabetical] = useState(true); // Determines if the list should be sorted alphabetically or numerically
+    const [numbers, setNumbers] = useState(Array(<div key={1} />)); // Contains an array of available song number categories
+    const [letters, setLetters] = useState(Array(<div key={1} />)); // Contains an array of available song letter categories
+
+    const memoizedDisplaySong = useCallback(
+        e => {
+            /**
+             * Displays a song at specified index
+             * @param {MouseEventInit&{ currentTarget: { getAttribute: (arg0: string) => String; }; }} e
+             */
+            function displaySong(e) {
+                const songID = e?.currentTarget?.getAttribute("data-song-id");
+                history.push(`${path}/${songID}`);
+            }
+
+            displaySong(e);
         },
-        listItem: {
-            "&:hover": {
-                background: "rgba(0,0,0,0.1)"
-            }
+        [history, path]
+    );
+
+    /** Memoized JSX Output */
+    const filteredJSX = useMemo(
+        () =>
+            filteredList.map(song => (
+                <div key={song.number} data-song-id={song.number} onClick={memoizedDisplaySong} className="listItem">
+                    <div className="listNumber">#{song.number}</div>
+                    <div className="listTitle">{song.title}</div>
+                </div>
+            )),
+        [filteredList, memoizedDisplaySong]
+    );
+    const unfilteredJSX = useMemo(() => {
+        if (songs?.length > 1 && unfiltered.length < songs?.length) {
+            setUnfiltered([...songs]);
         }
-    }
-});
 
-class SongList extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            listSortByLetters: true,
-            listSortAlphabetical: false,
-            letterRow: Array(<div key={1} />),
-            numbers: Array(Number),
-            songBody: Array(<div key={1} />)
-        };
-        this.displaySong = this.displaySong.bind(this);
-        this.loadSongsFromJSON = this.loadSongsFromJSON.bind(this);
-        this.createMenu = this.createMenu.bind(this);
-        this.filterSongs = this.filterSongs.bind(this);
-        this.changeActiveNav = this.changeActiveNav.bind(this);
-        this.swapListFilter = this.swapListFilter.bind(this);
+        return unfiltered.map(song => (
+            <div key={song.number} data-song-id={song.number} onClick={memoizedDisplaySong} className="listItem">
+                <div className="listNumber">#{song.number}</div>
+                <div className="listTitle">{song.title}</div>
+            </div>
+        ));
+    }, [unfiltered, songs, memoizedDisplaySong]);
+
+    /** Swaps between filtered and unfiltered list displays */
+    function toggleFilteredList() {
+        setShouldFilterList(showFilteredList ? true : false);
+        setShowFilteredList(!showFilteredList);
     }
 
-    /** Checks if songs have already been stored */
-    async checkDB() {
-        console.log(`%cChecking if songs exist already`, "color: #b70018; font-size: medium;");
-        let songStorage = await get("songs");
-        if (songStorage !== undefined) {
-            console.log(`%cSongs found! Attempting to load...`, "color: #b70018; font-size: medium;");
-            return true;
-        }
-        console.log(`%cNo database entry found, will parse json...`, "color: #b70018; font-size: medium;");
-        return false;
+    /** Shows the filtered list based on selection */
+    function changeActiveNav() {
+        setShowFilteredList(true);
     }
 
-    /** Loads songs from JSON and stores them locally */
-    loadSongsFromJSON() {
-        let { setProp } = this.context;
-        this.fetchSongs().then(json => {
-            setProp({ songList: this.cleanupStrings(json), listLoaded: true });
-            set("songs", json);
-        });
-    }
-
-    /** Fetches song database and returns it for parsing */
-    fetchSongs() {
-        return new Promise(async resolve => {
-            let url = process.env.PUBLIC_URL + "/songs.json";
-            let response = await fetch(url);
-            if (response.ok) {
-                resolve(response.json());
+    /** Handles Numeric Sort button actions */
+    function handleNumericSorts() {
+        if (!sortAlphabetical) {
+            setSortDescending(!sortDescending);
+            if (!showFilteredList) {
+                if (sortDescending) {
+                    numbers.sort((a, b) => parseInt(b.props["data-value"]) - parseInt(a.props["data-value"]));
+                } else {
+                    numbers.sort((a, b) => parseInt(a.props["data-value"]) - parseInt(b.props["data-value"]));
+                }
             } else {
-                throw Object.assign(new Error(`File not found on server!`));
+                filterList(false);
             }
-        }).catch(err => {
-            console.error(err);
-        });
-    }
+        } else {
+            setSortAlphabetical(false);
+            setFilterByLetters(false);
 
-    /** Generates a menu from all available letters and numbers */
-    createMenu() {
-        const { songList } = this.context;
-        return new Promise(resolve => {
-            let characters = [],
-                numbers = [];
-            for (let i = 0; i < songList.length; i++) {
-                characters.push(songList[i].title.charAt(0));
-                numbers.push(songList[i].number);
-            }
-            resolve({ letters: String.prototype.concat(...new Set(characters)), numbers: numbers });
-        });
-    }
-
-    /**
-     * Iterates over song array to make strings readable
-     * @param {import('../../App').SongType} songs
-     */
-    cleanupStrings(songs) {
-        let obj = songs;
-        for (let i = 0; i < obj.length; i++) {
-            if (obj[i].chorus.length > 0) {
-                obj[i].chorus = this.replaceString(obj[i].chorus);
-            }
-            let verses = [];
-            for (let j = 0; j < obj[i].verse.length; j++) {
-                if (obj[i].verse[j].length > 0) {
-                    verses.push(this.replaceString(obj[i].verse[j]));
+            if (!showFilteredList) {
+                if (sortDescending) {
+                    numbers.sort((a, b) => parseInt(a.props["data-value"]) - parseInt(b.props["data-value"]));
+                    setSortDescending(true);
+                } else {
+                    numbers.sort((a, b) => parseInt(b.props["data-value"]) - parseInt(a.props["data-value"]));
+                    setSortDescending(false);
                 }
             }
-            obj[i].verse = verses;
         }
+    }
 
-        return obj;
+    /** Handles Alphabetical Sort button actions */
+    function handleAlphaSorts() {
+        if (sortAlphabetical) {
+            setSortDescending(!sortDescending);
+            if (!showFilteredList) {
+                if (sortDescending) {
+                    letters.sort((a, b) => b.props["data-value"].localeCompare(a.props["data-value"]));
+                } else {
+                    letters.sort((a, b) => a.props["data-value"].localeCompare(b.props["data-value"]));
+                }
+            } else {
+                filterList(true);
+            }
+        } else {
+            setSortAlphabetical(true);
+            setFilterByLetters(true);
+
+            if (!showFilteredList) {
+                if (sortDescending) {
+                    letters.sort((a, b) => a.props["data-value"].localeCompare(b.props["data-value"]));
+                    setSortDescending(true);
+                } else {
+                    letters.sort((a, b) => b.props["data-value"].localeCompare(a.props["data-value"]));
+                    setSortDescending(false);
+                }
+            }
+        }
     }
 
     /**
-     * Removes unnecessary characters and spaces from string
-     * @param {string} string
+     * Swaps between numerical and alphabetical filter/sorting modes
      */
-    replaceString(string) {
-        let newString = string
-            .replace(/\*/g, "")
-            .replace(/\s{2,}/g, "\n")
-            .trim();
-        return newString;
-    }
+    function filterList(shouldFilterAlpha = filterByLetters) {
+        const callback = showFilteredList ? setUnfiltered : setFilteredList;
 
-    /**
-     * Filters list of songs by criteria
-     * @param {String} type
-     * @param {String} value
-     */
-    filterSongs(type, value) {
-        let filteredSongs;
-        if (type === "number") {
-            filteredSongs = this.context.songList.filter(song => song.number === value);
-        } else if (type === "numRange") {
-            filteredSongs = this.context.songList.filter(
-                song => Number.parseInt(song.number) >= value[0] && Number.parseInt(song.number) <= value[1]
-            );
-        } else if (type === "letter") {
-            filteredSongs = this.context.songList.filter(song => song.title.charAt(0) === value);
+        if (shouldFilterAlpha) {
+            if (sortDescending) {
+                callback(list => [...list].sort((a, b) => b.title.localeCompare(a.title)));
+            } else {
+                callback(list => [...list].sort((a, b) => a.title.localeCompare(b.title)));
+            }
         } else {
-            return null;
+            if (!sortDescending) {
+                callback(list => [...list].sort((a, b) => parseInt(a.number) - parseInt(b.number)));
+            } else {
+                callback(list => [...list].sort((a, b) => parseInt(b.number) - parseInt(a.number)));
+            }
         }
-        this.context.setProp({
-            filteredList: filteredSongs,
-            songDisplay: "list"
-        });
-    }
 
-    /**
-     * Displays a song at specified index
-     * @param {Number} index
-     * @param {Boolean} filtered
-     */
-    displaySong(index, filtered) {
-        if (filtered) {
-            this.context.setProp({
-                title: this.context.filteredList[index].title,
-                songDisplay: "fView",
-                activeIndex: index
-            });
-        } else {
-            this.context.setProp({
-                title: this.context.songList[index].title,
-                songDisplay: "dView",
-                activeIndex: index
-            });
-        }
-    }
-
-    /** Swaps between letter sort and number sort */
-    changeActiveNav() {
-        this.setState({
-            listSortByLetters: !this.state.listSortByLetters
-        });
-    }
-
-    /** Swaps between numerical and alphabetical sort */
-    swapListFilter(isAlphabetical) {
-        const { filteredList, setProp } = this.context;
-        if (isAlphabetical) {
-            setProp({
-                filteredList: [...filteredList].sort((a, b) => {
-                    return (a.title > b.title) - (a.title < b.title);
-                })
-            });
-        } else {
-            setProp({
-                filteredList: [...filteredList].sort((a, b) => {
-                    return parseInt(a.number) - parseInt(b.number);
-                })
-            });
-        }
-        this.setState({ listSortAlphabetical: isAlphabetical });
-    }
-
-    /** Triggers loading of songs from database on component mount */
-    componentDidMount() {
-        if (this.context.songList.length <= 1) {
-            console.log("%cLoading Songs from database", "color: #d8001c; font-size: large; font-weight: bold");
-            this.checkDB()
-                .then(async res => {
-                    if (res) {
-                        let songStorage = await get("songs");
-                        let { setProp } = this.context;
-                        setProp({ songList: this.cleanupStrings(songStorage), listLoaded: true });
-                    } else {
-                        this.loadSongsFromJSON();
-                    }
-                })
-                .finally(() => {
-                    if (this.props.id && this.props.id > 0 && this.props.id < this.context.songList.length)
-                        this.displaySong(this.props.id - 1, false);
-                });
-        }
+        setSortAlphabetical(shouldFilterAlpha);
+        setFilterByLetters(shouldFilterAlpha);
     }
 
     /** Handles changes to the active display when component updates */
-    componentDidUpdate() {
-        const { activeIndex, filteredList, songList, songDisplay, listLoaded } = this.context;
+    useEffect(() => {
+        /** Generates a menu from all available letters and numbers */
+        function createMenu() {
+            return new Promise(resolve => {
+                let characters = [],
+                    numbers = [];
+                for (let i = 0; i < songs.length; i++) {
+                    characters.push(songs[i].title.charAt(0));
+                    numbers.push(songs[i].number);
+                }
+                resolve({ letters: String.prototype.concat(...new Set(characters)), numbers: numbers });
+            });
+        }
 
-        /** Handles filtered song navigation */
-        if (songDisplay === "fView" && this.state.songBody.length <= 1) {
-            const newBody = filteredList[activeIndex].verse.map((verse, index) => {
-                if (index === 1) {
-                    return (
-                        <Fragment key={index}>
-                            <div>{filteredList[activeIndex].chorus}</div>
-                            <div>{verse}</div>
-                        </Fragment>
+        /**
+         * Filters list of songs by criteria
+         * @param {String} type
+         * @param {Number|Array} value
+         */
+        function filterSongs(type, value) {
+            let filteredSongs;
+            if (type === "numbers") {
+                filteredSongs = songs.filter(song => song.number === value);
+            } else if (type === "range") {
+                filteredSongs = songs.filter(
+                    song => Number.parseInt(song.number) >= value[0] && Number.parseInt(song.number) <= value[1]
+                );
+            } else if (type === "letters") {
+                filteredSongs = songs.filter(song => song.title.charAt(0) === value);
+            } else {
+                return null;
+            }
+
+            setFilteredList(filteredSongs);
+            setSortAlphabetical(false);
+            changeActiveNav();
+        }
+
+        if (songs.length > 1) {
+            if (letters.length <= 1) {
+                createMenu().then(val => {
+                    let letters = val.letters
+                        .replace(/\W/, "")
+                        .split("")
+                        .sort();
+                    let numbers = [];
+                    for (let i = 0; i < val.numbers.length; i += 100) {
+                        numbers.push(val.numbers.slice(i, i + 100));
+                    }
+
+                    let finalNumbers = numbers.map(n => {
+                        return [n[0], n[n.length - 1]];
+                    });
+
+                    setLetters(
+                        letters.map(letter => (
+                            <div
+                                className="menuOpt"
+                                onClick={() => filterSongs("letters", letter)}
+                                key={letter}
+                                data-value={letter}
+                            >
+                                {letter}
+                            </div>
+                        ))
                     );
-                }
-                return <div key={index}>{verse}</div>;
-            });
-            this.setState({ songBody: newBody });
-        }
-
-        /** Handles unfiltered song navigation */
-        if (songDisplay === "dView" && this.state.songBody.length <= 1) {
-            const newBody = songList[activeIndex].verse.map((verse, index) => {
-                if (index === 1) {
-                    return (
-                        <Fragment key={index}>
-                            <div>{songList[activeIndex].chorus}</div>
-                            <div>{verse}</div>
-                        </Fragment>
+                    setNumbers(
+                        finalNumbers.map(num => (
+                            <div
+                                className="menuOpt"
+                                onClick={() => filterSongs("range", [num[0], num[1]])}
+                                key={num[0]}
+                                data-value={num[0]}
+                            >
+                                {num[0]} - {num[1]}
+                            </div>
+                        ))
                     );
-                }
-                return <div key={index}>{verse}</div>;
-            });
-            this.setState({ songBody: newBody });
-        }
-
-        if (listLoaded && this.state.letterRow.length <= 1) {
-            const { classes } = this.props;
-
-            this.createMenu().then(val => {
-                let letters = val.letters
-                    .replace(/\W/, "")
-                    .split("")
-                    .sort();
-                let numbers = [];
-                for (let i = 0; i < val.numbers.length; i += 100) {
-                    numbers.push(val.numbers.slice(i, i + 100));
-                }
-
-                let finalNumbers = numbers.map(n => {
-                    return [n[0], n[n.length - 1]];
                 });
-
-                this.setState({
-                    letterRow: letters.map(letter => (
-                        <div
-                            className={classes.menuOpt}
-                            onClick={() => this.filterSongs("letter", letter)}
-                            key={letter}
-                        >
-                            {letter}
-                        </div>
-                    )),
-                    numbers: finalNumbers.map(num => (
-                        <div
-                            className={classes.menuOpt}
-                            onClick={() => this.filterSongs("numRange", [num[0], num[1]])}
-                            key={num[0]}
-                        >
-                            {num[0]} - {num[1]}
-                        </div>
-                    ))
-                });
-            });
+            }
         }
-    }
+    }, [songs, letters.length]);
 
-    render() {
-        const { letterRow, numbers, songBody, listSortByLetters, listSortAlphabetical } = this.state;
-        const { activeIndex, filteredList, songDisplay, listLoaded, songList } = this.context;
-        const { classes } = this.props;
+    useEffect(() => {
+        dispatch({ type: "setTitle", payload: meta.page });
+    }, [dispatch]);
 
-        return (
-            <Fragment>
-                {!listLoaded && (
-                    <div className={classes.loader}>
-                        <Loader type="Oval" color="blue" height="100" width="100" />
-                    </div>
-                )}
-                {songDisplay === "" && listLoaded && (
-                    <Fragment>
-                        <div className={classes.utilityHeader}>
-                            <button type="button" onClick={this.changeActiveNav} className={classes.listSwitcher}>
-                                {listSortByLetters ? "Filter by Numbers" : "Filter by Letters"}
-                            </button>
-                        </div>
-                        <List component="div" className={`${classes.container} ${classes.grid}`}>
-                            {listSortByLetters ? letterRow : numbers}
-                        </List>
-                    </Fragment>
-                )}
-                {songDisplay === "list" && (
-                    <Fragment>
-                        <button
-                            type="button"
-                            onClick={() => {
-                                this.swapListFilter(!listSortAlphabetical);
-                            }}
-                            className={classes.listSwitcher}
-                        >
-                            {listSortAlphabetical ? "Sort Numerically" : "Sort Alphabetically"}
+    return (
+        <>
+            {songs?.length <= 1 && (
+                <div className="loader">
+                    <Spin size="large" />
+                </div>
+            )}
+            {songs?.length > 1 && (
+                <>
+                    <Helmet>
+                        <title>{`Hymns | ${meta.title}`}</title>
+                    </Helmet>
+                    <div className="utilityHeader">
+                        <button type="button" className="listSwitcher" onClick={toggleFilteredList}>
+                            {showFilteredList && <ArrowLeft title="Back icon" />}
+                            {!showFilteredList && (
+                                <Filter title="Filter icon" className={shouldFilterList ? "active" : ""} />
+                            )}
                         </button>
-                        <List component="div" className={classes.container}>
-                            {filteredList.map((song, index) => (
-                                <div
-                                    key={song.number}
-                                    onClick={() => this.displaySong(index, true)}
-                                    className={`${classes.listItem} ${
-                                        index % 2 ? classes.listItemOdd : classes.listItemEven
-                                    }`}
-                                >
-                                    <div className={classes.listTitle}>#{song.number}</div>
-                                    <div className={classes.listTitle}>{song.title}</div>
-                                </div>
-                            ))}
-                        </List>
-                    </Fragment>
-                )}
-                {songDisplay === "fView" && (
-                    <div className={classes.songContainer}>
-                        <div className={classes.songHeader}>
-                            <div>{filteredList[activeIndex].number}</div>
-                            <div>{filteredList[activeIndex].title}</div>
-                        </div>
-                        <div className={classes.songBody}>{songBody}</div>
-                        {filteredList[activeIndex].author && (
-                            <div className={classes.songFooter}>{filteredList[activeIndex].author}</div>
-                        )}
+                        <button type="button" className="listSwitcher" onClick={handleAlphaSorts}>
+                            {sortDescending ? (
+                                <SortAlphaDown
+                                    title="Sort Alphabetically descending icon"
+                                    className={sortAlphabetical ? "active" : ""}
+                                />
+                            ) : (
+                                <SortAlphaDownAlt
+                                    title="Sort Alphabetically ascending icon"
+                                    className={sortAlphabetical ? "active" : ""}
+                                />
+                            )}
+                        </button>
+                        <button type="button" className="listSwitcher" onClick={handleNumericSorts}>
+                            {sortDescending ? (
+                                <SortNumericDown
+                                    title="Sort Numeric descending icon"
+                                    className={sortAlphabetical ? "" : "active"}
+                                />
+                            ) : (
+                                <SortNumericDownAlt
+                                    title="Sort Numeric ascending icon"
+                                    className={sortAlphabetical ? "" : "active"}
+                                />
+                            )}
+                        </button>
                     </div>
-                )}
-                {songDisplay === "dView" && (
-                    <div className={classes.songContainer}>
-                        <div className={classes.songHeader}>
-                            <div>{songList[activeIndex].number}</div>
-                            <div>{songList[activeIndex].title}</div>
-                        </div>
-                        <div className={classes.songBody}>{songBody}</div>
-                        {songList[activeIndex].author && (
-                            <div className={classes.songFooter}>{songList[activeIndex].author}</div>
-                        )}
-                    </div>
-                )}
-            </Fragment>
-        );
-    }
+                    {showFilteredList ? (
+                        <List>{shouldFilterList ? filteredJSX : unfilteredJSX}</List>
+                    ) : (
+                        <List>{filterByLetters ? letters : numbers}</List>
+                    )}
+                </>
+            )}
+        </>
+    );
 }
 
-SongList.propTypes = {
-    classes: PropTypes.object.isRequired
-};
-
-SongList.contextType = MainContext;
-
-export default withStyles(styles)(SongList);
+export default SongList;
