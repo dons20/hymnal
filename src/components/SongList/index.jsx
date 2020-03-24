@@ -25,7 +25,7 @@ function SongList() {
     const { songs, dispatch } = useContext(MainContext);
 
     /** Local State to handle list behaviour */
-    //const [unfiltered, setUnfiltered] = useState([]); // Contains a copy of songs from the context
+    const [unfiltered, setUnfiltered] = useState([]); // Contains a copy of songs from the context
     const [filteredList, setFilteredList] = useState([]); // Contains a subset of song list items
     const [sortDescending, setSortDescending] = useState(true); // Determines sorting direction of lists
     const [filterByLetters, setFilterByLetters] = useState(true); // Determines filter category; letters or numbers
@@ -63,18 +63,17 @@ function SongList() {
         [filteredList, memoizedDisplaySong]
     );
     const unfilteredJSX = useMemo(() => {
-        if (songs?.length > 1 && filteredList.length < songs.length) {
-            let allSongs = songs.filter(song => song);
-            setFilteredList(allSongs);
+        if (songs?.length > 1 && unfiltered.length < songs?.length) {
+            setUnfiltered([...songs]);
         }
 
-        return filteredList.map(song => (
+        return unfiltered.map(song => (
             <div key={song.number} data-song-id={song.number} onClick={memoizedDisplaySong} className="listItem">
                 <div className="listNumber">#{song.number}</div>
                 <div className="listTitle">{song.title}</div>
             </div>
         ));
-    }, [filteredList, songs, memoizedDisplaySong]);
+    }, [unfiltered, songs, memoizedDisplaySong]);
 
     /** Swaps between filtered and unfiltered list displays */
     function toggleFilteredList() {
@@ -145,16 +144,17 @@ function SongList() {
         }
     }
 
-    /** Swaps between numerical and alphabetical filter/sorting modes */
+    /**
+     * Swaps between numerical and alphabetical filter/sorting modes
+     */
     function filterList(shouldFilterAlpha = filterByLetters) {
-        //const callback = showFilteredList ? setFilteredList : setUnfiltered;
-        const callback = setFilteredList;
+        const callback = showFilteredList ? setUnfiltered : setFilteredList;
 
         if (shouldFilterAlpha) {
             if (sortDescending) {
-                callback(list => [...list].sort((a, b) => a.title.localeCompare(b.title)));
-            } else {
                 callback(list => [...list].sort((a, b) => b.title.localeCompare(a.title)));
+            } else {
+                callback(list => [...list].sort((a, b) => a.title.localeCompare(b.title)));
             }
         } else {
             if (!sortDescending) {
@@ -208,9 +208,6 @@ function SongList() {
         }
 
         if (songs.length > 1) {
-            // let rawSongs = songs.filter(song => song);
-            // setUnfiltered(rawSongs);
-
             if (letters.length <= 1) {
                 createMenu().then(val => {
                     let letters = val.letters
