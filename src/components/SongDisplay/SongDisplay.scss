@@ -13,6 +13,8 @@
         white-space: pre-line;
         grid-row-gap: 2rem;
         grid-template-rows: repeat(auto-fit, minmax(100px, 1fr));
+        width: 100%;
+        max-width: 1000px;
     }
 
     & > .header {
@@ -22,7 +24,7 @@
         font-weight: bold;
         grid-template-columns: auto 1fr;
         margin: auto;
-        max-width: 800px;
+        max-width: 1000px;
         width: 100%;
     }
 

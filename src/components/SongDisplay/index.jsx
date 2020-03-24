@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, Fragment } from "react";
+import React, { useContext, useEffect, Fragment, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { MainContext } from "../../App";
 import { Helmet } from "react-helmet";
@@ -9,29 +9,34 @@ function SongDisplay() {
     const { songID } = useParams();
 
     const songIndex = parseInt(songID) - 1;
-    const songBody = songs[songIndex].verse.map((verse, i) => {
-        if (i === 1 && songs[songIndex].chorus) {
-            return (
-                <Fragment key={i}>
-                    <div className="chorus">
-                        <span className="label">Chorus</span>
-                        {songs[songIndex].chorus}
-                    </div>
-                    <div className="verse">
+    const songBody = useMemo(
+        () =>
+            songs.length > 1 &&
+            songs[songIndex].verse.map((verse, i) => {
+                if (i === 1 && songs[songIndex].chorus) {
+                    return (
+                        <Fragment key={i}>
+                            <div className="chorus">
+                                <span className="label">Chorus</span>
+                                {songs[songIndex].chorus}
+                            </div>
+                            <div className="verse">
+                                <span className="label">Verse {i + 1}</span>
+                                {verse}
+                            </div>
+                        </Fragment>
+                    );
+                }
+
+                return (
+                    <div className="verse" key={i}>
                         <span className="label">Verse {i + 1}</span>
                         {verse}
                     </div>
-                </Fragment>
-            );
-        }
-
-        return (
-            <div className="verse" key={i}>
-                <span className="label">Verse {i + 1}</span>
-                {verse}
-            </div>
-        );
-    });
+                );
+            }),
+        [songIndex, songs]
+    );
 
     useEffect(() => {
         if (songs.length > 1) dispatch({ type: "setTitle", payload: songs[songIndex].title });
