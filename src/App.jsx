@@ -1,71 +1,104 @@
-import React, { Component } from 'react';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import BottomNav from './components/BottomNav';
-import Nav from './components/TopNav';
-import styles from './App.module.scss';
-import { Redirect } from 'react-router-dom';
+import React, { Suspense, useReducer, useEffect } from "react";
+import { Route, Switch, Redirect, useHistory } from "react-router-dom";
+import { useSongLoader } from "./components/CustomHooks";
+import { Header, Home, Songs, Settings } from "./pages";
+import BottomNav from "./components/BottomNav";
+import styles from "./App.module.scss";
 
-export const MainContext = React.createContext();
+const PictureHeader = React.lazy(() => import("./components/PictureHeader"));
 
-class App extends Component {
-	state = {
-		width: window.innerWidth,
-		path: '/',
-		pages: {
-			HOME: '/',
-			INDEX: '/songs',
-			FAVOURITES: '/favourites',
-			HISTORY: '/history',
-			SETTINGS: '/settings'
-		},
-		navigate: false,
-		dispatch: (path) => {
-			this.setState({ 
-				navigate: !this.navigate,
-				path: path,
-			})
-		},
-	}
+const pages = {
+    HOME: "/home",
+    INDEX: "/songs",
+    FAVOURITES: "/favourites",
+    SETTINGS: "/settings"
+};
 
-	componentWillMount() {
-		window.addEventListener('resize', this.handleWindowSizeChange);
-	}
+const initialAppState = {
+    meta: {
+        title: "",
+        subtitle: "",
+        width: document.body.getBoundingClientRect().width
+    }
+};
 
-	componentWillUnmount() {
-		window.removeEventListener('resize', this.handleWindowSizeChange);
-	}
+/**
+ * @param {{  }} _state
+ * @param {{ type: String, payload: Object }} action
+ */
+function reducer(_state, action) {
+    switch (action.type) {
+        case "setTitle":
+            return { ..._state, title: action.payload };
+        case "setSubtitle":
+            return { ..._state, subtitle: action.payload };
+        case "setWidth":
+            return { ..._state, width: action.payload };
+        default:
+            throw new Error(`Invalid Action Specified: ${action.payload}`);
+    }
+}
 
-	handleWindowSizeChange = () => {
-		this.setState({ width: window.innerWidth });
-	}
+const ScrollRestoration = () => {
+    const { pathname } = useHistory();
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [pathname]);
+    return null;
+};
 
-	render() {
-		const { width, navigate } = this.state;
-		const isMobile = width <= 960;
+/** @type {React.Context<any>} */
+export const MainContext = React.createContext({});
 
-		if (navigate) {
-			this.setState({ navigate: false });
-			return <Redirect to={this.state.path} push={true} />
-		}
+function App() {
+    const [state, dispatch] = useReducer(reducer, initialAppState);
+    const songs = useSongLoader();
 
-		return (
-			<div className={styles.app}>
-				<CssBaseline />
-				<MainContext.Provider value={this.state}>
-					<section className={styles.app_body}>
-						<Nav />
-						
-						<main className={styles.app_inner}>
-							{this.props.children}
-						</main>
-						
-						{/* Bottom Navigation on mobile */}
-						{isMobile ? <BottomNav /> : null}
-					</section>
-				</MainContext.Provider>
-			</div>
-		);
-	}
+    function handleOrientationChange() {
+        dispatch({ type: "setWidth", payload: document.body.getBoundingClientRect().width });
+    }
+
+    useEffect(() => {
+        window.addEventListener("orientationchange", handleOrientationChange, {
+            capture: false,
+            passive: true
+        });
+        return function cleanup() {
+            window.addEventListener("orientationchange", handleOrientationChange);
+        };
+    }, []);
+
+    const width = state?.meta?.width;
+    const isMobile = width <= 960;
+
+    return (
+        <div className={styles.root}>
+            <MainContext.Provider value={{ meta: state, dispatch, songs, pages }}>
+                <section className={styles.app_body}>
+                    <Header />
+                    <ScrollRestoration />
+                    <main className={styles.app_inner}>
+                        <Suspense fallback={<div>Loading...</div>}>
+                            <PictureHeader />
+                        </Suspense>
+
+                        <div className={styles.wrapper}>
+                            <Switch>
+                                <Route path="/home" component={Home} />
+                                <Route path="/songs" component={Songs} />
+                                <Route path="settings" component={Settings} />
+                                <Route>
+                                    <Redirect to="/home" />} />
+                                </Route>
+                            </Switch>
+                        </div>
+                    </main>
+
+                    {/* Bottom Navigation on mobile */ isMobile ? <BottomNav /> : null}
+                </section>
+            </MainContext.Provider>
+        </div>
+    );
 }
 
 export default App;

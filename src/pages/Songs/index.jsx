@@ -1,33 +1,27 @@
-import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
-import { Paper, withStyles } from '@material-ui/core';
+import React, { Suspense } from "react";
+import { Switch, Route, useRouteMatch, Redirect } from "react-router-dom";
+import { Spin } from "antd";
+import "./Songs.scss";
 
-const styles = (theme) => ({
-	root: {
-		...theme.mixins.gutters(),
-		backgroundColor: theme.palette.primary.light,
-		color: '#FFF',
-		paddingTop: theme.spacing.unit * 2,
-		paddingBottom: theme.spacing.unit * 2,
-		marginTop: theme.spacing.unit * 2,
-		marginBottom: theme.spacing.unit * 2
-    },
-});
+const SongList = React.lazy(() => import("../../components/SongList"));
+const SongDisplay = React.lazy(() => import("../../components/SongDisplay"));
 
-function Listing (props) {
-    const { classes } = props;
-    
-    return ( 
-        <Fragment>
-            <Paper className={classes.root}>
-                Index Page
-            </Paper>
-        </Fragment>
+function Listing() {
+    const { path } = useRouteMatch();
+
+    return (
+        <div className="songs">
+            <Suspense fallback={<Spin size="large" />}>
+                <Switch>
+                    <Route exact path={path} component={SongList} />
+                    <Route path={`${path}/:songID(\\d+)`} component={SongDisplay} />
+                    <Route>
+                        <Redirect to="/songs" />
+                    </Route>
+                </Switch>
+            </Suspense>
+        </div>
     );
 }
 
-Listing.propTypes = {
-	classes: PropTypes.object.isRequired
-};
- 
-export default withStyles(styles)(Listing);
+export default Listing;

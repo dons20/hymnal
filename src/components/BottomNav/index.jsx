@@ -1,51 +1,92 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-import BottomNavigation from '@material-ui/core/BottomNavigation';
-import BottomNavigationAction from '@material-ui/core/BottomNavigationAction';
-import FolderIcon from '@material-ui/icons/Folder';
-import RestoreIcon from '@material-ui/icons/Restore';
-import FavoriteIcon from '@material-ui/icons/Favorite';
-import LocationOnIcon from '@material-ui/icons/LocationOn';
+import React, { useState } from "react";
+import { useLocation, useHistory } from "react-router-dom";
+import { useScrollPosition } from "../CustomHooks";
+import { BookOutlined, HomeOutlined, StarOutlined, SettingOutlined } from "@ant-design/icons";
+import "./BottomNav.scss";
 
-const styles = theme => ({
-  root: {
-    display: 'none',
-    [theme.breakpoints.down('sm')]: {
-        bottom: 0,
-        display: 'flex',
-        position: 'sticky',
-        width: '100%'
+const scrollHeight = Math.max(
+        document.body.scrollHeight,
+        document.documentElement.scrollHeight,
+        document.body.offsetHeight,
+        document.documentElement.offsetHeight,
+        document.body.clientHeight,
+        document.documentElement.clientHeight
+    ),
+    offsetShow = scrollHeight - 80;
+
+function MobileNavBar() {
+    const { pathname } = useLocation();
+    const history = useHistory();
+    const [hidden, setHidden] = useState(false);
+
+    const barColor = "white",
+        unselectedTintColor = "#949494",
+        tintColor = "#33A3F4";
+
+    const tabValues = [
+        {
+            title: "Home",
+            url: "/home",
+            icon: <HomeOutlined />
+        },
+        {
+            title: "Songs",
+            url: "/songs",
+            icon: <BookOutlined />
+        },
+        {
+            title: "Favourites",
+            url: "/favourites",
+            icon: <StarOutlined />
+        },
+        {
+            title: "Settings",
+            url: "/settings",
+            icon: <SettingOutlined />
+        }
+    ];
+
+    /**
+     * Implements hide on scroll down, show on scroll up
+     * Will show if near the end of the page
+     */
+    useScrollPosition(
+        ({ prevPos, currPos }) => {
+            const shouldHide = currPos.y < prevPos.y;
+            const belowThreshold = currPos.y > offsetShow;
+            if (shouldHide !== hidden && !belowThreshold) setHidden(shouldHide);
+            else if (belowThreshold) setHidden(false);
+        },
+        [hidden],
+        false,
+        true,
+        60
+    );
+
+    /**
+     * @param {MouseEventInit&{ currentTarget: { getAttribute: (arg0: string) => String; }; }} e
+     */
+    function handleTabBarPress({ currentTarget }) {
+        const url = currentTarget.getAttribute("data-url");
+        history.push(url);
     }
-  },
-});
-
-class LabelBottomNavigation extends React.Component {
-  state = {
-    value: 'recents',
-  };
-
-  handleChange = (event, value) => {
-    this.setState({ value });
-  };
-
-  render() {
-    const { classes } = this.props;
-    const { value } = this.state;
 
     return (
-      <BottomNavigation value={value} onChange={this.handleChange} className={classes.root}>
-        <BottomNavigationAction label="Home" value="recents" icon={<RestoreIcon />} />
-        <BottomNavigationAction label="Favorites" value="favorites" icon={<FavoriteIcon />} />
-        <BottomNavigationAction label="Index" value="nearby" icon={<LocationOnIcon />} />
-        <BottomNavigationAction label="Settings" value="folder" icon={<FolderIcon />} />
-      </BottomNavigation>
+        <div className={`bottom-nav${hidden ? " --hidden" : ""}`} style={{ background: barColor }}>
+            {tabValues.map(tab => (
+                <div
+                    style={pathname.startsWith(tab.url) ? { color: tintColor } : { color: unselectedTintColor }}
+                    className="nav-item"
+                    onClick={handleTabBarPress}
+                    data-url={tab.url}
+                    key={tab.title}
+                >
+                    {tab.icon}
+                    {tab.title}
+                </div>
+            ))}
+        </div>
     );
-  }
 }
 
-LabelBottomNavigation.propTypes = {
-  classes: PropTypes.object.isRequired,
-};
-
-export default withStyles(styles)(LabelBottomNavigation);
+export default MobileNavBar;

@@ -1,36 +1,51 @@
 {
-  "name": "hymnal",
-  "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "@material-ui/core": "^3.4.0",
-    "@material-ui/icons": "^3.0.1",
-    "node-sass": "^4.10.0",
-    "react": "^16.6.0",
-    "react-dom": "^16.6.0",
-    "react-junctions": "^0.5.0",
-    "react-scripts": "2.1.1",
-    "react-router-dom": "^4.3.1"
-  },
-  "homepage": "./",
-  "scripts": {
-    "https": "set HTTPS=true&&npm start",
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "buildCache": "react-scripts build && sw-precache --config=sw-precache-config.js",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": "react-app"
-  },
-  "browserslist": [
-    ">0.2%",
-    "not dead",
-    "not ie <= 11",
-    "not op_mini all"
-  ],
-  "devDependencies": {
-    "sw-precache": "^5.2.1"
-  }
+    "name": "hymnal",
+    "version": "0.1.0",
+    "private": true,
+    "dependencies": {
+        "@n8tb1t/use-scroll-position": "^1.0.43",
+        "antd": "^4.0.3",
+        "customize-cra": "^0.9.1",
+        "idb-keyval": "^3.2.0",
+        "lodash": "^4.17.15",
+        "node-sass": "^4.13.1",
+        "react": "^16.13.1",
+        "react-app-rewired": "^2.1.5",
+        "react-dom": "^16.13.1",
+        "react-helmet": "6.0.0-beta.2",
+        "react-intersection-observer": "^8.26.1",
+        "react-junctions": "^0.5.0",
+        "react-loader-spinner": "^3.1.5",
+        "react-recipes": "^1.0.0",
+        "react-router-dom": "^5.1.2",
+        "react-scripts": "^3.4.1"
+    },
+    "homepage": "./",
+    "scripts": {
+        "https": "set HTTPS=true&&npm start",
+        "start": "react-app-rewired start",
+        "build": "react-app-rewired build",
+        "buildCache": "react-app-rewired build && sw-precache --config=sw-precache-config.js",
+        "test": "react-app-rewired test",
+        "eject": "react-scripts eject"
+    },
+    "eslintConfig": {
+        "extends": "react-app"
+    },
+    "browserslist": {
+        "production": [
+            ">0.2%",
+            "not dead",
+            "not op_mini all"
+        ],
+        "development": [
+            "last 1 chrome version",
+            "last 1 firefox version",
+            "last 1 safari version"
+        ]
+    },
+    "devDependencies": {
+        "sw-precache": "^5.2.1",
+        "babel-plugin-import": "^1.13.0"
+    }
 }
