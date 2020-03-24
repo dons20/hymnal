@@ -20,7 +20,7 @@
         "react-router-dom": "^5.1.2",
         "react-scripts": "^3.4.1"
     },
-    "homepage": "./",
+    "homepage": "/",
     "scripts": {
         "https": "set HTTPS=true&&npm start",
         "start": "react-app-rewired start",
