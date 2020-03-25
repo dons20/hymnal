@@ -29,9 +29,9 @@ function SongList() {
     const [filteredList, setFilteredList] = useState([]); // Contains a subset of song list items
     const [sortDescending, setSortDescending] = useState(true); // Determines sorting direction of lists
     const [filterByLetters, setFilterByLetters] = useState(true); // Determines filter category; letters or numbers
+    const [sortAlphabetical, setSortAlphabetical] = useState(true); // Determines if the list should be sorted alphabetically or numerically
     const [shouldFilterList, setShouldFilterList] = useState(true); // Determines if the list should have category filters enabled
     const [showFilteredList, setShowFilteredList] = useState(false); // Determines if the filtered list should be shown
-    const [sortAlphabetical, setSortAlphabetical] = useState(true); // Determines if the list should be sorted alphabetically or numerically
     const [numbers, setNumbers] = useState(Array(<div key={1} />)); // Contains an array of available song number categories
     const [letters, setLetters] = useState(Array(<div key={1} />)); // Contains an array of available song letter categories
 
@@ -76,14 +76,9 @@ function SongList() {
     }, [unfiltered, songs, memoizedDisplaySong]);
 
     /** Swaps between filtered and unfiltered list displays */
-    function toggleFilteredList() {
-        setShouldFilterList(showFilteredList ? true : false);
+    function toggleFilteredList(enable) {
+        setShouldFilterList(enable);
         setShowFilteredList(!showFilteredList);
-    }
-
-    /** Shows the filtered list based on selection */
-    function changeActiveNav() {
-        setShowFilteredList(true);
     }
 
     /** Handles Numeric Sort button actions */
@@ -148,7 +143,7 @@ function SongList() {
      * Swaps between numerical and alphabetical filter/sorting modes
      */
     function filterList(shouldFilterAlpha = filterByLetters) {
-        const callback = showFilteredList ? setUnfiltered : setFilteredList;
+        const callback = showFilteredList ? setFilteredList : setUnfiltered;
 
         if (shouldFilterAlpha) {
             if (sortDescending) {
@@ -204,7 +199,7 @@ function SongList() {
 
             setFilteredList(filteredSongs);
             setSortAlphabetical(false);
-            changeActiveNav();
+            setShowFilteredList(true);
         }
 
         if (songs.length > 1) {
@@ -269,9 +264,16 @@ function SongList() {
                         <title>{`Hymns | ${meta.title}`}</title>
                     </Helmet>
                     <div className="utilityHeader">
-                        <button type="button" className="listSwitcher" onClick={toggleFilteredList}>
-                            {showFilteredList && <ArrowLeft title="Back icon" />}
-                            {!showFilteredList && (
+                        <button
+                            type="button"
+                            className="listSwitcher"
+                            onClick={
+                                showFilteredList ? () => toggleFilteredList(true) : () => toggleFilteredList(false)
+                            }
+                        >
+                            {showFilteredList ? (
+                                <ArrowLeft title="Back icon" />
+                            ) : (
                                 <Filter title="Filter icon" className={shouldFilterList ? "active" : ""} />
                             )}
                         </button>

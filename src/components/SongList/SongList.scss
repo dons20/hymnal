@@ -1,12 +1,4 @@
 .songs {
-    & .container {
-        display: grid;
-        grid-auto-rows: 80;
-        max-width: 1200;
-        margin: 0 auto;
-        padding: 10px 0;
-    }
-
     & .grid {
         width: 100%;
         display: grid;
@@ -86,15 +78,12 @@
     & .menuOpt {
         align-items: center;
         background: rgba(255, 255, 255, 1);
-        //box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-        border-bottom: 1px solid #ddd;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.3);
         cursor: pointer;
         display: flex;
         font-size: 2rem;
         justify-content: center;
         padding: 0.6rem 0;
-        transition: background 0.1s ease-in-out, box-shadow 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        will-change: background, box-shadow;
     }
 
     & .ant-spin-container {
@@ -106,6 +95,8 @@
 @media (min-width: 960px) {
     .songs .menuOpt,
     .songs .listItem {
+        transition: background 0.1s ease-in-out, box-shadow 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        will-change: background, box-shadow;
         &:hover {
             background: rgba(255, 255, 255, 0.75);
             //box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
@@ -113,6 +104,8 @@
     }
 
     .songs .utilityHeader .listSwitcher {
+        transition: background 0.1s ease-in-out, box-shadow 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        will-change: background, box-shadow;
         &:hover {
             background: #f5f5f5aa;
         }
