@@ -1,6 +1,6 @@
 import React, { Suspense, useReducer, useEffect } from "react";
 import { Route, Switch, Redirect, useHistory } from "react-router-dom";
-import { useSongLoader } from "./components/CustomHooks";
+import { useSongLoader, useTouchScreenDetection } from "./components/CustomHooks";
 import { Header, Home, Songs, Settings } from "./pages";
 import BottomNav from "./components/BottomNav";
 import styles from "./App.module.scss";
@@ -53,6 +53,9 @@ export const MainContext = React.createContext({});
 function App() {
     const [state, dispatch] = useReducer(reducer, initialAppState);
     const songs = useSongLoader();
+    const hasTouchScreen = useTouchScreenDetection();
+    const width = state?.meta?.width;
+    const isMobile = width <= 1200 && hasTouchScreen;
 
     function handleOrientationChange() {
         dispatch({ type: "setWidth", payload: document.body.getBoundingClientRect().width });
@@ -67,9 +70,6 @@ function App() {
             window.addEventListener("orientationchange", handleOrientationChange);
         };
     }, []);
-
-    const width = state?.meta?.width;
-    const isMobile = width <= 960;
 
     return (
         <div className={styles.root}>

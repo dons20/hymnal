@@ -1,17 +1,17 @@
 .songs > .container {
-    background-color: rgba(255, 255, 255, 1);
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    height: 100%;
-    justify-content: flex-start;
+    align-content: space-between;
+    background-color: white;
+    display: grid;
+    grid-auto-rows: max-content;
+    justify-content: center;
+    min-height: 100%;
     padding: 1.5rem;
 
     & > .body {
         margin: 20px auto;
         display: grid;
         white-space: pre-line;
-        grid-row-gap: 2rem;
+        grid-row-gap: 2.5rem;
         grid-template-rows: repeat(auto-fit, minmax(100px, 1fr));
         width: 100%;
         max-width: 1000px;
@@ -29,7 +29,7 @@
     }
 
     & > .footer {
-        align-self: flex-end;
+        justify-self: flex-end;
         font-style: italic;
         color: #555;
     }

@@ -76,8 +76,8 @@ function SongList() {
     }, [unfiltered, songs, memoizedDisplaySong]);
 
     /** Swaps between filtered and unfiltered list displays */
-    function toggleFilteredList(enable) {
-        setShouldFilterList(enable);
+    function toggleFilteredList() {
+        setShouldFilterList(showFilteredList);
         setShowFilteredList(!showFilteredList);
     }
 
@@ -165,7 +165,7 @@ function SongList() {
 
     /** Handles changes to the active display when component updates */
     useEffect(() => {
-        /** Generates a menu from all available letters and numbers */
+        /** Generates category labels from all available letters and numbers */
         function createMenu() {
             return new Promise(resolve => {
                 let characters = [],
@@ -202,6 +202,10 @@ function SongList() {
             setShowFilteredList(true);
         }
 
+        /**
+         * Check if songs have been loaded into global state
+         * Splits category entries into JSX elements for actual menu
+         */
         if (songs.length > 1) {
             if (letters.length <= 1) {
                 createMenu().then(val => {
@@ -247,6 +251,7 @@ function SongList() {
         }
     }, [songs, letters.length]);
 
+    /** Sets the page title */
     useEffect(() => {
         dispatch({ type: "setTitle", payload: meta.page });
     }, [dispatch]);
@@ -264,13 +269,7 @@ function SongList() {
                         <title>{`Hymns | ${meta.title}`}</title>
                     </Helmet>
                     <div className="utilityHeader">
-                        <button
-                            type="button"
-                            className="listSwitcher"
-                            onClick={
-                                showFilteredList ? () => toggleFilteredList(true) : () => toggleFilteredList(false)
-                            }
-                        >
+                        <button type="button" className="listSwitcher" onClick={toggleFilteredList}>
                             {showFilteredList ? (
                                 <ArrowLeft title="Back icon" />
                             ) : (

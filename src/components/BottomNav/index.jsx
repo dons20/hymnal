@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useLocation, useHistory } from "react-router-dom";
 import { useScrollPosition } from "../CustomHooks";
 import { BookOutlined, HomeOutlined, StarOutlined, SettingOutlined } from "@ant-design/icons";
@@ -12,12 +12,14 @@ const scrollHeight = Math.max(
         document.body.clientHeight,
         document.documentElement.clientHeight
     ),
-    offsetShow = scrollHeight - 80;
+    offsetShow = scrollHeight;
 
 function MobileNavBar() {
     const { pathname } = useLocation();
     const history = useHistory();
+    const prevPath = useRef(null);
     const [hidden, setHidden] = useState(false);
+    const [transitioning, setTransitioning] = useState(false);
 
     const barColor = "white",
         unselectedTintColor = "#949494",
@@ -54,14 +56,45 @@ function MobileNavBar() {
         ({ prevPos, currPos }) => {
             const shouldHide = currPos.y < prevPos.y;
             const belowThreshold = currPos.y > offsetShow;
-            if (shouldHide !== hidden && !belowThreshold) setHidden(shouldHide);
-            else if (belowThreshold) setHidden(false);
+            if (shouldHide !== hidden && !belowThreshold && !transitioning) {
+                setHidden(shouldHide);
+                triggerTransition();
+            } else if (belowThreshold && !transitioning) {
+                setHidden(!shouldHide);
+                triggerTransition();
+            }
         },
         [hidden],
         false,
         true,
-        60
+        120
     );
+
+    useEffect(() => {
+        if (pathname !== prevPath.current) {
+            new Promise(resolve => {
+                resolve(
+                    setTimeout(() => {
+                        setTransitioning(false);
+                        setHidden(false);
+                    }, 300)
+                );
+            });
+        }
+
+        prevPath.current = pathname;
+    }, [pathname, prevPath.current]);
+
+    function triggerTransition() {
+        setTransitioning(true);
+        new Promise(resolve => {
+            resolve(setTimeout(() => setTransitioning(false), 250));
+        });
+    }
+
+    function disableTransitionState() {
+        setTransitioning(false);
+    }
 
     /**
      * @param {MouseEventInit&{ currentTarget: { getAttribute: (arg0: string) => String; }; }} e
@@ -78,6 +111,7 @@ function MobileNavBar() {
                     style={pathname.startsWith(tab.url) ? { color: tintColor } : { color: unselectedTintColor }}
                     className="nav-item"
                     onClick={handleTabBarPress}
+                    onTransitionEnd={disableTransitionState}
                     data-url={tab.url}
                     key={tab.title}
                 >
