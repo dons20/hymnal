@@ -1,8 +1,20 @@
 import { useEffect, useState } from "react";
 import { get, set } from "idb-keyval";
 
+/**
+ * @typedef {Object} Song
+ * @property {Number} number
+ * @property {String} title
+ * @property {String[]} verse
+ * @property {String} chorus
+ * @property {String} author
+ */
+
+/** 
+ * @type {Song}
+ */
 const Song = {
-    number: 0,
+    number: -1,
     title: "",
     verse: [],
     chorus: "",
@@ -10,7 +22,7 @@ const Song = {
 };
 
 function useSongLoader(_id) {
-    const [songs, setSongs] = useState(Array(Song));
+    const [songs, setSongs] = useState([]]);
 
     /**
      * Initiates the process of loading songs from the db
@@ -18,10 +30,10 @@ function useSongLoader(_id) {
     useEffect(() => {
         /**
          * Iterates over song array to make strings readable
-         * @param {Song} songs
+         * @param {Song[]} songs
          */
         function cleanupStrings(songs) {
-            let obj = [{ ...songs }];
+            let obj = songs;
             for (let i = 0; i < obj.length; i++) {
                 if (obj[i].chorus.length > 0) {
                     obj[i].chorus = replaceString(obj[i].chorus);
