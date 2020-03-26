@@ -1,4 +1,7 @@
 .songs {
     color: #111;
     height: 100%;
+    display: grid;
+    justify-items: stretch;
+    align-items: center;
 }

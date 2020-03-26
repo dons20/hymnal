@@ -57,11 +57,11 @@ function MobileNavBar() {
             const shouldHide = currPos.y < prevPos.y;
             const belowThreshold = currPos.y > offsetShow;
             if (shouldHide !== hidden && !belowThreshold && !transitioning) {
-                setHidden(shouldHide);
-                triggerTransition();
+                //setHidden(shouldHide);
+                //triggerTransition();
             } else if (belowThreshold && !transitioning) {
-                setHidden(!shouldHide);
-                triggerTransition();
+                //setHidden(!shouldHide);
+                //triggerTransition();
             }
         },
         [hidden],
@@ -72,18 +72,18 @@ function MobileNavBar() {
 
     useEffect(() => {
         if (pathname !== prevPath.current) {
-            new Promise(resolve => {
+            /* new Promise(resolve => {
                 resolve(
                     setTimeout(() => {
                         setTransitioning(false);
                         setHidden(false);
                     }, 300)
                 );
-            });
+            }); */
         }
 
         prevPath.current = pathname;
-    }, [pathname, prevPath.current]);
+    }, [pathname]);
 
     function triggerTransition() {
         setTransitioning(true);
