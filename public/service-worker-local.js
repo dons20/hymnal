@@ -2,15 +2,18 @@ console.log('Service Worker code goes here');
 var CACHE_NAME = 'my-pwa-cache-v1';
 var urlsToCache = [
 	'./',
+	"./**.js",
+	"./**.png",
+	"./songs.json",
 	'./favicon.ico',
     './manifest.json',
     './launcher-144.png',
     './launcher-192.png',
     './launcher-512.png',
-	'./static/js/bundle.js',
-	'./static/js/0.chunk.js',
-	'./static/js/main.chunk.js',
-    './service-worker-local.js'
+	"./static/js/**.js",
+	"./static/css/**.css",
+	"./static/media/**.svg",
+	'./service-worker-local.js'
 ];
 
 //Cache Files on first load
