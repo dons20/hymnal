@@ -10,7 +10,7 @@ import { get, set } from "idb-keyval";
  * @property {String} author
  */
 
-/** 
+/**
  * @type {Song}
  */
 const Song = {
@@ -22,7 +22,7 @@ const Song = {
 };
 
 function useSongLoader(_id) {
-    const [songs, setSongs] = useState([]]);
+    const [songs, setSongs] = useState(Array(Song));
 
     /**
      * Initiates the process of loading songs from the db

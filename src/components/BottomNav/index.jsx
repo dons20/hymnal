@@ -111,7 +111,7 @@ function MobileNavBar() {
                     style={pathname.startsWith(tab.url) ? { color: tintColor } : { color: unselectedTintColor }}
                     className="nav-item"
                     onClick={handleTabBarPress}
-                    onTransitionEnd={disableTransitionState}
+                    //onTransitionEnd={disableTransitionState}
                     data-url={tab.url}
                     key={tab.title}
                 >
