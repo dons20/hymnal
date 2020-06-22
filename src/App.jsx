@@ -1,29 +1,30 @@
 import React, { Suspense, useReducer, useEffect } from "react";
-import { Route, Switch, Redirect, useHistory } from "react-router-dom";
-import { useSongLoader, useTouchScreenDetection } from "./components/CustomHooks";
-import { Header, Home, Songs, Settings } from "./pages";
-import BottomNav from "./components/BottomNav";
+import { Route, Switch, Redirect, useLocation } from "react-router-dom";
+import { useSongLoader, useTouchScreenDetection } from "components/CustomHooks";
+import { Header } from "components";
+import { Home, Songs, Settings } from "pages";
+import BottomNav from "components/BottomNav";
 import styles from "./App.module.scss";
 
-const PictureHeader = React.lazy(() => import("./components/PictureHeader"));
+const PictureHeader = React.lazy(() => import("components/PictureHeader"));
 
 const pages = {
     HOME: "/home",
     INDEX: "/songs",
     FAVOURITES: "/favourites",
-    SETTINGS: "/settings"
+    SETTINGS: "/settings",
 };
 
 const initialAppState = {
     meta: {
         title: "",
         subtitle: "",
-        width: document.body.getBoundingClientRect().width
-    }
+        width: document.body.getBoundingClientRect().width,
+    },
 };
 
 /**
- * @param {{  }} _state
+ * @param {initialAppState} _state
  * @param {{ type: String, payload: Object }} action
  */
 function reducer(_state, action) {
@@ -40,7 +41,7 @@ function reducer(_state, action) {
 }
 
 const ScrollRestoration = () => {
-    const { pathname } = useHistory();
+    const { pathname } = useLocation();
     useEffect(() => {
         window.scrollTo(0, 0);
     }, [pathname]);
@@ -64,7 +65,7 @@ function App() {
     useEffect(() => {
         window.addEventListener("orientationchange", handleOrientationChange, {
             capture: false,
-            passive: true
+            passive: true,
         });
         return function cleanup() {
             window.addEventListener("orientationchange", handleOrientationChange);
@@ -88,7 +89,7 @@ function App() {
                                 <Route path="/songs" component={Songs} />
                                 <Route path="settings" component={Settings} />
                                 <Route>
-                                    <Redirect to="/home" />} />
+                                    <Redirect to="/home" />
                                 </Route>
                             </Switch>
                         </div>

@@ -2,6 +2,7 @@
     align-content: space-between;
     background-color: white;
     display: grid;
+    grid-row: 1 / span 2;
     grid-auto-rows: max-content;
     justify-content: center;
     min-height: 100%;

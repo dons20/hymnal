@@ -18,8 +18,8 @@ function MobileNavBar() {
     const { pathname } = useLocation();
     const history = useHistory();
     const prevPath = useRef(null);
-    const [hidden, setHidden] = useState(false);
-    const [transitioning, setTransitioning] = useState(false);
+    const [hidden] = useState(false);
+    const [transitioning] = useState(false);
 
     const barColor = "white",
         unselectedTintColor = "#949494",
@@ -29,23 +29,23 @@ function MobileNavBar() {
         {
             title: "Home",
             url: "/home",
-            icon: <HomeOutlined />
+            icon: <HomeOutlined />,
         },
         {
             title: "Songs",
             url: "/songs",
-            icon: <BookOutlined />
+            icon: <BookOutlined />,
         },
         {
             title: "Favourites",
             url: "/favourites",
-            icon: <StarOutlined />
+            icon: <StarOutlined />,
         },
         {
             title: "Settings",
             url: "/settings",
-            icon: <SettingOutlined />
-        }
+            icon: <SettingOutlined />,
+        },
     ];
 
     /**
@@ -85,16 +85,16 @@ function MobileNavBar() {
         prevPath.current = pathname;
     }, [pathname]);
 
-    function triggerTransition() {
+    /* function triggerTransition() {
         setTransitioning(true);
         new Promise(resolve => {
             resolve(setTimeout(() => setTransitioning(false), 250));
         });
-    }
+    } */
 
-    function disableTransitionState() {
+    /* function disableTransitionState() {
         setTransitioning(false);
-    }
+    } */
 
     /**
      * @param {MouseEventInit&{ currentTarget: { getAttribute: (arg0: string) => String; }; }} e
@@ -106,7 +106,7 @@ function MobileNavBar() {
 
     return (
         <div className={`bottom-nav${hidden ? " --hidden" : ""}`} style={{ background: barColor }}>
-            {tabValues.map(tab => (
+            {tabValues.map((tab) => (
                 <div
                     style={pathname.startsWith(tab.url) ? { color: tintColor } : { color: unselectedTintColor }}
                     className="nav-item"
