@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext, useCallback, useRef } from "rea
 import { useHistory, useRouteMatch } from "react-router-dom";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { List, Menu, Dropdown, Button } from "antd";
-import { VariableSizeGrid } from "react-window";
+import { FixedSizeGrid } from "react-window";
 import { Helmet } from "react-helmet";
 import Icon from "@ant-design/icons";
 import { MainContext } from "App";
@@ -337,19 +337,19 @@ function SongList() {
 				{showFilteredList ? (
 					<AutoSizer>
 						{({ height, width }) => (
-							<VariableSizeGrid
+							<FixedSizeGrid
 								height={height}
-								width={width}
-								rowHeight={index => 100}
-								columnWidth={index =>
-									window.innerWidth > 950 ? window.innerWidth / 2 : window.innerWidth
+								width={width - 1}
+								rowHeight={100}
+								columnWidth={
+									window.innerWidth > 950 ? window.innerWidth / 2 - 10 : window.innerWidth - 20
 								}
 								columnCount={numColumns.current}
 								rowCount={numRows.current}
 								itemData={shouldFilterCategory ? filteredList : unfilteredList}
 							>
 								{Cell}
-							</VariableSizeGrid>
+							</FixedSizeGrid>
 						)}
 					</AutoSizer>
 				) : (
