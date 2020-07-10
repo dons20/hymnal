@@ -1,5 +1,5 @@
-import React, { useContext } from "react";
-import { MainContext } from "../../App";
+import React, { useContext, useRef } from "react";
+import { MainContext } from "App";
 import { Typography } from "antd";
 import "./PictureHeader.scss";
 
@@ -8,16 +8,15 @@ const imgPath = process.env.PUBLIC_URL + "/rainbow/";
 
 function PictureHeader() {
     const { meta } = useContext(MainContext);
-
-    let img = null,
-        src = "";
+    const img = useRef(null);
+    const src = useRef("");
 
     function update(e) {
-        img = e;
-        let thisSrc = img.getAttribute("src");
+        img.current = e;
+        let thisSrc = img.current.getAttribute("src");
         if (src !== thisSrc) {
-            src = thisSrc;
-            img.parentElement.style.backgroundImage = `url("${src}")`;
+            src.current = thisSrc;
+            img.current.parentElement.style.backgroundImage = `url("${src.current}")`;
         }
     }
 
@@ -38,7 +37,7 @@ function PictureHeader() {
                     src={`${imgPath}rainbow_rg388g_c_scale,w_1400.jpg`}
                     alt="Rainbow Background"
                     className="bgImg"
-                    onLoad={e => update(e.target)}
+                    onLoad={(e) => update(e.target)}
                 />
                 <div className="hCont">
                     {meta.title && (

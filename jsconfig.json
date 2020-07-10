@@ -1,12 +1,10 @@
 {
-    "compilerOptions": {
-        "esModuleInterop": true,
-        "checkJs": true,
-        "jsx": "preserve",
-        "target": "es2018",
-        "module": "commonJS",
-        "baseUrl": "src"
-    },
-    "exclude": ["node_modules", "**/node_modules/*"],
-    "typeAcquisition": { "enable": true }
+	"compilerOptions": {
+		"checkJs": true,
+		"jsx": "preserve",
+		"target": "es2018",
+		"module": "commonJS",
+		"baseUrl": "src"
+	},
+	"exclude": ["node_modules", "**/node_modules/*"]
 }

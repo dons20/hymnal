@@ -1,120 +1,133 @@
 .songs {
-    .grid {
-        width: 100%;
-        display: grid;
-        grid-gap: 10px;
-        grid-auto-rows: 80px;
-        grid-template-columns: repeat(2, minmax(60px, 1fr));
-    }
+	.grid {
+		width: 100%;
+		display: grid;
+		grid-gap: 10px;
+		grid-auto-rows: 80px;
+		grid-template-columns: repeat(2, minmax(60px, 1fr));
+	}
 
-    .listItem {
-        align-items: center;
-        background-color: #fff;
-        //box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-        border-bottom: 1px solid rgba(0, 0, 0, 0.12);
-        border-right: 1px solid rgba(0, 0, 0, 0.12);
-        cursor: pointer;
-        display: grid;
-        padding: 0 20px;
-        text-align: left;
-        transition: background 0.1s ease-in-out;
-        user-select: none;
-        will-change: background;
-        grid-template-columns: 100px 1fr;
-    }
+	.listItem {
+		align-items: center;
+		background-color: #fff;
+		//box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+		border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+		border-right: 1px solid rgba(0, 0, 0, 0.12);
+		cursor: pointer;
+		display: grid;
+		grid-template-columns: 80px 1fr;
+		padding: 0 20px;
+		text-align: left;
+		transition: background 0.1s ease-in-out;
+		user-select: none;
+		will-change: background;
+	}
 
-    .listNumber {
-        font-size: 1rem;
-        font-weight: 700;
-    }
+	.listNumber {
+		font-size: 1rem;
+		font-weight: 700;
+	}
 
-    .listTitle {
-        font-size: 1.3rem;
-        font-weight: 700;
-    }
+	.listTitle {
+		font-size: 1.3rem;
+		font-weight: 700;
+	}
 
-    .utilityHeader {
-        background-color: #fff;
-        border-bottom: 1px solid #ddd;
-        color: #333;
-        display: flex;
-        justify-content: center;
-        height: 3.5rem;
-        font-size: 1.3rem;
+	.utilityHeader {
+		background-color: #fff;
+		border-bottom: 1px solid #ddd;
+		color: #333;
+		display: flex;
+		justify-content: center;
+		height: 3.5rem;
+		font-size: 1.3rem;
+		position: sticky;
+		max-width: 500px;
+		margin: auto;
+		top: 0;
+		width: 100%;
+		z-index: 10;
 
-        width: 100%;
+		& button {
+			background-color: #fff;
+			border: 0;
+			border-right: 1px solid #ddd;
+			cursor: pointer;
+			flex: 1 1 100%;
+			height: 100%;
+			padding: 0.5rem;
+		}
 
-        & button {
-            background-color: #fff;
-            border: 0;
-            border-right: 1px solid #ddd;
-            cursor: pointer;
-            flex: 1 1 100%;
-            height: 100%;
-            padding: 0.5rem;
-        }
+		& > :last-child {
+			border-right: none;
+		}
 
-        & > :last-child {
-            border-right: none;
-        }
+		& svg {
+			height: 100%;
+			color: var(--dark-neutral-color);
+			fill: var(--dark-neutral-color);
 
-        & svg {
-            height: 100%;
-            color: var(--dark-neutral-color);
-            fill: var(--dark-neutral-color);
+			&.active {
+				color: var(--primary-color);
+				fill: var(--primary-color);
+			}
+		}
+	}
 
-            &.active {
-                color: var(--primary-color);
-                fill: var(--primary-color);
-            }
-        }
-    }
+	.listSwitcher {
+		align-items: center;
+		display: flex;
+		justify-content: center;
+		transition: background 0.1s ease-in-out;
+		will-change: background;
+		&:hover {
+			background: lighten($color: rgb(24, 144, 255), $amount: 30%);
+		}
+	}
 
-    .listSwitcher {
-        transition: background 0.1s ease-in-out;
-        will-change: background;
-        &:hover {
-            background: lighten($color: rgb(24, 144, 255), $amount: 30%);
-        }
-    }
+	.menuOpt,
+	.listItem {
+		transition: background 0.1s ease-in-out, color 0.1s ease-in;
+		will-change: background, color;
+		&:hover {
+			background: rgb(24, 144, 255);
+			color: #fff;
+		}
+	}
 
-    .menuOpt,
-    .listItem {
-        transition: background 0.1s ease-in-out, color 0.1s ease-in;
-        will-change: background, color;
-        &:hover {
-            background: rgb(24, 144, 255);
-            color: #fff;
-        }
-    }
+	.loader {
+		height: 100%;
+		width: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
 
-    .loader {
-        height: 100%;
-        width: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
+	.menuOpt {
+		align-items: center;
+		background: rgba(255, 255, 255, 1);
+		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.3);
+		cursor: pointer;
+		display: flex;
+		font-size: 2rem;
+		justify-content: center;
+		padding: 0.6rem 0;
+	}
 
-    .menuOpt {
-        align-items: center;
-        background: rgba(255, 255, 255, 1);
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.3);
-        cursor: pointer;
-        display: flex;
-        font-size: 2rem;
-        justify-content: center;
-        padding: 0.6rem 0;
-    }
-
-    .ant-spin-container {
-        display: grid;
-        grid-auto-rows: 4rem;
-    }
+	.ant-spin-container {
+		display: grid;
+		grid-auto-rows: minmax(4rem, auto);
+	}
 }
 
 @media (min-width: 960px) {
-    .songs .ant-spin-container {
-        grid-template-columns: 1fr 1fr;
-    }
+	.songs .ant-spin-container {
+		grid-template-columns: 1fr 1fr;
+	}
+}
+
+.custom-overlay {
+	min-width: 300px;
+	max-width: 400px;
+	margin: auto;
 }

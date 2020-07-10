@@ -3,8 +3,8 @@ import { Switch, Route, useRouteMatch, Redirect } from "react-router-dom";
 import { Spin } from "antd";
 import "./Songs.scss";
 
-const SongList = React.lazy(() => import("../../components/SongList"));
-const SongDisplay = React.lazy(() => import("../../components/SongDisplay"));
+const SongList = React.lazy(() => import("components/SongList"));
+const SongDisplay = React.lazy(() => import("components/SongDisplay"));
 
 function Listing() {
     const { path } = useRouteMatch();
