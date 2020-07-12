@@ -2,16 +2,16 @@ const { override, useBabelRc, adjustWorkbox } = require("customize-cra");
 const { InjectManifest, GenerateSW } = require("workbox-webpack-plugin");
 const path = require("path");
 
-const webpack = function(config, env) {
-    config.plugins.push(
-        new InjectManifest({
-            globPatterns: ["./rainbow/*.jpg"],
-            globDirectory: "build",
-            swSrc: path.join("public", "service-worker-local.js"),
-            swDest: "service-worker-local.js",
-            include: [/\.html$/]
-        })
-        /* new GenerateSW({
+const webpack = function (config, env) {
+	config.plugins.push(
+		new InjectManifest({
+			globPatterns: ["./rainbow/*.jpg"],
+			globDirectory: "build",
+			swSrc: path.join("public", "service-worker-local.js"),
+			swDest: "service-worker-local.js",
+			include: [/\.html$/],
+		})
+		/* new GenerateSW({
             clientsClaim: true,
             exclude: [/\.map$/, /asset-manifest\.json$/],
             importWorkboxFrom: "cdn",
@@ -26,18 +26,17 @@ const webpack = function(config, env) {
                 //new RegExp('/[^/?]+\\.[^/]+$'),
             ]
         }) */
-    );
+	);
 
-    return config;
+	return config;
 };
 
 module.exports = override(
-    useBabelRc(),
-    adjustWorkbox(wb => {
-        Object.assign(wb, {
-            globPatterns: ["rainbow/*.jpg"],
-            globDirectory: "public",
-            include: [/\.html$/, /\.js$/, /\.png$/, /\.jpg$/, /\.svg$/]
-        });
-    })
+	useBabelRc(),
+	adjustWorkbox(wb => {
+		Object.assign(wb, {
+			skipWaiting: true,
+			exclude: (wb.exclude || []).concat("index.html"),
+		});
+	})
 );

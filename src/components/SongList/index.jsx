@@ -93,8 +93,11 @@ function SongList() {
 	/** Disables the list filters to show all songs */
 	function toggleListFilter() {
 		setSortDescending(true);
-		enableCategoryFilters(!shouldFilterCategory);
-		setShowFilteredList(!showFilteredList);
+		if (shouldFilterCategory && showFilteredList) enableCategoryFilters(false);
+		else enableCategoryFilters(!shouldFilterCategory);
+
+		if (!(shouldFilterCategory && showFilteredList)) setShowFilteredList(!showFilteredList);
+
 		shouldUpdateFilter.current = true;
 	}
 
@@ -258,7 +261,7 @@ function SongList() {
 		<Menu>
 			<Menu.Item key="0">
 				<Button type="default" size="large" onClick={toggleListFilter} block>
-					{showFilteredList ? "Enable Filter" : "No Filter"}
+					{showFilteredList && !shouldFilterCategory ? "Enable Filter" : "No Filter"}
 				</Button>
 			</Menu.Item>
 			<Menu.Item key="1">
@@ -329,7 +332,7 @@ function SongList() {
 				>
 					<button type="button" className="listSwitcher ant-dropdown-link" onClick={e => e.preventDefault()}>
 						<Filter title="Filter icon" className={shouldFilterCategory ? "active" : ""} />
-						Filter
+						Sort and Filter
 					</button>
 				</Dropdown>
 			</div>
@@ -339,11 +342,9 @@ function SongList() {
 						{({ height, width }) => (
 							<FixedSizeGrid
 								height={height}
-								width={width - 1}
+								width={width}
 								rowHeight={100}
-								columnWidth={
-									window.innerWidth > 950 ? window.innerWidth / 2 - 10 : window.innerWidth - 20
-								}
+								columnWidth={window.innerWidth > 950 ? window.innerWidth / 2 : window.innerWidth}
 								columnCount={numColumns.current}
 								rowCount={numRows.current}
 								itemData={shouldFilterCategory ? filteredList : unfilteredList}
