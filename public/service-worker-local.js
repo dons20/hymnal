@@ -1,6 +1,7 @@
 var CACHE_NAME = "my-pwa-cache-v1";
 var urlsToCache = [
 	"/",
+	"/songs",
 	"/index.html",
 	"/songs.json",
 	"/favicon.ico",
