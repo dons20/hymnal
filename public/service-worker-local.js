@@ -24,7 +24,7 @@ self.addEventListener("install", function (e) {
 //Serve cached data
 self.addEventListener("fetch", function (e) {
 	// @ts-ignore
-	console.log(e.request.url);
+	//console.log(e.request.url);
 	// @ts-ignore
 	if (e.request.cache === "only-if-cached" && e.request.mode !== "same-origin") return;
 	// @ts-ignore

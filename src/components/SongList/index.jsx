@@ -331,8 +331,8 @@ function SongList() {
 					overlayStyle={{ minWidth: 300 }}
 				>
 					<button type="button" className="listSwitcher ant-dropdown-link" onClick={e => e.preventDefault()}>
-						<Filter title="Filter icon" className={shouldFilterCategory ? "active" : ""} />
-						Sort and Filter
+						<Filter title="Filter icon" className={`icon ${shouldFilterCategory ? "active" : ""}`} />
+						<div className="label">Sort and Filter</div>
 					</button>
 				</Dropdown>
 			</div>
@@ -344,7 +344,7 @@ function SongList() {
 								height={height}
 								width={width}
 								rowHeight={100}
-								columnWidth={window.innerWidth > 950 ? window.innerWidth / 2 : window.innerWidth}
+								columnWidth={window.innerWidth > 950 ? width / 2 - 6 : width - 6}
 								columnCount={numColumns.current}
 								rowCount={numRows.current}
 								itemData={shouldFilterCategory ? filteredList : unfilteredList}
