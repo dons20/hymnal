@@ -1,44 +1,42 @@
 .songs > .container {
-    align-content: space-between;
-    background-color: white;
-    display: grid;
-    grid-row: 1 / span 2;
-    grid-auto-rows: max-content;
-    justify-content: center;
-    min-height: 100%;
-    padding: 1.5rem;
+	align-content: space-between;
+	display: grid;
+	grid-row: 1 / span 2;
+	grid-auto-rows: max-content;
+	justify-content: center;
+	min-height: 100%;
+	padding: 1.5rem;
 
-    & > .body {
-        margin: 20px auto;
-        display: grid;
-        white-space: pre-line;
-        grid-row-gap: 2.5rem;
-        grid-template-rows: repeat(auto-fit, minmax(100px, 1fr));
-        width: 100%;
-        max-width: 1000px;
-    }
+	& > .body {
+		margin: 20px auto;
+		display: grid;
+		white-space: pre-line;
+		grid-row-gap: 2.5rem;
+		grid-template-rows: repeat(auto-fit, minmax(100px, 1fr));
+		width: 100%;
+		max-width: 1000px;
+	}
 
-    & > .header {
-        align-items: center;
-        column-gap: 2rem;
-        display: grid;
-        font-weight: bold;
-        grid-template-columns: auto 1fr;
-        margin: auto;
-        max-width: 1000px;
-        width: 100%;
-    }
+	& > .header {
+		align-items: center;
+		column-gap: 2rem;
+		display: grid;
+		font-weight: bold;
+		grid-template-columns: auto 1fr;
+		margin: auto;
+		max-width: 1000px;
+		width: 100%;
+	}
 
-    & > .footer {
-        justify-self: flex-end;
-        font-style: italic;
-        color: #555;
-    }
+	& > .footer {
+		justify-self: flex-end;
+		font-style: italic;
+	}
 
-    & .label {
-        display: block;
-        font-style: italic;
-        font-size: calc(10px + 1vmin);
-        font-weight: 600;
-    }
+	& .label {
+		display: block;
+		font-style: italic;
+		font-size: calc(10px + 1vmin);
+		font-weight: 600;
+	}
 }

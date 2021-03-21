@@ -14,7 +14,7 @@
 
 	.listItem {
 		align-items: center;
-		background-color: #fff;
+		// background-color: #fff;
 		//box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
 		border-bottom: 1px solid rgba(0, 0, 0, 0.12);
 		border-right: 1px solid rgba(0, 0, 0, 0.12);
@@ -40,9 +40,8 @@
 
 	.utilityHeader {
 		align-items: center;
-		background-color: #fff;
-		border-bottom: 1px solid #ddd;
-		color: #333;
+		// background-color: #fff;
+		// color: #333;
 		display: grid;
 		font-size: 1.3rem;
 		grid-template-rows: 100%;
@@ -59,9 +58,8 @@
 
 		button {
 			align-items: center;
-			background-color: #fff;
+			// background-color: #fff;
 			border: 0;
-			border-right: 1px solid #ddd;
 			cursor: pointer;
 			display: grid;
 			grid-template-columns: auto 1fr;
@@ -115,7 +113,7 @@
 
 	.menuOpt {
 		align-items: center;
-		background: rgba(255, 255, 255, 1);
+		// background: rgba(255, 255, 255, 1);
 		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.3);
 		cursor: pointer;
 		display: flex;

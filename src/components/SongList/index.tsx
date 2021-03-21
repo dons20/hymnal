@@ -1,30 +1,39 @@
-import React, { useState, useEffect, useContext, useCallback, useRef } from "react";
+import { useState, useEffect, useContext, useCallback, useRef } from "react";
+import { FaSortAlphaDown, FaSortAlphaDownAlt, FaSortNumericDown, FaSortNumericDownAlt } from "react-icons/fa";
+import {
+	Icon,
+	Menu,
+	MenuItem,
+	MenuList,
+	List,
+	MenuButton,
+	Box,
+	Text,
+	MenuOptionGroup,
+	useColorModeValue,
+} from "@chakra-ui/react";
+import { FixedSizeGrid, GridChildComponentProps } from "react-window";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import AutoSizer from "react-virtualized-auto-sizer";
-import { List, Menu, Dropdown, Button } from "antd";
-import { FixedSizeGrid } from "react-window";
 import { Helmet } from "react-helmet";
-import Icon from "@ant-design/icons";
+import { Button } from "components";
 import { MainContext } from "App";
 import "./SongList.scss";
 
-/** FA Images */
-import { ReactComponent as Filter } from "img/filter-solid.svg";
-//import { ReactComponent as ArrowLeft } from "img/arrow-left-solid.svg";
-import { ReactComponent as SortAlphaDown } from "img/sort-alpha-down-solid.svg";
-import { ReactComponent as SortAlphaDownAlt } from "img/sort-alpha-down-alt-solid.svg";
-import { ReactComponent as SortNumericDown } from "img/sort-numeric-down-solid.svg";
-import { ReactComponent as SortNumericDownAlt } from "img/sort-numeric-down-alt-solid.svg";
+type filterSongT =
+	| { type: "numbers"; value: number }
+	| { type: "range"; value: number[] }
+	| { type: "letters"; value: string };
 
 const meta = {
 	title: "Song List",
 	page: "List of Hymns",
 };
 
-const SortAlphaDownIcon = props => <Icon component={SortAlphaDown} {...props} />;
-const SortAlphaUpIcon = props => <Icon component={SortAlphaDownAlt} {...props} />;
-const SortNumericDownIcon = props => <Icon component={SortNumericDown} {...props} />;
-const SortNumericUpIcon = props => <Icon component={SortNumericDownAlt} {...props} />;
+const SortAlphaDownIcon: typeof Icon = () => <Icon as={FaSortAlphaDown} />;
+const SortAlphaUpIcon: typeof Icon = () => <Icon as={FaSortAlphaDownAlt} />;
+const SortNumericDownIcon: typeof Icon = () => <Icon as={FaSortNumericDown} />;
+const SortNumericUpIcon: typeof Icon = () => <Icon as={FaSortNumericDownAlt} />;
 
 function SongList() {
 	/** Effects */
@@ -33,8 +42,8 @@ function SongList() {
 	const { songs, dispatch } = useContext(MainContext);
 
 	/** Local State to handle list behaviour */
-	const [filteredList, setFilteredList] = useState([...songs]); // Contains a subset of song list items
-	const [unfilteredList, setUnfilteredList] = useState([...songs]); // Contains a copy of songs from the context
+	const [filteredList, setFilteredList] = useState([...songs!]); // Contains a subset of song list items
+	const [unfilteredList, setUnfilteredList] = useState([...songs!]); // Contains a copy of songs from the context
 	const [sortDescending, setSortDescending] = useState(true); // Determines sorting direction of lists
 	const [filterByLetters, setFilterByLetters] = useState(true); // Determines filter category; letters or numbers
 	const [sortAlphabetical, setSortAlphabetical] = useState(true); // Determines if the list should be sorted alphabetically or numerically
@@ -43,10 +52,12 @@ function SongList() {
 	const [numbers, setNumbers] = useState(Array(<div key={1} />)); // Contains an array of available song number categories
 	const [letters, setLetters] = useState(Array(<div key={1} />)); // Contains an array of available song letter categories
 	const shouldUpdateFilter = useRef(true);
-	/** @type {React.MutableRefObject<HTMLDivElement>} */
-	const wrapperRef = useRef(null);
+	const wrapperRef = useRef<HTMLDivElement>(null);
 	const numColumns = useRef(window.innerWidth > 950 ? 2 : 1);
 	const numRows = useRef(0);
+
+	/** Reactive colours */
+	const btnColor = useColorModeValue("white", "white");
 
 	if (shouldFilterCategory) {
 		if (numColumns.current === 2) numRows.current = filteredList.length / 2;
@@ -60,9 +71,8 @@ function SongList() {
 		e => {
 			/**
 			 * Displays a song at specified index
-			 * @param {MouseEventInit&{ currentTarget: { getAttribute: (arg0: string) => String; }; }} e
 			 */
-			function displaySong(e) {
+			function displaySong(e: MouseEventInit & { currentTarget: { getAttribute: (arg0: string) => String } }) {
 				const songID = e.currentTarget.getAttribute("data-song-id");
 				history.push(`${path}/${songID}`);
 			}
@@ -73,7 +83,7 @@ function SongList() {
 	);
 
 	useEffect(() => {
-		if (!shouldUpdateFilter.current || songs.length <= 1) return;
+		if (!shouldUpdateFilter.current || songs!.length <= 1) return;
 
 		let newArray = [...unfilteredList];
 
@@ -140,7 +150,7 @@ function SongList() {
 	/**
 	 * Swaps between numerical and alphabetical filter/sorting modes
 	 */
-	function filterList(shouldFilterAlpha) {
+	function filterList(shouldFilterAlpha: boolean) {
 		const callback = shouldFilterCategory ? setFilteredList : setUnfilteredList;
 
 		if (shouldFilterAlpha) {
@@ -159,35 +169,29 @@ function SongList() {
 	useEffect(() => {
 		/** Generates category labels from all available letters and numbers */
 		function createMenu() {
-			return new Promise(resolve => {
-				let characters = [],
-					numbers = [];
-				for (let i = 0; i < songs.length; i++) {
-					characters.push(songs[i].title.charAt(0));
-					numbers.push(songs[i].number);
-				}
-				resolve({ letters: String.prototype.concat(...new Set(characters)), numbers: numbers });
-			});
+			let characters = [],
+				numbers = [];
+			for (let i = 0; i < songs!.length; i++) {
+				characters.push(songs![i].title.charAt(0));
+				numbers.push(songs![i].number);
+			}
+			return { letters: String.prototype.concat(...new Set(characters)), numbers: numbers };
 		}
 
 		/**
 		 * Filters list of songs by criteria
-		 * @param {String} type
-		 * @param {Number|Array|String} value
 		 */
-		function filterSongs(type, value) {
-			let filteredSongs;
-			if (type === "numbers") {
-				filteredSongs = songs.filter(song => song.number === value);
+		function filterSongs(props: filterSongT) {
+			let filteredSongs = songs!;
+			if (props.type === "numbers") {
+				filteredSongs = songs!.filter(song => song.number === props.value);
 				setSortAlphabetical(false);
-			} else if (type === "range") {
-				filteredSongs = songs.filter(song => song.number >= value[0] && song.number <= value[1]);
+			} else if (props.type === "range") {
+				filteredSongs = songs!.filter(song => song.number >= props.value[0] && song.number <= props.value[1]);
 				setSortAlphabetical(false);
-			} else if (type === "letters") {
-				filteredSongs = songs.filter(song => song.title.charAt(0) === value);
+			} else if (props.type === "letters") {
+				filteredSongs = songs!.filter(song => song.title.charAt(0) === props.value);
 				setSortAlphabetical(true);
-			} else {
-				return null;
 			}
 
 			setSortDescending(true);
@@ -199,121 +203,124 @@ function SongList() {
 		 * Check if songs have been loaded into global state
 		 * Splits category entries into JSX elements for actual menu
 		 */
-		if (songs.length > 1 && letters.length <= 1) {
-			createMenu().then(val => {
-				let letters = val.letters.replace(/\W/, "").split("").sort();
-				let numbers = [];
-				for (let i = 0; i < val.numbers.length; i += 100) {
-					numbers.push(val.numbers.slice(i, i + 100));
-				}
+		if (songs!.length > 1 && letters.length <= 1) {
+			const menuValues = createMenu();
+			let letters = menuValues.letters.replace(/\W/, "").split("").sort();
+			let numbers = [];
+			for (let i = 0; i < menuValues.numbers.length; i += 100) {
+				numbers.push(menuValues.numbers.slice(i, i + 100));
+			}
 
-				let finalNumbers = numbers.map(n => {
-					return [n[0], n[n.length - 1]];
-				});
-
-				setLetters(
-					letters.map(letter => (
-						<div
-							className="menuOpt"
-							onClick={() => filterSongs("letters", letter)}
-							key={letter}
-							data-value={letter}
-						>
-							{letter}
-						</div>
-					))
-				);
-				setNumbers(
-					finalNumbers.map(num => (
-						<div
-							className="menuOpt"
-							onClick={() => filterSongs("range", [num[0], num[1]])}
-							key={num[0]}
-							data-value={num[0]}
-						>
-							{num[0]} - {num[1]}
-						</div>
-					))
-				);
+			let finalNumbers = numbers.map(n => {
+				return [n[0], n[n.length - 1]];
 			});
+
+			setLetters(
+				letters.map(letter => (
+					<Box
+						className="menuOpt"
+						onClick={() => filterSongs({ type: "letters", value: letter })}
+						key={letter}
+						data-value={letter}
+					>
+						{letter}
+					</Box>
+				))
+			);
+			setNumbers(
+				finalNumbers.map(num => (
+					<Box
+						className="menuOpt"
+						onClick={() => filterSongs({ type: "range", value: [num[0], num[1]] })}
+						key={num[0]}
+						data-value={num[0]}
+					>
+						{num[0]} - {num[1]}
+					</Box>
+				))
+			);
 		}
 	}, [songs, letters.length]);
 
-	/** @param {import("react-window").GridChildComponentProps} props */
-	const Cell = ({ columnIndex, rowIndex, style, data }) => {
+	/** Renders a single cell */
+	const Cell = ({ columnIndex, rowIndex, style, data }: GridChildComponentProps) => {
 		const itemIndex = rowIndex * numColumns.current + columnIndex;
 
 		return (
-			<div
+			<Box
 				key={data[itemIndex].number}
 				data-song-id={data[itemIndex].number}
 				onClick={memoizedDisplaySong}
 				className="listItem"
 				style={style}
 			>
-				<div className="listNumber">#{data[itemIndex].number}</div>
-				<div className="listTitle">{data[itemIndex].title}</div>
-			</div>
+				<Text className="listNumber">#{data[itemIndex].number}</Text>
+				<Text className="listTitle">{data[itemIndex].title}</Text>
+			</Box>
 		);
 	};
 
-	const menu = (
-		<Menu>
-			<Menu.Item key="0">
-				<Button type="default" size="large" onClick={toggleListFilter} block>
-					{showFilteredList && !shouldFilterCategory ? "Enable Filter" : "No Filter"}
-				</Button>
-			</Menu.Item>
-			<Menu.Item key="1">
-				<Button
-					type={sortAlphabetical && sortDescending ? "primary" : "default"}
-					icon={<SortAlphaDownIcon className={sortAlphabetical ? "active" : ""} />}
-					onClick={sortAlphaDescending}
-					size="large"
-					block
-				>
-					Sort Alphabetic - Descending
-				</Button>
-			</Menu.Item>
-			<Menu.Item key="2">
-				<Button
-					type={sortAlphabetical && !sortDescending ? "primary" : "default"}
-					icon={<SortAlphaUpIcon className={sortAlphabetical ? "active" : ""} />}
-					onClick={sortAlphaAscending}
-					size="large"
-					block
-				>
-					Sort Alphabetic - Ascending
-				</Button>
-			</Menu.Item>
-			<Menu.Item key="3">
-				<Button
-					type={!sortAlphabetical && sortDescending ? "primary" : "default"}
-					icon={<SortNumericDownIcon className={sortAlphabetical ? "" : "active"} />}
-					onClick={sortNumericDescending}
-					size="large"
-					block
-				>
-					Sort Numeric - Descending
-				</Button>
-			</Menu.Item>
-			<Menu.Item key="4">
-				<Button
-					type={!sortAlphabetical && !sortDescending ? "primary" : "default"}
-					icon={<SortNumericUpIcon className={sortAlphabetical ? "" : "active"} />}
-					onClick={sortNumericAscending}
-					size="large"
-					block
-				>
-					Sort Numeric - Ascending
-				</Button>
-			</Menu.Item>
+	const FilterMenu = (
+		<Menu closeOnSelect={false}>
+			<MenuButton as={Button} colorScheme="blue" rightIcon={<SortAlphaUpIcon />}>
+				Filter
+			</MenuButton>
+			<MenuList>
+				<MenuOptionGroup defaultValue="toggleFilter" title="Order" type="radio">
+					<MenuItem value="toggleFilter">
+						<Button onClick={toggleListFilter} colorScheme="transparent">
+							{showFilteredList && !shouldFilterCategory ? "Enable Filter" : "No Filter"}
+						</Button>
+					</MenuItem>
+					<MenuItem>
+						<Button
+							type={sortAlphabetical && sortDescending ? "primary" : "default"}
+							icon={<SortAlphaDownIcon className={sortAlphabetical ? "active" : ""} />}
+							onClick={sortAlphaDescending}
+							colorScheme="transparent"
+						>
+							Sort Alphabetic - Descending
+						</Button>
+					</MenuItem>
+					<MenuItem>
+						<Button
+							type={sortAlphabetical && !sortDescending ? "primary" : "default"}
+							icon={<SortAlphaUpIcon className={sortAlphabetical ? "active" : ""} />}
+							onClick={sortAlphaAscending}
+							colorScheme="transparent"
+						>
+							Sort Alphabetic - Ascending
+						</Button>
+					</MenuItem>
+					<MenuItem>
+						<Button
+							type={!sortAlphabetical && sortDescending ? "primary" : "default"}
+							icon={<SortNumericDownIcon className={sortAlphabetical ? "" : "active"} />}
+							onClick={sortNumericDescending}
+							colorScheme="transparent"
+						>
+							Sort Numeric - Descending
+						</Button>
+					</MenuItem>
+					<MenuItem>
+						<Button
+							type={!sortAlphabetical && !sortDescending ? "primary" : "default"}
+							icon={<SortNumericUpIcon className={sortAlphabetical ? "" : "active"} />}
+							onClick={sortNumericAscending}
+							colorScheme="transparent"
+							color="white"
+						>
+							Sort Numeric - Ascending
+						</Button>
+					</MenuItem>
+				</MenuOptionGroup>
+			</MenuList>
 		</Menu>
 	);
 
 	/** Sets the page title */
 	useEffect(() => {
-		dispatch({ type: "setTitle", payload: meta.page });
+		dispatch!({ type: "setTitle", payload: meta.page });
 	}, [dispatch]);
 
 	return (
@@ -322,21 +329,8 @@ function SongList() {
 				<title>{`Hymns | ${meta.title}`}</title>
 			</Helmet>
 
-			<div className="utilityHeader">
-				<Dropdown
-					overlay={menu}
-					trigger={["click"]}
-					placement="bottomCenter"
-					overlayClassName="custom-overlay"
-					overlayStyle={{ minWidth: 300 }}
-				>
-					<button type="button" className="listSwitcher ant-dropdown-link" onClick={e => e.preventDefault()}>
-						<Filter title="Filter icon" className={`icon ${shouldFilterCategory ? "active" : ""}`} />
-						<div className="label">Sort and Filter</div>
-					</button>
-				</Dropdown>
-			</div>
-			<div className="list-wrapper" ref={wrapperRef}>
+			<Box className="utilityHeader">{FilterMenu}</Box>
+			<Box className="list-wrapper" ref={wrapperRef}>
 				{showFilteredList ? (
 					<AutoSizer>
 						{({ height, width }) => (
@@ -356,7 +350,7 @@ function SongList() {
 				) : (
 					<List>{filterByLetters ? letters : numbers}</List>
 				)}
-			</div>
+			</Box>
 		</>
 	);
 }

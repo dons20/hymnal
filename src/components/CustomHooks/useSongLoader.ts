@@ -1,19 +1,8 @@
 import { useEffect, useState } from "react";
 import { get, set } from "idb-keyval";
+import axios from "axios";
 
-/**
- * @typedef {Object} Song
- * @property {Number} number
- * @property {String} title
- * @property {String[]} verse
- * @property {String} chorus
- * @property {String} author
- */
-
-/**
- * @type {Song}
- */
-const Song = {
+const NewSong: Song = {
 	number: -1,
 	title: "",
 	verse: [],
@@ -21,18 +10,15 @@ const Song = {
 	author: "",
 };
 
-function useSongLoader(_id) {
-	const [songs, setSongs] = useState([Song]);
+function useSongLoader(_id = 0) {
+	const [songs, setSongs] = useState([NewSong]);
 
 	/**
 	 * Initiates the process of loading songs from the db
 	 */
 	useEffect(() => {
-		/**
-		 * Iterates over song array to make strings readable
-		 * @param {Song[]} songs
-		 */
-		function cleanupStrings(songs) {
+		/** Iterates over song array to make strings readable */
+		function cleanupStrings(songs: Song[]) {
 			let obj = songs;
 			for (let i = 0; i < obj.length; i++) {
 				if (obj[i].chorus.length > 0) {
@@ -53,11 +39,15 @@ function useSongLoader(_id) {
 		/**
 		 * Loads songs from JSON and stores them locally
 		 */
-		function loadSongsFromJSON() {
-			fetchSongs().then(json => {
-				setSongs(cleanupStrings(json));
-				set("songs", json);
-			});
+		async function loadSongsFromJSON() {
+			let songsJson: Song[];
+			try {
+				songsJson = await fetchSongs<Song[]>();
+				setSongs(cleanupStrings(songsJson));
+				set("songs", songsJson);
+			} catch (err) {
+				console.error(err.message);
+			}
 		}
 
 		if (songs.length <= 1) {
@@ -89,9 +79,8 @@ function useSongLoader(_id) {
 
 	/**
 	 * Removes unnecessary characters and spaces from string
-	 * @param {string} string
 	 */
-	function replaceString(string) {
+	function replaceString(string: string) {
 		let newString = string
 			.replace(/\*/g, "")
 			.replace(/\s{2,}/g, "\n")
@@ -102,18 +91,15 @@ function useSongLoader(_id) {
 	/**
 	 * Fetches song database and returns it for parsing
 	 */
-	function fetchSongs() {
-		return new Promise(async resolve => {
-			let url = process.env.PUBLIC_URL + "/songs.json";
-			let response = await fetch(url);
-			if (response.ok) {
-				resolve(response.json());
-			} else {
-				throw Object.assign(new Error(`File not found on server!`));
-			}
-		}).catch(err => {
-			console.error(err);
-		});
+	async function fetchSongs<T>(): Promise<T> {
+		const url = process.env.PUBLIC_URL + "/songs.json";
+		try {
+			const response = await axios.post(url);
+			if (response.status !== 200) throw new Error(`File not found on server!`);
+			return response.data;
+		} catch (err) {
+			throw new Error(err);
+		}
 	}
 
 	return songs;
