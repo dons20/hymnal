@@ -3,7 +3,7 @@ declare interface Song {
 	title: string;
 	verse: string[];
 	chorus: string;
-	author: string;
+	author?: string;
 }
 
 declare interface HttpResponse<T> extends Response {
@@ -13,4 +13,8 @@ declare interface HttpResponse<T> extends Response {
 declare interface PosT {
 	prevPos: { x: number; y: number };
 	currPos: { x: number; y: number };
+}
+
+declare interface IDBFactory extends IDBFactory {
+	databases: () => Promise<{ name: string }[]>;
 }

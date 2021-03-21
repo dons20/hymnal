@@ -10,6 +10,7 @@ import {
 	Box,
 	Text,
 	MenuOptionGroup,
+	// eslint-disable-next-line
 	useColorModeValue,
 } from "@chakra-ui/react";
 import { FixedSizeGrid, GridChildComponentProps } from "react-window";
@@ -57,7 +58,8 @@ function SongList() {
 	const numRows = useRef(0);
 
 	/** Reactive colours */
-	const btnColor = useColorModeValue("white", "white");
+	// const btnBG = useColorModeValue("white", "white");
+	// const btnColor = useColorModeValue("white", "white");
 
 	if (shouldFilterCategory) {
 		if (numColumns.current === 2) numRows.current = filteredList.length / 2;

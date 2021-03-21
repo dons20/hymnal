@@ -2,9 +2,9 @@ import React, { useReducer, useEffect } from "react";
 import { Route, Switch, Redirect, useLocation } from "react-router-dom";
 import { useSongLoader } from "components/CustomHooks";
 import { isMobile } from "react-device-detect";
-import { Spinner } from "@chakra-ui/react";
 import styles from "./App.module.scss";
 import { withSuspense } from "helpers";
+import { Loader } from "components";
 
 const Header = withSuspense(React.lazy(() => import("components/Header")));
 const BottomNav = withSuspense(React.lazy(() => import("components/BottomNav")));
@@ -98,15 +98,7 @@ function App() {
 						<div className={styles.wrapper}>
 							<Switch>
 								<Route path="/home" component={Home} />
-								<Route path="/songs">
-									{songs.length > 1 ? (
-										<Songs />
-									) : (
-										<div className="loader">
-											<Spinner size="xl" />
-										</div>
-									)}
-								</Route>
+								<Route path="/songs">{songs.length > 1 ? <Songs /> : <Loader />}</Route>
 								<Route path="settings" component={Settings} />
 								<Route>
 									<Redirect to="/home" />

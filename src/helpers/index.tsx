@@ -1,5 +1,6 @@
 import React, { Suspense } from "react";
-import { Spinner } from "@chakra-ui/spinner";
+// import { Spinner } from "@chakra-ui/spinner";
+import { Loader } from "components";
 
 export const withSuspense = <P extends React.ReactNode & object, Q extends React.ReactNode & object>(
 	LazyComponent: React.FC<P>,
@@ -11,7 +12,8 @@ export const withSuspense = <P extends React.ReactNode & object, Q extends React
 				FallbackComponent ? (
 					<FallbackComponent {...(props as Q)} />
 				) : (
-					<Spinner thickness="4px" speed="0.65s" emptyColor="gray.200" color="blue.500" size="xl" />
+					<Loader />
+					// <Spinner thickness="4px" speed="0.65s" emptyColor="gray.200" color="blue.500" size="xl" />
 				)
 			}
 		>
