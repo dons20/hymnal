@@ -1,19 +1,22 @@
 .card {
-    display: grid;
-    grid-template-rows: auto minmax(auto, 70%) auto;
-    width: 100%;
-    height: 100%;
-    min-width: 300px;
-    max-height: 600px;
+	align-content: space-between;
+	display: grid;
+	grid-template-rows: auto minmax(auto, 70%) auto;
+	width: 100%;
+	height: 100%;
+	min-width: 380px;
+	max-width: 380px;
 }
 
 .grid {
-    align-content: space-around;
-    height: 100%;
-    display: grid;
-    grid-gap: 30px;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    padding: 2rem 0;
-    width: 90%;
-    margin: auto;
+	align-content: space-around;
+	height: 100%;
+	display: grid;
+	grid-gap: 30px;
+	grid-template-columns: repeat(auto-fit, minmax(380px, auto));
+	justify-items: center;
+	margin: auto;
+	max-width: 800px;
+	padding: 2rem 0;
+	width: 90%;
 }
