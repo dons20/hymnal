@@ -1,8 +1,9 @@
 import { useContext, useEffect, Fragment, useMemo } from "react";
 import { useColorModeValue } from "@chakra-ui/color-mode";
+import { useHistory, useParams } from "react-router-dom";
 import { Box, Text } from "@chakra-ui/layout";
-import { useParams } from "react-router-dom";
 import { Helmet } from "react-helmet";
+import { Button } from "components";
 import { MainContext } from "App";
 import "./SongDisplay.scss";
 
@@ -11,6 +12,7 @@ type ParamTypes = {
 };
 
 function SongDisplay() {
+	const history = useHistory();
 	const { songs, dispatch } = useContext(MainContext);
 	const { songID } = useParams<ParamTypes>();
 	const authorColor = useColorModeValue("#555555", "gray.300");
@@ -45,6 +47,8 @@ function SongDisplay() {
 		);
 	}, [songIndex, songs]);
 
+	const backToIndex = () => history.push(`${process.env.PUBLIC_URL}/songs/index`);
+
 	useEffect(() => {
 		if (songs!.length > 1) dispatch!({ type: "setTitle", payload: songs![songIndex].title });
 	}, [dispatch, songs, songIndex]);
@@ -54,6 +58,9 @@ function SongDisplay() {
 			<Helmet>
 				<title>{`Hymns | ${songs![songIndex].title}`}</title>
 			</Helmet>
+			<Button onClick={backToIndex} pos="fixed" left={-5} top="18%" zIndex={100}>
+				Index
+			</Button>
 			<Box className="header">
 				<Text># {songs![songIndex].number}</Text>
 				<Text>{songs![songIndex].title}</Text>

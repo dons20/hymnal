@@ -1,21 +1,21 @@
 :root {
-    --header-font: "PT Sans", sans-serif;
-    --body-font: "Noto Sans", sans-serif;
-    --primary-color: #1890ff;
-    --accent-color: #0e66b9;
-    --dim-color: #0e66b9;
-    --dark-neutral-color: #444444;
-    --background-color: #ffffff;
-    --background-color-alt: #f5f5f5;
+	--header-font: "PT Sans", sans-serif;
+	--body-font: "Noto Sans", sans-serif;
+	--primary-color: #1890ff;
+	--accent-color: #0e66b9;
+	--dim-color: #0e66b9;
+	--dark-neutral-color: #444444;
+	--background-color: #ffffff;
+	--background-color-alt: #f5f5f5;
 }
 
 body {
-    margin: 0;
-    padding: 0;
-    font-family: var(--body-font), -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
-        "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+	margin: 0;
+	padding: 0;
+	font-family: var(--body-font), -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
+		"Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }
 
 h1,
@@ -24,18 +24,19 @@ h3,
 h4,
 h5,
 h6 {
-    font-family: var(--header-font);
-    font-weight: 400;
+	font-family: var(--header-font);
+	font-weight: 400;
 }
 
 html,
 body,
 #root {
-    height: auto;
+	height: auto;
+	overflow-x: hidden;
 }
 
 code {
-    font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+	font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 
 /**
@@ -48,10 +49,10 @@ input,
 optgroup,
 select,
 textarea {
-    font-family: inherit; /* 1 */
-    font-size: 100%; /* 1 */
-    line-height: 1.15; /* 1 */
-    margin: 0; /* 2 */
+	font-family: inherit; /* 1 */
+	font-size: 100%; /* 1 */
+	line-height: 1.15; /* 1 */
+	margin: 0; /* 2 */
 }
 
 /**
@@ -61,8 +62,8 @@ textarea {
 
 button,
 input {
-    /* 1 */
-    overflow: visible;
+	/* 1 */
+	overflow: visible;
 }
 
 /**
@@ -72,8 +73,8 @@ input {
 
 button,
 select {
-    /* 1 */
-    text-transform: none;
+	/* 1 */
+	text-transform: none;
 }
 
 /**
@@ -84,7 +85,7 @@ button,
 [type="button"],
 [type="reset"],
 [type="submit"] {
-    -webkit-appearance: button;
+	-webkit-appearance: button;
 }
 
 /**
@@ -95,8 +96,8 @@ button::-moz-focus-inner,
 [type="button"]::-moz-focus-inner,
 [type="reset"]::-moz-focus-inner,
 [type="submit"]::-moz-focus-inner {
-    border-style: none;
-    padding: 0;
+	border-style: none;
+	padding: 0;
 }
 
 /**
@@ -107,9 +108,9 @@ button:-moz-focusring,
 [type="button"]:-moz-focusring,
 [type="reset"]:-moz-focusring,
 [type="submit"]:-moz-focusring {
-    outline: 1px dotted ButtonText;
+	outline: 1px dotted ButtonText;
 }
 
 .ant-card-head-title {
-    font-weight: bold;
+	font-weight: bold;
 }

@@ -59,7 +59,7 @@ function useSongLoader(_id = 0) {
 					const db = await openDB<SongsTDB>("Songs");
 					db.addEventListener("error", () => loadSongsFromJSON());
 					const songStorage = await db.getAllFromIndex("song", "number");
-					console.info(songStorage);
+					// console.info(songStorage);
 					setSongs(songStorage);
 				} else {
 					console.log(`%cNo database entry found, will parse json...`, "color: #b70018; font-size: medium;");

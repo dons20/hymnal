@@ -1,27 +1,26 @@
-import React, { Suspense } from "react";
+import React from "react";
 import { Switch, Route, useRouteMatch, Redirect } from "react-router-dom";
-import { Spinner } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
+import { withSuspense } from "helpers";
 
 import "./Songs.scss";
 
-const SongList = React.lazy(() => import("components/SongList"));
-const SongDisplay = React.lazy(() => import("components/SongDisplay"));
+const SongList = withSuspense(React.lazy(() => import("components/SongList")));
+const SongDisplay = withSuspense(React.lazy(() => import("components/SongDisplay")));
 
 function Listing() {
 	const { path } = useRouteMatch();
 
 	return (
-		<div className="songs">
-			<Suspense fallback={<Spinner size="xl" />}>
-				<Switch>
-					<Route exact path={path} component={SongList} />
-					<Route path={`${path}/:songID(\\d+)`} component={SongDisplay} />
-					<Route>
-						<Redirect to="/songs" />
-					</Route>
-				</Switch>
-			</Suspense>
-		</div>
+		<Box className="songs">
+			<Switch>
+				<Route exact path={`${path}/index`} component={SongList} />
+				<Route path={`${path}/:songID(\\d+)`} component={SongDisplay} />
+				<Route>
+					<Redirect to="/songs/index" />
+				</Route>
+			</Switch>
+		</Box>
 	);
 }
 

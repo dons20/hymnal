@@ -1,10 +1,13 @@
-import { Button as CoreButton } from "@chakra-ui/react";
+import { Button as CoreButton, ButtonProps } from "@chakra-ui/react";
+import { Link, LinkProps } from "react-router-dom";
 
-type ButtonP<T> = T extends React.ComponentType<infer P> | React.Component<infer P>
-	? JSX.LibraryManagedAttributes<T, P>
-	: never;
+interface ButtonLink extends ButtonProps {
+	as: Link;
+}
 
-const Button = ({ children, size = "lg", colorScheme = "blue", ...rest }: ButtonP<typeof CoreButton>) => (
+type ButtonP = ButtonProps | (ButtonLink & LinkProps);
+
+const Button = ({ children, size = "lg", colorScheme = "blue", ...rest }: ButtonP) => (
 	<CoreButton size={size} colorScheme={colorScheme} {...rest}>
 		{children}
 	</CoreButton>

@@ -18,3 +18,16 @@ declare interface PosT {
 declare interface IDBFactory extends IDBFactory {
 	databases: () => Promise<{ name: string }[]>;
 }
+
+declare type DBSchema = import("idb/with-async-ittr").DBSchema;
+
+declare interface SongsTDB extends DBSchema {
+	song: {
+		key: string;
+		value: Song;
+		indexes: {
+			number: string;
+			title: string;
+		};
+	};
+}

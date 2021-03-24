@@ -1,8 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
+import { FaItunesNote, FaHome, FaStar } from "react-icons/fa";
 import { useLocation, useHistory } from "react-router-dom";
 import { useScrollPosition } from "components/CustomHooks";
-import { FaItunesNote, FaHome, FaStar } from "react-icons/fa";
+import { useColorModeValue } from "@chakra-ui/color-mode";
+import { useMediaQuery } from "@chakra-ui/media-query";
 import { IoMdSettings } from "react-icons/io";
+import { Box, Text } from "@chakra-ui/layout";
+import { Button } from "components";
 import "./BottomNav.scss";
 
 const scrollHeight = Math.max(
@@ -21,10 +25,10 @@ function MobileNavBar() {
 	const prevPath = useRef<string | null>(null);
 	const [hidden] = useState(false);
 	const [transitioning] = useState(false);
-
-	const barColor = "white",
-		unselectedTintColor = "#949494",
-		tintColor = "#33A3F4";
+	const [showMobileMenu] = useMediaQuery("(max-width: 650px)");
+	const [iconsOnly] = useMediaQuery("(max-width: 475px)");
+	const footerBg = useColorModeValue("blue.500", "blue.600");
+	const footerColors = useColorModeValue("gray.100", "gray.100");
 
 	const tabValues = [
 		{
@@ -103,23 +107,36 @@ function MobileNavBar() {
 	}
 
 	return (
-		<div className={`bottom-nav${hidden ? " --hidden" : ""}`} style={{ background: barColor }}>
+		<Box className={`bottom-nav${showMobileMenu ? "" : " --hidden"}`} color={footerColors} bg={footerBg}>
 			{tabValues.map(tab => (
-				<button
-					style={pathname.startsWith(tab.url) ? { color: tintColor } : { color: unselectedTintColor }}
-					className="nav-item"
+				<Button
+					leftIcon={tab.icon}
+					aria-label={tab.title}
 					onClick={handleTabBarPress}
-					//onTransitionEnd={disableTransitionState}
-					type="button"
-					data-url={tab.url}
 					key={tab.title}
+					color={footerColors}
+					bg="transparent"
+					w="25%"
+					p={0}
 				>
-					{tab.icon}
-					{tab.title}
-				</button>
+					{!iconsOnly && <Text>{tab.title}</Text>}
+				</Button>
 			))}
-		</div>
+		</Box>
 	);
 }
+
+/* <button
+	style={pathname.startsWith(tab.url) ? { color: tintColor } : { color: unselectedTintColor }}
+	className="nav-item"
+	onClick={handleTabBarPress}
+	//onTransitionEnd={disableTransitionState}
+	type="button"
+	data-url={tab.url}
+	key={tab.title}
+>
+	{tab.icon}
+	{tab.title}
+</button> */
 
 export default MobileNavBar;

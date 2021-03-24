@@ -1,34 +1,54 @@
 import { useState, useEffect, useContext, useCallback, useRef } from "react";
 import { FaSortAlphaDown, FaSortAlphaDownAlt, FaSortNumericDown, FaSortNumericDownAlt } from "react-icons/fa";
-import {
-	Icon,
-	Menu,
-	MenuItem,
-	MenuList,
-	List,
-	MenuButton,
-	Box,
-	Text,
-	MenuOptionGroup,
-	// eslint-disable-next-line
-	useColorModeValue,
-} from "@chakra-ui/react";
 import { FixedSizeGrid, GridChildComponentProps } from "react-window";
-import { useHistory, useRouteMatch } from "react-router-dom";
+import { DEFAULT_ALPHA_PROPS, DEFAULT_NUM_PROPS } from "./defaults";
 import AutoSizer from "react-virtualized-auto-sizer";
+import { useHistory } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "components";
 import { MainContext } from "App";
+import {
+	Icon,
+	Box,
+	Text,
+	useDisclosure,
+	Stack,
+	Checkbox,
+	RadioGroup,
+	Radio,
+	Heading,
+	Slide,
+	VStack,
+	Flex,
+	useColorModeValue,
+	CloseButton,
+	Portal,
+} from "@chakra-ui/react";
 import "./SongList.scss";
 
-type filterSongT =
+enum FILTER_TYPES {
+	FAVE = "Favourites",
+	ALPHA = "Alphabetically",
+	NUM = "Numerically",
+}
+
+enum FILTER_DIRS {
+	ASCENDING = "Ascending",
+	DESCENDING = "Descending",
+}
+
+type MenuOptionsFnT = [string[], number[][]];
+
+type FilterSongT =
 	| { type: "numbers"; value: number }
 	| { type: "range"; value: number[] }
 	| { type: "letters"; value: string };
 
+type FilterT = FILTER_TYPES.FAVE | FILTER_TYPES.ALPHA | FILTER_TYPES.NUM;
+
 const meta = {
-	title: "Song List",
-	page: "List of Hymns",
+	title: "Hymns Index",
+	page: "Hymns Index",
 };
 
 const SortAlphaDownIcon: typeof Icon = () => <Icon as={FaSortAlphaDown} />;
@@ -37,59 +57,142 @@ const SortNumericDownIcon: typeof Icon = () => <Icon as={FaSortNumericDown} />;
 const SortNumericUpIcon: typeof Icon = () => <Icon as={FaSortNumericDownAlt} />;
 
 function SongList() {
-	/** Effects */
+	/** Core, Context, Routing */
 	const history = useHistory();
-	const { path } = useRouteMatch();
 	const { songs, dispatch } = useContext(MainContext);
 
+	// TODO: Sync all filter options with local storage as preferences
+
 	/** Local State to handle list behaviour */
-	const [filteredList, setFilteredList] = useState([...songs!]); // Contains a subset of song list items
-	const [unfilteredList, setUnfilteredList] = useState([...songs!]); // Contains a copy of songs from the context
-	const [sortDescending, setSortDescending] = useState(true); // Determines sorting direction of lists
-	const [filterByLetters, setFilterByLetters] = useState(true); // Determines filter category; letters or numbers
-	const [sortAlphabetical, setSortAlphabetical] = useState(true); // Determines if the list should be sorted alphabetically or numerically
-	const [shouldFilterCategory, enableCategoryFilters] = useState(true); // Determines if the list should have category filters enabled
-	const [showFilteredList, setShowFilteredList] = useState(false); // Determines if the filtered list should be shown
-	const [numbers, setNumbers] = useState(Array(<div key={1} />)); // Contains an array of available song number categories
-	const [letters, setLetters] = useState(Array(<div key={1} />)); // Contains an array of available song letter categories
-	const shouldUpdateFilter = useRef(true);
+	const [finalList, setFinalList] = useState([...songs!]); // Contains a copy of songs from the context
+	const [filterAlphaProps, setFilterAlphaProps] = useState(DEFAULT_ALPHA_PROPS);
+	const [filterNumberProps, setFilterNumberProps] = useState(DEFAULT_NUM_PROPS);
+	// const [numbers, setNumbers] = useState<NumberP[]>([]); // An array of available song number categories
+	// const [letters, setLetters] = useState<LetterP[]>([]); // An array of available song letter categories
+
+	/** Virtualized list props */
 	const wrapperRef = useRef<HTMLDivElement>(null);
 	const numColumns = useRef(window.innerWidth > 950 ? 2 : 1);
 	const numRows = useRef(0);
 
-	/** Reactive colours */
-	// const btnBG = useColorModeValue("white", "white");
-	// const btnColor = useColorModeValue("white", "white");
+	if (numColumns.current === 2) numRows.current = finalList.length / 2;
+	else numRows.current = finalList.length;
 
-	if (shouldFilterCategory) {
-		if (numColumns.current === 2) numRows.current = filteredList.length / 2;
-		else numRows.current = filteredList.length;
-	} else {
-		if (numColumns.current === 2) numRows.current = unfilteredList.length / 2;
-		else numRows.current = unfilteredList.length;
-	}
+	/** Handles Filter Drawer display */
+	const { isOpen, onOpen, onToggle } = useDisclosure();
+	const modalBG = useColorModeValue("white", "gray.800");
+	const modalColors = useColorModeValue("gray.800", "gray.100");
 
-	const memoizedDisplaySong = useCallback(
+	/** Triggers navigation to a song at a specified index */
+	const memoDisplaySong = useCallback(
 		e => {
-			/**
-			 * Displays a song at specified index
-			 */
 			function displaySong(e: MouseEventInit & { currentTarget: { getAttribute: (arg0: string) => String } }) {
 				const songID = e.currentTarget.getAttribute("data-song-id");
-				history.push(`${path}/${songID}`);
+				history.push(`${process.env.PUBLIC_URL}/songs/${songID}`);
 			}
 
 			displaySong(e);
 		},
-		[history, path]
+		[history]
 	);
 
-	useEffect(() => {
-		if (!shouldUpdateFilter.current || songs!.length <= 1) return;
+	/** Generates category labels from all available letters and numbers */
+	const createMenu = useCallback(() => {
+		let characters = [],
+			numbers = [];
+		for (let i = 0; i < finalList.length; i++) {
+			characters.push(finalList[i].title.charAt(0));
+			numbers.push(finalList[i].number);
+		}
+		return { letters: String.prototype.concat(...new Set(characters)), numbers: numbers };
+	}, [finalList]);
 
-		let newArray = [...unfilteredList];
+	const generateMenuOptions = useCallback((): MenuOptionsFnT => {
+		const menuValues = createMenu();
+		let letters = menuValues.letters.replace(/\W/, "").split("").sort();
+		let numbers = [];
+		for (let i = 0; i < menuValues.numbers.length; i += 100) {
+			numbers.push(menuValues.numbers.slice(i, i + 100));
+		}
 
-		if (sortAlphabetical) {
+		let finalNumbers = numbers.map(n => {
+			return [n[0], n[n.length - 1]];
+		});
+
+		return [letters, finalNumbers];
+	}, [createMenu]);
+
+	const [letters, numbers] = generateMenuOptions();
+
+	const createLetters = () =>
+		letters.map(letter => ({
+			callback: () => filterSongs({ type: "letters", value: letter }),
+			value: letter,
+		}));
+
+	const createNumbers = () =>
+		numbers.map(num => ({
+			callback: () => filterSongs({ type: "range", value: [num[0], num[1]] }),
+			start: num[0],
+			end: num[1],
+		}));
+
+	/** Filters list of songs by criteria */
+	function filterSongs(props: FilterSongT) {
+		let filtered: Song[] = [];
+		if (props.type === "numbers") {
+			filtered = songs!.filter(song => song.number === props.value);
+		} else if (props.type === "range") {
+			filtered = songs!.filter(song => song.number >= props.value[0] && song.number <= props.value[1]);
+		} else if (props.type === "letters") {
+			filtered = songs!.filter(song => song.title.charAt(0) === props.value);
+		}
+
+		const isAlphabetical = filterAlphaProps.enabled;
+		const sortDescending = isAlphabetical ? filterAlphaProps.sortDescending : filterNumberProps.sortDescending;
+		sortList(filterAlphaProps.enabled, sortDescending, filtered);
+	}
+
+	/** [Radio Buttons] Handles list filter directional changes */
+	function handleFilterChange(value: string | number, filterType: FilterT) {
+		const sortDescending = value === "Descending";
+
+		if (filterType === FILTER_TYPES.NUM) {
+			setFilterNumberProps(props => ({ ...props, sortDescending: sortDescending }));
+			if (filterNumberProps.enabled) handleFilterToggle(filterType);
+		}
+
+		if (filterType === FILTER_TYPES.ALPHA) {
+			setFilterAlphaProps(props => ({ ...props, sortDescending: sortDescending }));
+			if (filterAlphaProps.enabled) handleFilterToggle(filterType);
+		}
+	}
+
+	/** [Checkboxes] Handles list filter features enable / disable */
+	function handleFilterToggle(filterType: FilterT) {
+		console.log("Toggle called ", filterType);
+		if (filterType !== FILTER_TYPES.FAVE) {
+			const sortAlphabetical = filterType === FILTER_TYPES.ALPHA;
+			const sortDescending = sortAlphabetical
+				? filterAlphaProps.sortDescending
+				: filterNumberProps.sortDescending;
+
+			console.log(sortDescending);
+			setFilterNumberProps(props => ({ ...props, enabled: !sortAlphabetical }));
+			setFilterAlphaProps(props => ({ ...props, enabled: sortAlphabetical }));
+			sortList(sortAlphabetical, sortDescending);
+		} else {
+			const isAlphabetical = filterAlphaProps.enabled;
+			const sortDescending = isAlphabetical ? filterAlphaProps.sortDescending : filterNumberProps.sortDescending;
+			sortList(filterAlphaProps.enabled, sortDescending, songs);
+		}
+	}
+
+	/** Sorts the displayed list using the selected filters */
+	function sortList(sortAlphabetically: boolean, sortDescending: boolean, sourceList?: Song[]) {
+		const newArray = sourceList ? [...sourceList] : [...finalList];
+
+		if (sortAlphabetically) {
 			if (sortDescending) newArray.sort((a, b) => a.title.localeCompare(b.title));
 			else newArray.sort((a, b) => b.title.localeCompare(a.title));
 		} else {
@@ -97,152 +200,39 @@ function SongList() {
 			else newArray.sort((a, b) => a.number - b.number);
 		}
 
-		setUnfilteredList(newArray);
-
-		shouldUpdateFilter.current = false;
-	}, [unfilteredList, sortAlphabetical, songs, sortDescending]);
-
-	/** Disables the list filters to show all songs */
-	function toggleListFilter() {
-		setSortDescending(true);
-		if (shouldFilterCategory && showFilteredList) enableCategoryFilters(false);
-		else enableCategoryFilters(!shouldFilterCategory);
-
-		if (!(shouldFilterCategory && showFilteredList)) setShowFilteredList(!showFilteredList);
-
-		shouldUpdateFilter.current = true;
+		setFinalList(newArray);
 	}
 
-	/** Sorts Numbers Descending */
-	function sortNumericDescending() {
-		setSortDescending(true);
-		filterList(false);
-		if (!showFilteredList)
-			setNumbers([...numbers].sort((a, b) => parseInt(a.props["data-value"]) - parseInt(b.props["data-value"])));
-		shouldUpdateFilter.current = true;
-	}
-
-	/** Sorts Numbers Ascending */
-	function sortNumericAscending() {
-		setSortDescending(false);
-		filterList(false);
-		if (!showFilteredList)
-			setNumbers([...numbers].sort((a, b) => parseInt(b.props["data-value"]) - parseInt(a.props["data-value"])));
-		shouldUpdateFilter.current = true;
-	}
-
-	/** Sorts Letters Descending */
-	function sortAlphaDescending() {
-		setSortDescending(true);
-		filterList(true);
-		if (!showFilteredList)
-			setLetters([...letters].sort((a, b) => a.props["data-value"].localeCompare(b.props["data-value"])));
-		shouldUpdateFilter.current = true;
-	}
-
-	/** Sorts Letters Ascending */
-	function sortAlphaAscending() {
-		setSortDescending(false);
-		filterList(true);
-		if (!showFilteredList)
-			setLetters([...letters].sort((a, b) => b.props["data-value"].localeCompare(a.props["data-value"])));
-		shouldUpdateFilter.current = true;
-	}
-
-	/**
-	 * Swaps between numerical and alphabetical filter/sorting modes
-	 */
-	function filterList(shouldFilterAlpha: boolean) {
-		const callback = shouldFilterCategory ? setFilteredList : setUnfilteredList;
-
-		if (shouldFilterAlpha) {
-			if (sortDescending) callback(list => [...list].sort((a, b) => b.title.localeCompare(a.title)));
-			else callback(list => [...list].sort((a, b) => a.title.localeCompare(b.title)));
-		} else {
-			if (!sortDescending) callback(list => [...list].sort((a, b) => a.number - b.number));
-			else callback(list => [...list].sort((a, b) => b.number - a.number));
-		}
-
-		setSortAlphabetical(shouldFilterAlpha);
-		setFilterByLetters(shouldFilterAlpha);
-	}
-
-	/** Handles changes to the active display when component updates */
+	/** Sets the page title */
 	useEffect(() => {
-		/** Generates category labels from all available letters and numbers */
-		function createMenu() {
-			let characters = [],
-				numbers = [];
-			for (let i = 0; i < songs!.length; i++) {
-				characters.push(songs![i].title.charAt(0));
-				numbers.push(songs![i].number);
-			}
-			return { letters: String.prototype.concat(...new Set(characters)), numbers: numbers };
-		}
+		dispatch!({ type: "setTitle", payload: meta.page });
+	}, [dispatch]);
 
-		/**
-		 * Filters list of songs by criteria
-		 */
-		function filterSongs(props: filterSongT) {
-			let filteredSongs = songs!;
-			if (props.type === "numbers") {
-				filteredSongs = songs!.filter(song => song.number === props.value);
-				setSortAlphabetical(false);
-			} else if (props.type === "range") {
-				filteredSongs = songs!.filter(song => song.number >= props.value[0] && song.number <= props.value[1]);
-				setSortAlphabetical(false);
-			} else if (props.type === "letters") {
-				filteredSongs = songs!.filter(song => song.title.charAt(0) === props.value);
-				setSortAlphabetical(true);
-			}
+	const NumberItems = () => {
+		const values = createNumbers();
+		return (
+			<>
+				{values.map(number => (
+					<Radio value={number.start} key={number.start}>
+						{number.start} - {number.end}
+					</Radio>
+				))}
+			</>
+		);
+	};
 
-			setSortDescending(true);
-			setFilteredList(filteredSongs);
-			setShowFilteredList(true);
-		}
-
-		/**
-		 * Check if songs have been loaded into global state
-		 * Splits category entries into JSX elements for actual menu
-		 */
-		if (songs!.length > 1 && letters.length <= 1) {
-			const menuValues = createMenu();
-			let letters = menuValues.letters.replace(/\W/, "").split("").sort();
-			let numbers = [];
-			for (let i = 0; i < menuValues.numbers.length; i += 100) {
-				numbers.push(menuValues.numbers.slice(i, i + 100));
-			}
-
-			let finalNumbers = numbers.map(n => {
-				return [n[0], n[n.length - 1]];
-			});
-
-			setLetters(
-				letters.map(letter => (
-					<Box
-						className="menuOpt"
-						onClick={() => filterSongs({ type: "letters", value: letter })}
-						key={letter}
-						data-value={letter}
-					>
-						{letter}
-					</Box>
-				))
-			);
-			setNumbers(
-				finalNumbers.map(num => (
-					<Box
-						className="menuOpt"
-						onClick={() => filterSongs({ type: "range", value: [num[0], num[1]] })}
-						key={num[0]}
-						data-value={num[0]}
-					>
-						{num[0]} - {num[1]}
-					</Box>
-				))
-			);
-		}
-	}, [songs, letters.length]);
+	const LetterItems = () => {
+		const values = createLetters();
+		return (
+			<>
+				{values.map(letter => (
+					<Radio value={letter.value} key={letter.value}>
+						{letter.value}
+					</Radio>
+				))}
+			</>
+		);
+	};
 
 	/** Renders a single cell */
 	const Cell = ({ columnIndex, rowIndex, style, data }: GridChildComponentProps) => {
@@ -252,7 +242,7 @@ function SongList() {
 			<Box
 				key={data[itemIndex].number}
 				data-song-id={data[itemIndex].number}
-				onClick={memoizedDisplaySong}
+				onClick={memoDisplaySong}
 				className="listItem"
 				style={style}
 			>
@@ -262,68 +252,101 @@ function SongList() {
 		);
 	};
 
-	const FilterMenu = (
-		<Menu closeOnSelect={false}>
-			<MenuButton as={Button} colorScheme="blue" rightIcon={<SortAlphaUpIcon />}>
-				Filter
-			</MenuButton>
-			<MenuList>
-				<MenuOptionGroup defaultValue="toggleFilter" title="Order" type="radio">
-					<MenuItem value="toggleFilter">
-						<Button onClick={toggleListFilter} colorScheme="transparent">
-							{showFilteredList && !shouldFilterCategory ? "Enable Filter" : "No Filter"}
-						</Button>
-					</MenuItem>
-					<MenuItem>
-						<Button
-							type={sortAlphabetical && sortDescending ? "primary" : "default"}
-							icon={<SortAlphaDownIcon className={sortAlphabetical ? "active" : ""} />}
-							onClick={sortAlphaDescending}
-							colorScheme="transparent"
+	const FilterMenu = () => (
+		<VStack pl={5} spacing={6}>
+			<RadioGroup
+				name="sorting-type"
+				value={filterAlphaProps.enabled ? FILTER_TYPES.ALPHA : FILTER_TYPES.NUM}
+				onChange={nextValue => handleFilterToggle(nextValue as FILTER_TYPES)}
+				w="100%"
+			>
+				<Stack>
+					<Box w="100%">
+						<Heading fontSize="lg">Sort Alphabetically</Heading>
+						<Box mt={4}>
+							<Radio value={FILTER_TYPES.ALPHA} name="sorting-type">
+								Enable
+							</Radio>
+							<RadioGroup
+								name="sort-alpha"
+								value={filterAlphaProps.sortDescending ? "Descending" : "Ascending"}
+								onChange={nextValue => handleFilterChange(nextValue, FILTER_TYPES.ALPHA)}
+							>
+								<Stack>
+									<Radio value="Ascending">
+										Ascending <SortAlphaUpIcon />
+									</Radio>
+									<Radio value="Descending">
+										Descending <SortAlphaDownIcon />
+									</Radio>
+								</Stack>
+							</RadioGroup>
+						</Box>
+					</Box>
+					<Box w="100%">
+						<Heading fontSize="lg">Sort Numerically</Heading>
+						<Box mt={4}>
+							<Radio value={FILTER_TYPES.NUM} name="sorting-type">
+								Enable
+							</Radio>
+							<RadioGroup
+								name="sort-numeric"
+								value={filterNumberProps.sortDescending ? "Descending" : "Ascending"}
+								onChange={value => handleFilterChange(value, FILTER_TYPES.NUM)}
+							>
+								<Stack>
+									<Radio value="Ascending">
+										Ascending <SortNumericUpIcon />
+									</Radio>
+									<Radio value="Descending">
+										Descending <SortNumericDownIcon />
+									</Radio>
+								</Stack>
+							</RadioGroup>
+						</Box>
+					</Box>
+				</Stack>
+			</RadioGroup>
+			<Box w="100%">
+				<Heading fontSize="lg">Filter By Letter</Heading>
+				<Box mt={4}>
+					<Stack>
+						<Checkbox>Enable</Checkbox>
+						<RadioGroup
+							name="filter-letter"
+							defaultValue={FILTER_DIRS.DESCENDING}
+							onChange={value => handleFilterChange(value, FILTER_TYPES.NUM)}
 						>
-							Sort Alphabetic - Descending
-						</Button>
-					</MenuItem>
-					<MenuItem>
-						<Button
-							type={sortAlphabetical && !sortDescending ? "primary" : "default"}
-							icon={<SortAlphaUpIcon className={sortAlphabetical ? "active" : ""} />}
-							onClick={sortAlphaAscending}
-							colorScheme="transparent"
-						>
-							Sort Alphabetic - Ascending
-						</Button>
-					</MenuItem>
-					<MenuItem>
-						<Button
-							type={!sortAlphabetical && sortDescending ? "primary" : "default"}
-							icon={<SortNumericDownIcon className={sortAlphabetical ? "" : "active"} />}
-							onClick={sortNumericDescending}
-							colorScheme="transparent"
-						>
-							Sort Numeric - Descending
-						</Button>
-					</MenuItem>
-					<MenuItem>
-						<Button
-							type={!sortAlphabetical && !sortDescending ? "primary" : "default"}
-							icon={<SortNumericUpIcon className={sortAlphabetical ? "" : "active"} />}
-							onClick={sortNumericAscending}
-							colorScheme="transparent"
-							color="white"
-						>
-							Sort Numeric - Ascending
-						</Button>
-					</MenuItem>
-				</MenuOptionGroup>
-			</MenuList>
-		</Menu>
+							<Stack>
+								<LetterItems />
+							</Stack>
+						</RadioGroup>
+					</Stack>
+				</Box>
+			</Box>
+			<Box w="100%">
+				<Heading fontSize="lg">Filter By Range</Heading>
+				<Box mt={4}>
+					<Stack>
+						<Checkbox>Enable</Checkbox>
+						<RadioGroup name="filter-range" onChange={value => handleFilterChange(value, FILTER_TYPES.NUM)}>
+							<Stack>
+								<NumberItems />
+							</Stack>
+						</RadioGroup>
+					</Stack>
+				</Box>
+			</Box>
+			<Box w="100%">
+				<Heading fontSize="lg">Favourites</Heading>
+				<Box mt={4}>
+					<Checkbox value="Favourites" onChange={() => handleFilterToggle(FILTER_TYPES.FAVE)}>
+						Only favourites
+					</Checkbox>
+				</Box>
+			</Box>
+		</VStack>
 	);
-
-	/** Sets the page title */
-	useEffect(() => {
-		dispatch!({ type: "setTitle", payload: meta.page });
-	}, [dispatch]);
 
 	return (
 		<>
@@ -331,27 +354,66 @@ function SongList() {
 				<title>{`Hymns | ${meta.title}`}</title>
 			</Helmet>
 
-			<Box className="utilityHeader">{FilterMenu}</Box>
+			<Button onClick={onOpen} pos="absolute" right={-5} top="18%" zIndex={95}>
+				Filter
+			</Button>
+
+			<Slide direction="right" in={isOpen} style={{ height: "100vh", width: "300px", zIndex: 100 }}>
+				<Portal appendToParentPortal={false}>
+					{isOpen && (
+						<Box
+							background="rgba(0,0,0,0.5)"
+							w="100%"
+							h="100%"
+							pos="absolute"
+							left={0}
+							top={0}
+							onClick={onToggle}
+							zIndex={99}
+						/>
+					)}
+				</Portal>
+
+				<VStack
+					color={modalColors}
+					bg={modalBG}
+					rounded="md"
+					h="100vh"
+					w="300px"
+					right={0}
+					pos="absolute"
+					overflowY="scroll"
+					zIndex={100}
+				>
+					<Box p={5} shadow="md" borderWidth="1px" bg="blue.500" w="100%" color="white">
+						<Flex justifyContent="space-between">
+							<Heading fontSize={28}>Filters</Heading>
+							<CloseButton onClick={onToggle} />
+						</Flex>
+						<Text fontSize="sm">Last updated: March 23, 2021</Text>
+					</Box>
+					<Box color={modalColors} w="100%">
+						<FilterMenu />
+					</Box>
+				</VStack>
+			</Slide>
+
 			<Box className="list-wrapper" ref={wrapperRef}>
-				{showFilteredList ? (
-					<AutoSizer>
-						{({ height, width }) => (
-							<FixedSizeGrid
-								height={height}
-								width={width}
-								rowHeight={100}
-								columnWidth={window.innerWidth > 950 ? width / 2 - 6 : width - 6}
-								columnCount={numColumns.current}
-								rowCount={numRows.current}
-								itemData={shouldFilterCategory ? filteredList : unfilteredList}
-							>
-								{Cell}
-							</FixedSizeGrid>
-						)}
-					</AutoSizer>
-				) : (
-					<List>{filterByLetters ? letters : numbers}</List>
-				)}
+				<AutoSizer>
+					{({ height, width }) => (
+						<FixedSizeGrid
+							height={height}
+							width={width}
+							rowHeight={100}
+							columnWidth={window.innerWidth > 950 ? width / 2 - 6 : width - 6}
+							columnCount={numColumns.current}
+							rowCount={numRows.current}
+							itemData={finalList}
+						>
+							{Cell}
+						</FixedSizeGrid>
+					)}
+				</AutoSizer>
 			</Box>
 		</>
 	);
