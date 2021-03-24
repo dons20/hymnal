@@ -23,6 +23,8 @@ export const withSuspense = <P extends React.ReactNode & object, Q extends React
 	);
 };
 
+export const lazyImport = (importPromise: Promise<any>) => withSuspense(React.lazy(() => importPromise));
+
 /**
  * Loads songs from JSON and stores them locally
  */

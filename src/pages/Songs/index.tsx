@@ -1,12 +1,11 @@
-import React from "react";
 import { Switch, Route, useRouteMatch, Redirect } from "react-router-dom";
 import { Box, useColorModeValue } from "@chakra-ui/react";
-import { withSuspense } from "helpers";
+import { lazyImport } from "helpers";
 
 import "./Songs.scss";
 
-const SongList = withSuspense(React.lazy(() => import("components/SongList")));
-const SongDisplay = withSuspense(React.lazy(() => import("components/SongDisplay")));
+const SongList = lazyImport(import("components/SongList"));
+const SongDisplay = lazyImport(import("components/SongDisplay"));
 
 function Listing() {
 	const { path } = useRouteMatch();

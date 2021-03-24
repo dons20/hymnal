@@ -1,6 +1,4 @@
 import { useEffect, useState } from "react";
-import { SongsDB, version } from "data/songs";
-import localForage from "localforage";
 
 const dbName = "Songs";
 
@@ -16,16 +14,18 @@ function useSongLoader(_id = 0) {
 		 * Loads songs from JSON and stores them locally
 		 */
 		async function loadNewSongs() {
+			const SongsJS = await import("data/songs");
+			const localForage = await import("localforage");
 			const _songs = localForage.createInstance({ storeName: "items", name: dbName });
 			const _version = localForage.createInstance({ storeName: "version", name: dbName });
 
 			try {
 				await Promise.all([
-					SongsDB.forEach(async (song, i) => await _songs.setItem(`${i}`, song)),
-					_version.setItem("value", version).catch(e => console.info(e)),
+					SongsJS.SongsDB.forEach(async (song, i) => await _songs.setItem(`${i}`, song)),
+					_version.setItem("value", SongsJS.version).catch(e => console.info(e)),
 				]);
 
-				setSongs(SongsDB);
+				setSongs(SongsJS.SongsDB);
 			} catch (err) {
 				console.info(err.message);
 			}
@@ -35,6 +35,8 @@ function useSongLoader(_id = 0) {
 		 * Checks if songs have already been stored
 		 */
 		async function checkDB() {
+			const SongsJS = await import("data/songs");
+			const localForage = await import("localforage");
 			localForage.config({
 				name: dbName,
 				description: "Stores the songs db and its version number",
@@ -50,13 +52,13 @@ function useSongLoader(_id = 0) {
 				console.log(`%cChecking if songs exist already`, "color: #3182ce; font-size: medium;");
 				const _songs = localForage.createInstance({ name: dbName, storeName: "items" });
 				const songsLength = await _songs.length();
-				if (songsLength < SongsDB.length) throw new Error("Items out of sync with latest items");
+				if (songsLength < SongsJS.SongsDB.length) throw new Error("Items out of sync with latest items");
 
 				console.log(`%cChecking for updates`, "color: #3182ce; font-size: medium;");
 				const _version = localForage.createInstance({ name: dbName, storeName: "version" });
 				if (!_version) throw new Error("No version stored");
 				const versionNumber = (await _version.getItem("value")) as string;
-				if (version !== versionNumber) throw new Error("Version mismatch, sync necessary");
+				if (SongsJS.version !== versionNumber) throw new Error("Version mismatch, sync necessary");
 
 				console.log(`%cSongs found! Attempting to load...`, "color: #3182ce; font-size: medium;");
 				const songStorage: Song[] = [];

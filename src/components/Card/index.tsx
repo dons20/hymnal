@@ -40,7 +40,7 @@ const Card = ({ title, subtitle, primaryLink, primaryLabel, imageSrc, imageAlt }
 					{subtitle}
 				</Box>
 			</Box>
-			{imageSrc && <Image alt={imageAlt} src={imageSrc} h="100%" w="100%" marginBottom="6" />}
+			{imageSrc && <Image alt={imageAlt} src={imageSrc} h="100%" w="100%" marginBottom="6" minH={280} />}
 			<Button size="md" colorScheme="blue" as={Link} to={primaryLink}>
 				{primaryLabel}
 			</Button>

@@ -256,6 +256,7 @@ function SongList() {
 				onClick={memoDisplaySong}
 				className="listItem"
 				style={style}
+				bg={modalBG}
 			>
 				<Text className="listNumber">#{data[itemIndex].number}</Text>
 				<Text className="listTitle">{data[itemIndex].title}</Text>
@@ -401,7 +402,7 @@ function SongList() {
 							<Heading fontSize={28}>Filters</Heading>
 							<CloseButton onClick={onToggle} />
 						</Flex>
-						<Text fontSize="sm">Last updated: March 23, 2021</Text>
+						<Text fontSize="sm">Last updated: March 24, 2021</Text>
 					</Box>
 					<Box color={modalColors} w="100%">
 						<FilterMenu />

@@ -30,10 +30,11 @@
 	"scripts": {
 		"start": "react-scripts start",
 		"build": "react-scripts build",
-		"postbuild": "react-snap",
+		"postbuildyy": "react-snap",
 		"test": "react-scripts test",
 		"eject": "react-scripts eject",
 		"install:fe": "yarn install",
+		"analyze": "node scripts/analyze.js",
 		"remote-debug": "remotedebug_ios_webkit_adapter --port=9000"
 	},
 	"eslintConfig": {
@@ -62,8 +63,10 @@
 		"@types/react-router-dom": "^5.1.7",
 		"@types/react-virtualized-auto-sizer": "^1.0.0",
 		"@types/react-window": "^1.8.2",
+		"progress-bar-webpack-plugin": "^2.1.0",
 		"react-snap": "^1.23.0",
 		"sw-precache": "^5.2.1",
-		"typescript": "^4.2.3"
+		"typescript": "^4.2.3",
+		"webpack-bundle-analyzer": "^4.4.0"
 	}
 }
