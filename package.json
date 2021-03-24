@@ -10,7 +10,7 @@
 		"axios": "^0.21.1",
 		"focus-visible": "^5.2.0",
 		"framer-motion": "3.10.6",
-		"idb": "^6.0.0",
+		"localforage": "^1.9.0",
 		"react": "^17.0.1",
 		"react-app-polyfill": "^2.0.0",
 		"react-device-detect": "^1.17.0",

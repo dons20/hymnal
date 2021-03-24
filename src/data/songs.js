@@ -1,3 +1,4 @@
+export const version = "1.1.0";
 export const SongsDB = [
 	{
 		number: 1,
@@ -5345,6 +5346,151 @@ export const SongsDB = [
 		verse: [
 			"I've found a Friend; oh, such a Friend! He loved me ere I knew Him;\nHe drew me with the cords of love, And then He bound me to Him.\nAnd 'round my heart still closely twine those ties which nought can sever,\nFor I am His and He is mine, forever and forever.",
 			"\"I've found a Friend; oh such a Friend! He bled, He died to save me;\nAnd not alone the gift of life, But His own self He gave me.\nNought that I have my own I call, I hold it for the Giver;\nMy heart my strength, my life, my all, Are His, and His forever.",
+		],
+		chorus: "",
+		author: "",
+	},
+	{
+		number: 444,
+		title: "Just when I need Him most",
+		verse: [
+			"Just when I need Him, Jesus is near,\nJust when I falter, just when I fear;\nReady to help me, ready to cheer,\nJust when I need Him most.",
+			"Just when I need Him, Jesus is true,\nNever forsaking, all the way through;\nGiving for burdens pleasures anew,\nJust when I need Him most.",
+			"Just when I need Him, Jesus is strong,\nBearing my burdens all the day long;\nFor all my sorrow giving a song,\nJust when I need Him most.",
+			"Just when I need Him, He is my all,\nAnswering when upon Him I call;\nTenderly watching lest I should fall,\nJust when I need Him most.",
+		],
+		chorus:
+			"Just when I need Him most,\nJust when I need Him most,\nJesus is near to comfort and cheer,\nJust when I need Him most.",
+		author: "",
+	},
+	{
+		number: 445,
+		title: "God Shall Return",
+		verse: [
+			"Life is filled with lonely people, broken-hearted, sad and blue;\nLost and weary, sin-sick people, They don't know what God can do.\nWandering from place to place, A hopeless stare upon their face.",
+			"Heaven is filled with happy people, Mansions there for everyone\nGo and shout it from the steeple, Eternal day, Earth's night is done.\nProclaim it now from place to place, God has for all abundant grace.",
+		],
+		chorus:
+			"God shall return, with promised peace for all mankind.\nAll sin will burn, his people left with sinless minds.\nWhy should you be lost when in Heaven is prepared a place for you? (Rep 1)",
+		author: "Don Clayton",
+	},
+	{
+		number: 446,
+		title: "Angels Surround Me",
+		verse: [
+			"As I travel along this pathway of life,\nMy head gets all bowed down with worry and strife,\nMy heart feels so lonely, there's no one to care,\nIt's then that I look up, and Jesus is there.",
+			"Many times I have sinned and I've felt so alone.\nI've wondered if for me Christ's blood could atone.\nBut God, He has shown that He loves even me,\nAnd promised that I'll live through eternity.",
+			"There are millions of angels awaiting on high.\nVery soon we shall see them, they'll all fill the sky.\nAnd glory to Jesus, together we'll sing,\nWith angels around us we'll all praise the king.",
+		],
+		chorus:
+			"Jesus cares for me today,\nHe takes my worries, they all fly away.\nI'm not alone wherever I stand,\nFor angels surround me at Jesus' command.",
+		author: "Don Clayton",
+	},
+	{
+		number: 447,
+		title: "Confusion",
+		verse: [
+			"Confusion is in our land, there's violence on every hand\nOur hearts fill with fear as we try to understand\nThe reasons why all we hear are cries of dark despair\nWhere can we find escape from earthly care?",
+			"There's war everywhere, Jesus will soon be here.\nWhy do you still delay to turn to him?\nHis patience is wearing thin, He's leading a new world in.\nTurn to him a new life begin",
+		],
+		chorus:
+			"How can we find relief, in a world that is filled with hate,\nWhen your heart will not believe in the one who can recreate.\nJesus is always there to hear your deepest prayer.\nTurn to him a new life begin.",
+		author: "Charles Clayton",
+	},
+	{
+		number: 448,
+		title: "I shall see the King",
+		verse: [
+			"I shall see the King where the angels sing,\nI shall see the King some day, in the better land,\nOn that golden strand,\nI shall see the King someday.",
+			"In the land of song, in the glory throng,\nWhere there never comes a night,\nWith my Lord once slain I shall ever reign\nIn the glory land of light.",
+			"I shall see the King, all my tributes bring,\nAnd shall look upon His face;\nThen my song shall be how He ransomed me\nAnd has kept me by His grace.",
+		],
+		chorus:
+			"In His glory, I shall see the King,\nAnd forever endless praises sing;\n'Twas on Calvary Jesus died for me;\nI shall see the King some day.",
+		author: "William C. Poole",
+	},
+	{
+		number: 449,
+		title: "Just when I need Him",
+		verse: [
+			"Just when I need Him, Jesus is near,\nJust when I falter, just when I fear;\nReady to help me, ready to cheer,\nJust when I need Him most.",
+			"Just when I need Him, Jesus is true,\nNever forsaking, all the way through;\nGiving for burdens pleasures anew,\nJust when I need Him most.",
+			"Just when I need Him, Jesus is strong,\nBearing my burdens all the day long;\nFor all my sorrow giving a song,\nJust when I need Him most.",
+			"Just when I need Him, He is my all,\nAnswering when upon Him I call;\nTenderly watching lest I should fall,\nJust when I need Him most.",
+		],
+		chorus:
+			"Just when I need Him most,\nJust when I need Him most,\nJesus is near to comfort and cheer,\nJust when I need Him most.",
+		author: "William C. Poole",
+	},
+	{
+		number: 450,
+		title: "Just a closer walk with thee",
+		verse: [
+			"I am weak but Thou art strong,\nJesus keep me from all wrong,\nI'll be satisfied as long,\nAs I walk, let me walk close to Thee.",
+			"When my feeble life is o'er,\nTime for me will be no more,\nGuide me gently, safely o'er,\nTo Thy kingdom's shore, to Thy shore.",
+		],
+		chorus:
+			"Just a closer walk with Thee,\nGrant it, Jesus, is my plea,\nDaily walking close to Thee,\nLet it be, dear Lord, let it be.",
+		author: "Patsy Cline",
+	},
+	{
+		number: 451,
+		title: "Through it All",
+		verse: [
+			"I've had many tears and sorrows,\nI've had questions for tomorrow,\nThere've been times I didn't know right from wrong,\nBut in every situation,\nGod gave blessed consolation,\nThat my trials only come to make me strong.",
+			"I've been a lot of places,\nAnd I've seen so many faces,\nBut there've been times I've felt so all alone,\nBut in that lonely hour,\nIn that precious, lonely hour,\nJesus let me know I was His own.",
+			"So I thank God for the mountains,\nAnd I thank Him for the valleys,\nI thank Him for the storms He's brought me through,\n‘Cause if I never had a problem,\nI wouldn't know that He could solve them,\nI wouldn't know what faith in His Word could do.",
+		],
+		chorus:
+			"Through it all, through it all,\nI've learned to trust in Jesus,\nI've learned to trust in God,\nThrough it all, through it all,\nI've learned to depend upon His Word.",
+		author: "Andrae Crouch",
+	},
+	{
+		number: 452,
+		title: "How Big is God",
+		verse: [
+			"Though man may strive to go beyond the reach of space,\nTo crawl beyond the distant shim'ring stars,\nThis world's a room so small within my Master's house,\nThe open sky's but a portion of His yard.",
+			"As winter's chill may cause the tiny seed to fall,\nTo lie asleep till waked by summer's rain,\nThe heart grown cold will warm and throb with life anew,\nThe Master's touch will bring the glow again.",
+		],
+		chorus:
+			"How big is God? How big and wide His vast domain,\nTo try and tell, these lips can only start,\nHe's big enough to rule His mighty universe,\nYet small enough to live within my heart.",
+		author: "Andrae Crouch",
+	},
+	{
+		number: 453,
+		title: "O, For a Closer Walk With God",
+		verse: [
+			"O, For a Closer Walk With God,\nA calm and heavenly frame,\nA light to shine upon the road\nThat leads me to the Lamb.",
+			"Where is the blessedness I knew,\nwhen first I sought the Lord?\nWhere is the soul refreshing view\nof Jesus and His Word?",
+			"What peaceful hours I once enjoyed,\nhow sweet their memories still,\nbut they have left an aching void,\nthe world can never fill",
+			"Return o heavenly dove return\nsweet messenger of grace\nI hate the sins that made thee mourn\nand drove thee from my breast",
+			"The dearest idol I have known\nwhate'er that idol be,\nhelp me to tear it from thy throne\nand worship only thee.",
+			"So shall my walk be close with God,\ncalm and serene my frame;\nso purer light shall mark the road\nthat leads me to the Lamb.",
+		],
+		chorus: "",
+		author: "William Cowper",
+	},
+	{
+		number: 454,
+		title: "Keep Looking Up",
+		verse: [
+			"Life has its joys and sorrows too,\nSometimes the mists will hide our view,\nIf we would hope and strength renew,\nThere’s just one thing to do.",
+			"So when your faith is sorely tried,\nAnd earnest pray’rs have been denied,\nWhene’er you need a faithful guide,\nThere’s just one thing to do.",
+		],
+		chorus:
+			"Keep looking up, Thy God is still the same today,\nKeep looking up He will not fail thee Come what may,\nkeep looking up The darkest night will roll away,\nSo do not doubt, but keep on looking up.",
+		author: "",
+	},
+	{
+		number: 455,
+		title: "O God, our help in ages past",
+		verse: [
+			"O God, our help in ages past,\nour hope for years to come,\nour shelter from the stormy blast,\nand our eternal home;",
+			"under the shadow of your throne\nyour saints have dwelt secure.\nSufficient is your arm alone,\nand our defense is sure.",
+			"Before the hills in order stood,\nor earth received its frame,\nfrom everlasting you are God,\nto endless years the same.",
+			"A thousand ages in your sight\nare like an evening gone,\nshort as the watch that ends the night\nbefore the rising sun.",
+			"Time, like an ever-rolling stream,\nsoon bears us all away.\nWe fly forgotten, as a dream\ndies at the op’ning day.",
+			"O God, our help in ages past,\nour hope for years to come,\nstill be our guard while troubles last,\nand our eternal home.",
 		],
 		chorus: "",
 		author: "",

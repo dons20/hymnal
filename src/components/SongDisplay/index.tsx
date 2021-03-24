@@ -1,7 +1,7 @@
 import { useContext, useEffect, Fragment, useMemo } from "react";
 import { useColorModeValue } from "@chakra-ui/color-mode";
 import { useHistory, useParams } from "react-router-dom";
-import { Box, Text } from "@chakra-ui/layout";
+import { Box, Container, Text } from "@chakra-ui/layout";
 import { Helmet } from "react-helmet";
 import { Button } from "components";
 import { MainContext } from "App";
@@ -16,6 +16,8 @@ function SongDisplay() {
 	const { songs, dispatch } = useContext(MainContext);
 	const { songID } = useParams<ParamTypes>();
 	const authorColor = useColorModeValue("#555555", "gray.300");
+	const songBG = useColorModeValue("white", "inherit");
+	const songShadow = useColorModeValue("md", undefined);
 
 	const songIndex = parseInt(songID || "1") - 1;
 	const songBody = useMemo(() => {
@@ -25,23 +27,23 @@ function SongDisplay() {
 				if (i === 1 && songs![songIndex].chorus) {
 					return (
 						<Fragment key={i}>
-							<div className="chorus">
+							<Box className="chorus">
 								<span className="label">Chorus</span>
 								{songs![songIndex].chorus}
-							</div>
-							<div className="verse">
+							</Box>
+							<Box className="verse">
 								<span className="label">Verse {i + 1}</span>
 								{verse}
-							</div>
+							</Box>
 						</Fragment>
 					);
 				}
 
 				return (
-					<div className="verse" key={i}>
+					<Box className="verse" key={i}>
 						<span className="label">Verse {i + 1}</span>
 						{verse}
-					</div>
+					</Box>
 				);
 			})
 		);
@@ -54,7 +56,7 @@ function SongDisplay() {
 	}, [dispatch, songs, songIndex]);
 
 	return (
-		<Box className="container">
+		<Container className="container" bg={songBG} shadow={songShadow} my={4} py="1rem" px="1.5rem">
 			<Helmet>
 				<title>{`Hymns | ${songs![songIndex].title}`}</title>
 			</Helmet>
@@ -71,7 +73,7 @@ function SongDisplay() {
 					{songs![songIndex].author}
 				</Text>
 			)}
-		</Box>
+		</Container>
 	);
 }
 

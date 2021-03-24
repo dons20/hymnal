@@ -65,9 +65,11 @@ function SongList() {
 	// TODO: Sync all filter options with local storage as preferences
 
 	/** Local State to handle list behaviour */
-	const [finalList, setFinalList] = useState([...songs!]); // Contains a copy of songs from the context
 	const [filterAlphaProps, setFilterAlphaProps] = useState(DEFAULT_ALPHA_PROPS);
 	const [filterNumberProps, setFilterNumberProps] = useState(DEFAULT_NUM_PROPS);
+	const [finalList, setFinalList] = useState<Song[]>(
+		sortList(filterAlphaProps.enabled, filterNumberProps.sortDescending, songs, true)
+	); // Contains a copy of songs from the context
 	// const [numbers, setNumbers] = useState<NumberP[]>([]); // An array of available song number categories
 	// const [letters, setLetters] = useState<LetterP[]>([]); // An array of available song letter categories
 
@@ -155,7 +157,7 @@ function SongList() {
 		sortList(filterAlphaProps.enabled, sortDescending, filtered);
 	}
 
-	/** [Radio Buttons] Handles list filter directional changes */
+	/** [ASC/DESC] Handles list filter directional changes */
 	function handleFilterChange(value: string | number, filterType: FilterT) {
 		const sortDescending = value === "Descending";
 
@@ -170,7 +172,7 @@ function SongList() {
 		}
 	}
 
-	/** [Checkboxes] Handles list filter features enable / disable */
+	/** [Enable Options] Handles list filter features enable / disable */
 	function handleFilterToggle(filterType: FilterT) {
 		console.log("Toggle called ", filterType);
 		if (filterType !== FILTER_TYPES.FAVE) {
@@ -191,18 +193,25 @@ function SongList() {
 	}
 
 	/** Sorts the displayed list using the selected filters */
-	function sortList(sortAlphabetically: boolean, sortDescending: boolean, sourceList?: Song[]) {
+	function sortList(
+		sortAlphabetically: boolean,
+		sortDescending: boolean,
+		sourceList?: Song[],
+		initialize?: boolean
+	): Song[] {
 		const newArray = sourceList ? [...sourceList] : [...finalList];
 
 		if (sortAlphabetically) {
 			if (sortDescending) newArray.sort((a, b) => a.title.localeCompare(b.title));
 			else newArray.sort((a, b) => b.title.localeCompare(a.title));
 		} else {
-			if (sortDescending) newArray.sort((a, b) => b.number - a.number);
-			else newArray.sort((a, b) => a.number - b.number);
+			if (sortDescending) newArray.sort((a, b) => a.number - b.number);
+			else newArray.sort((a, b) => b.number - a.number);
 		}
 
-		setFinalList(newArray);
+		if (!initialize) setFinalList(newArray);
+		// For the one time it needs to return something ...
+		return newArray;
 	}
 
 	/** Sets the page title */
@@ -407,10 +416,11 @@ function SongList() {
 							height={height}
 							width={width}
 							rowHeight={100}
-							columnWidth={window.innerWidth > 950 ? width / 2 - 6 : width - 6}
+							columnWidth={window.innerWidth > 950 ? width / 2 - 8 : width - 8}
 							columnCount={numColumns.current}
 							rowCount={numRows.current}
 							itemData={finalList}
+							style={{ overflowX: "hidden" }}
 						>
 							{Cell}
 						</FixedSizeGrid>

@@ -1,5 +1,5 @@
 import { useContext, useEffect } from "react";
-import { Box, useColorModeValue } from "@chakra-ui/react";
+import { Box, SimpleGrid, useColorModeValue } from "@chakra-ui/react";
 import { Helmet } from "react-helmet";
 import { Card } from "components";
 import { MainContext } from "App";
@@ -27,7 +27,12 @@ function HomeScreen() {
 				<title>{`Hymns | ${meta.page}`}</title>
 			</Helmet>
 			<Box bg={pageBG} h="100%">
-				<Box className="grid">
+				<SimpleGrid
+					minChildWidth={{ base: "300px", sm: "380px" }}
+					spacing="30px"
+					className="grid"
+					maxWidth={{ md: "800px" }}
+				>
 					<Card
 						title="Songs"
 						subtitle="View a listing of all songs"
@@ -45,7 +50,7 @@ function HomeScreen() {
 						primaryLink={pages!.FAVOURITES}
 						primaryLabel="View Favourites"
 					/>
-				</Box>
+				</SimpleGrid>
 			</Box>
 		</>
 	);
