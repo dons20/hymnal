@@ -27,7 +27,6 @@
 		"react-window": "^1.8.6",
 		"sass": "^1.32.8"
 	},
-	"homepage": ".",
 	"scripts": {
 		"start": "react-scripts start",
 		"build": "react-scripts build",
