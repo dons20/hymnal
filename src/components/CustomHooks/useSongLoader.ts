@@ -65,7 +65,7 @@ function useSongLoader(_id = 0) {
 				await _songs.iterate(function (value: Song) {
 					songStorage.push(value);
 				});
-				console.info(songStorage);
+				// console.info(songStorage);
 				setSongs(songStorage);
 			} catch (e) {
 				console.log(

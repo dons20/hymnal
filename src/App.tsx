@@ -12,6 +12,7 @@ const PictureHeader = lazyImport(import("components/PictureHeader"));
 
 const Home = lazyImport(import("pages/Home"));
 const Songs = lazyImport(import("pages/Songs"));
+const Search = lazyImport(import("pages/Search"));
 const Settings = lazyImport(import("pages/Settings"));
 
 const pages = {
@@ -99,7 +100,8 @@ function App() {
 							<Switch>
 								<Route path="/home" component={Home} />
 								<Route path="/songs">{songs.length > 1 ? <Songs /> : <Loader />}</Route>
-								<Route path="settings" component={Settings} />
+								<Route path="/search" component={Search} />
+								<Route path="/settings" component={Settings} />
 								<Route>
 									<Redirect to="/home" />
 								</Route>

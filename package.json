@@ -10,6 +10,7 @@
 		"axios": "^0.21.1",
 		"focus-visible": "^5.2.0",
 		"framer-motion": "3.10.6",
+		"fuse.js": "^6.4.6",
 		"localforage": "^1.9.0",
 		"react": "^17.0.1",
 		"react-app-polyfill": "^2.0.0",
@@ -25,7 +26,8 @@
 		"react-scripts": "^4.0.3",
 		"react-virtualized-auto-sizer": "^1.0.5",
 		"react-window": "^1.8.6",
-		"sass": "^1.32.8"
+		"sass": "^1.32.8",
+		"use-debounce": "^6.0.0"
 	},
 	"scripts": {
 		"start": "react-scripts start",

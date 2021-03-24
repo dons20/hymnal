@@ -18,18 +18,19 @@ function SongDisplay() {
 	const authorColor = useColorModeValue("#555555", "gray.300");
 	const songBG = useColorModeValue("white", "inherit");
 	const songShadow = useColorModeValue("md", undefined);
-
 	const songIndex = parseInt(songID || "1") - 1;
+	const songToRender = songs!.find(song => song.number === songIndex + 1);
+
 	const songBody = useMemo(() => {
 		return (
 			songs!.length > 1 &&
-			songs![songIndex].verse.map((verse, i) => {
-				if (i === 1 && songs![songIndex].chorus) {
+			songToRender!.verse.map((verse, i) => {
+				if (i === 1 && songToRender!.chorus) {
 					return (
 						<Fragment key={i}>
 							<Box className="chorus">
 								<span className="label">Chorus</span>
-								{songs![songIndex].chorus}
+								{songToRender!.chorus}
 							</Box>
 							<Box className="verse">
 								<span className="label">Verse {i + 1}</span>
@@ -47,30 +48,30 @@ function SongDisplay() {
 				);
 			})
 		);
-	}, [songIndex, songs]);
+	}, [songs, songToRender]);
 
 	const backToIndex = () => history.push(`${process.env.PUBLIC_URL}/songs/index`);
 
 	useEffect(() => {
-		if (songs!.length > 1) dispatch!({ type: "setTitle", payload: songs![songIndex].title });
-	}, [dispatch, songs, songIndex]);
+		if (songs!.length > 1) dispatch!({ type: "setTitle", payload: songToRender!.title });
+	}, [dispatch, songs, songToRender]);
 
 	return (
 		<Container className="container" bg={songBG} shadow={songShadow} my={4} py="1rem" px="1.5rem">
 			<Helmet>
-				<title>{`Hymns | ${songs![songIndex].title}`}</title>
+				<title>{`Hymns | ${songToRender!.title}`}</title>
 			</Helmet>
 			<Button onClick={backToIndex} pos="fixed" left={-5} top="18%" zIndex={100}>
 				Index
 			</Button>
 			<Box className="header">
-				<Text># {songs![songIndex].number}</Text>
-				<Text>{songs![songIndex].title}</Text>
+				<Text># {songToRender!.number}</Text>
+				<Text>{songToRender!.title}</Text>
 			</Box>
 			<Box className="body">{songBody}</Box>
-			{songs![songIndex].author && (
+			{songToRender!.author && (
 				<Text className="footer" color={authorColor}>
-					{songs![songIndex].author}
+					{songToRender!.author}
 				</Text>
 			)}
 		</Container>
