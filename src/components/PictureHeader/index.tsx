@@ -1,4 +1,4 @@
-import React, { useContext, useRef } from "react";
+import { useContext, useRef } from "react";
 import { Heading, Box } from "@chakra-ui/react";
 import { MainContext } from "App";
 import "./PictureHeader.scss";

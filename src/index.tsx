@@ -14,7 +14,7 @@ import App from "./App";
 const rootElement = document.getElementById("root");
 
 if (rootElement?.hasChildNodes()) {
-	hydrate(
+	render(
 		<ChakraProvider resetCSS theme={customTheme}>
 			<ColorModeScript initialColorMode={customTheme.config.initialColorMode} />
 			<BrowserRouter>
