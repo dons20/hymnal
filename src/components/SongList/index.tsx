@@ -23,6 +23,7 @@ import {
 	useColorModeValue,
 	CloseButton,
 	Portal,
+	useMediaQuery,
 } from "@chakra-ui/react";
 import "./SongList.scss";
 
@@ -72,7 +73,8 @@ function SongList() {
 
 	/** Virtualized list props */
 	const wrapperRef = useRef<HTMLDivElement>(null);
-	const numColumns = useRef(window.innerWidth > 950 ? 2 : 1);
+	const [dualColumns] = useMediaQuery("(min-width: 951px)");
+	const numColumns = useRef(dualColumns ? 2 : 1);
 	const numRows = useRef(0);
 
 	if (numColumns.current === 2) numRows.current = finalList.length / 2;
@@ -354,7 +356,7 @@ function SongList() {
 				<title>{`Hymns | ${meta.title}`}</title>
 			</Helmet>
 
-			<Button onClick={onOpen} pos="absolute" right={-5} top="18%" zIndex={95}>
+			<Button onClick={onOpen} pos="absolute" right={-5} top="12%" zIndex={95}>
 				Filter
 			</Button>
 

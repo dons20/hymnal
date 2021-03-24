@@ -26,7 +26,7 @@ function HomeScreen() {
 			<Helmet>
 				<title>{`Hymns | ${meta.page}`}</title>
 			</Helmet>
-			<Box bg={pageBG}>
+			<Box bg={pageBG} h="100%">
 				<Box className="grid">
 					<Card
 						title="Songs"

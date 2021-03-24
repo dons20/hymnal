@@ -4,6 +4,7 @@ import { useLocation, useHistory } from "react-router-dom";
 import { useScrollPosition } from "components/CustomHooks";
 import { useColorModeValue } from "@chakra-ui/color-mode";
 import { useMediaQuery } from "@chakra-ui/media-query";
+import { Collapse } from "@chakra-ui/transition";
 import { IoMdSettings } from "react-icons/io";
 import { Box, Text } from "@chakra-ui/layout";
 import { Button } from "components";
@@ -107,36 +108,25 @@ function MobileNavBar() {
 	}
 
 	return (
-		<Box className={`bottom-nav${showMobileMenu ? "" : " --hidden"}`} color={footerColors} bg={footerBg}>
-			{tabValues.map(tab => (
-				<Button
-					leftIcon={tab.icon}
-					aria-label={tab.title}
-					onClick={handleTabBarPress}
-					key={tab.title}
-					color={footerColors}
-					bg="transparent"
-					w="25%"
-					p={0}
-				>
-					{!iconsOnly && <Text>{tab.title}</Text>}
-				</Button>
-			))}
-		</Box>
+		<Collapse in={showMobileMenu} animateOpacity>
+			<Box className={`bottom-nav${showMobileMenu ? "" : " --hidden"}`} color={footerColors} bg={footerBg}>
+				{tabValues.map(tab => (
+					<Button
+						leftIcon={tab.icon}
+						aria-label={tab.title}
+						onClick={handleTabBarPress}
+						key={tab.title}
+						color={footerColors}
+						bg="transparent"
+						w="25%"
+						p={0}
+					>
+						{!iconsOnly && <Text>{tab.title}</Text>}
+					</Button>
+				))}
+			</Box>
+		</Collapse>
 	);
 }
-
-/* <button
-	style={pathname.startsWith(tab.url) ? { color: tintColor } : { color: unselectedTintColor }}
-	className="nav-item"
-	onClick={handleTabBarPress}
-	//onTransitionEnd={disableTransitionState}
-	type="button"
-	data-url={tab.url}
-	key={tab.title}
->
-	{tab.icon}
-	{tab.title}
-</button> */
 
 export default MobileNavBar;
