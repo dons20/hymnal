@@ -422,7 +422,7 @@ function SongList() {
 					w="300px"
 					right={0}
 					pos="absolute"
-					overflowY="scroll"
+					overflowY="auto"
 					zIndex={100}
 				>
 					<Box p={5} shadow="md" borderWidth="1px" bg="blue.500" w="100%" color="white">
@@ -432,7 +432,7 @@ function SongList() {
 						</Flex>
 						<Text fontSize="sm">Last updated: March 24, 2021</Text>
 					</Box>
-					<Box color={modalColors} w="100%">
+					<Box pr={5} color={modalColors} w="100%">
 						<FilterMenu />
 					</Box>
 				</VStack>
