@@ -24,6 +24,7 @@ import {
 	CloseButton,
 	Portal,
 	useMediaQuery,
+	SimpleGrid,
 } from "@chakra-ui/react";
 import "./SongList.scss";
 
@@ -31,11 +32,6 @@ enum FILTER_TYPES {
 	FAVE = "Favourites",
 	ALPHA = "Alphabetically",
 	NUM = "Numerically",
-}
-
-enum FILTER_DIRS {
-	ASCENDING = "Ascending",
-	DESCENDING = "Descending",
 }
 
 type MenuOptionsFnT = [string[], number[][]];
@@ -148,12 +144,15 @@ function SongList() {
 		let filtered: Song[] = [];
 		if (props.type === "numbers") {
 			if (!filterNumberProps.enabled) return;
+			setFilterNumberProps(_props => ({ ..._props, currValue: props.value.toString() }));
 			filtered = songs!.filter(song => song.number === props.value);
 		} else if (props.type === "range") {
 			if (!filterNumberProps.enabled) return;
+			setFilterNumberProps(_props => ({ ..._props, currValue: props.value.toString() }));
 			filtered = songs!.filter(song => song.number >= props.value[0] && song.number <= props.value[1]);
 		} else if (props.type === "letters") {
 			if (!filterLetterProps.enabled) return;
+			setFilterLetterProps(_props => ({ ..._props, currValue: props.value.toString() }));
 			filtered = songs!.filter(song => song.title.charAt(0) === props.value);
 		}
 
@@ -232,16 +231,22 @@ function SongList() {
 		const values = createNumbers();
 		return (
 			<>
-				{values.map(number => (
-					<Button
-						key={number.start}
-						onClick={number.callback}
-						size="sm"
-						disabled={!filterNumberProps.enabled}
-					>
-						{number.start} - {number.end}
-					</Button>
-				))}
+				{values.map(number => {
+					const displayValue = `${number.start} - ${number.end}`;
+					const checkValue = [[number.start], [number.end]].toString();
+					return (
+						<Button
+							key={number.start}
+							onClick={number.callback}
+							size="sm"
+							disabled={!filterNumberProps.enabled}
+							border={filterNumberProps.currValue === checkValue ? "3px solid" : undefined}
+							borderColor="yellow.300"
+						>
+							{displayValue}
+						</Button>
+					);
+				})}
 			</>
 		);
 	};
@@ -256,6 +261,8 @@ function SongList() {
 						onClick={letter.callback}
 						size="sm"
 						disabled={!filterLetterProps.enabled}
+						border={filterLetterProps.currValue === letter.value ? "3px solid" : undefined}
+						borderColor="yellow.300"
 					>
 						{letter.value}
 					</Button>
@@ -348,11 +355,9 @@ function SongList() {
 						>
 							Enable
 						</Checkbox>
-						<Flex flexWrap="wrap">
-							<Stack>
-								<LetterItems />
-							</Stack>
-						</Flex>
+						<SimpleGrid minChildWidth="30px" spacing="10px">
+							<LetterItems />
+						</SimpleGrid>
 					</Stack>
 				</Box>
 			</Box>
@@ -366,11 +371,9 @@ function SongList() {
 						>
 							Enable
 						</Checkbox>
-						<Flex flexWrap="wrap">
-							<Stack>
-								<NumberItems />
-							</Stack>
-						</Flex>
+						<SimpleGrid minChildWidth="60px" spacing="10px">
+							<NumberItems />
+						</SimpleGrid>
 					</Stack>
 				</Box>
 			</Box>
