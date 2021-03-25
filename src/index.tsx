@@ -6,7 +6,7 @@ import { ChakraProvider, ColorModeScript } from "@chakra-ui/react";
 import { unregister } from "./serviceWorker";
 
 import "focus-visible/dist/focus-visible";
-import "./index.css";
+import "./index.scss";
 
 import { customTheme } from "theme";
 import App from "./App";

@@ -66,17 +66,18 @@ function Search() {
 			<Box
 				key={data[itemIndex].item.number}
 				data-song-id={data[itemIndex].item.number}
-				onClick={memoDisplaySong}
 				className="gridItemWrapper"
 				style={style}
 				py={5}
 				pl={window.innerWidth * 0.07}
+				cursor="default"
 			>
 				<Grid
 					maxW="800px"
 					margin="auto"
 					p={5}
 					bg={cellBG}
+					onClick={memoDisplaySong}
 					templateColumns="80px 1fr"
 					shadow="md"
 					borderRadius="md"
@@ -92,7 +93,7 @@ function Search() {
 	return (
 		<Grid pt="10" templateRows="auto 1fr" h="100%" bg={pageBG}>
 			<Container centerContent>
-				<InputGroup size="lg" as="form" onSubmit={submitQuery} w="90%">
+				<InputGroup size="lg" as="form" onSubmit={submitQuery} w="90%" mb="5">
 					<Input
 						value={searchQuery}
 						onChange={searchQueryChange}
