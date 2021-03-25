@@ -9,7 +9,7 @@ const SongDisplay = lazyImport(import("components/SongDisplay"));
 
 function Listing() {
 	const { path } = useRouteMatch();
-	const pageBG = useColorModeValue("#f5f5f5", "gray.800");
+	const pageBG = useColorModeValue("gray.200", "gray.800");
 
 	return (
 		<Box className="songs" bg={pageBG}>

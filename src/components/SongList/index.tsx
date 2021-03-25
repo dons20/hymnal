@@ -79,12 +79,12 @@ function SongList() {
 	const numColumns = useRef(dualColumns ? 2 : 1);
 	const numRows = useRef(0);
 
-	if (numColumns.current === 2) numRows.current = finalList.length / 2;
+	if (numColumns.current === 2) numRows.current = Math.ceil(finalList.length / 2);
 	else numRows.current = finalList.length;
 
 	/** Handles Filter Drawer display */
 	const { isOpen, onOpen, onToggle } = useDisclosure();
-	const modalBG = useColorModeValue("white", "gray.800");
+	const modalBG = useColorModeValue("gray.100", "gray.800");
 	const modalColors = useColorModeValue("gray.800", "gray.100");
 
 	/** Triggers navigation to a song at a specified index */
@@ -248,7 +248,7 @@ function SongList() {
 	/** Renders a single cell */
 	const Cell = ({ columnIndex, rowIndex, style, data }: GridChildComponentProps) => {
 		const itemIndex = rowIndex * numColumns.current + columnIndex;
-
+		if (itemIndex >= finalList.length) return null;
 		return (
 			<Box
 				key={data[itemIndex].number}
@@ -410,7 +410,7 @@ function SongList() {
 				</VStack>
 			</Slide>
 
-			<Box className="list-wrapper" ref={wrapperRef}>
+			<Box ref={wrapperRef} pos="relative" overflow="hidden">
 				<AutoSizer>
 					{({ height, width }) => (
 						<FixedSizeGrid

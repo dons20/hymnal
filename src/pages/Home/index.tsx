@@ -28,8 +28,9 @@ function HomeScreen() {
 			</Helmet>
 			<Box bg={pageBG} h="100%">
 				<SimpleGrid
-					minChildWidth={{ base: "300px", sm: "380px" }}
-					spacing="30px"
+					minChildWidth={{ base: "260px", sm: "380px" }}
+					spacingX="30px"
+					spacingY="15px"
 					className="grid"
 					maxWidth={{ md: "800px" }}
 				>
