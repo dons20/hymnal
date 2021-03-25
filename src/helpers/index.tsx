@@ -1,6 +1,7 @@
 import React, { Suspense } from "react";
-import { openDB } from "idb/with-async-ittr";
-import { SongsDB } from "data/songs";
+import { SongsDB, version } from "data/songs";
+import { useLocation } from "react-router";
+import localForage from "localforage";
 import { Loader } from "components";
 
 export const withSuspense = <P extends React.ReactNode & object, Q extends React.ReactNode & object>(
@@ -23,56 +24,60 @@ export const withSuspense = <P extends React.ReactNode & object, Q extends React
 	);
 };
 
-const createDB = async () => {
-	console.log(`%cNo database entry found, will parse json...`, "color: #b70018; font-size: medium;");
-	await openDB<SongsTDB>("Songs", 1, {
-		upgrade(db) {
-			// Create a store of objects
-			const store = db.createObjectStore("song", {
-				// The 'number' property of the object will be the key.
-				keyPath: "number",
-				// If it isn't explicitly set, create a value by auto incrementing.
-				autoIncrement: false,
-			});
-			// Create an index on the 'number' property of the songs.
-			store.createIndex("number", "number");
-			// Create an index on the 'title' property of the songs.
-			store.createIndex("title", "title");
-		},
-	});
-};
+export const lazyImport = (importPromise: Promise<any>) => withSuspense(React.lazy(() => importPromise));
 
-export const loadSongsFromDB = async () => {
-	const db = await openDB<SongsTDB>("Songs");
+/**
+ * Loads songs from JSON and stores them locally
+ */
+export async function loadNewSongs() {
+	const _songs = localForage.createInstance({ storeName: "items" });
+	const _version = localForage.createInstance({ storeName: "version" });
 
 	try {
-		SongsDB.forEach(async song => await db.add("song", { ...song }));
-		return db.getAll("song", "");
+		await Promise.all([
+			SongsDB.forEach((song, i) => _songs.setItem(`${i}`, { ...song }).catch(e => console.info(e))),
+			_version.setItem("value", version).catch(e => console.info(e)),
+		]);
 	} catch (err) {
 		console.info(err.message);
 	}
-};
+}
 
 /**
  * Checks if songs have already been stored
  */
-export const checkDB = async () => {
-	console.log(`%cChecking if songs exist already`, "color: #b70018; font-size: medium;");
+export async function checkDB() {
+	const dbName = "Songs";
+	localForage.config({
+		name: dbName,
+		description: "Stores the songs db and its version number",
+	});
+
 	try {
-		const dbExists = (await indexedDB.databases()).map(db => db.name).includes("Songs");
-		if (dbExists) {
-			const db = await openDB<SongsTDB>("Songs");
-			db.addEventListener("error", createDB);
-			console.log(`%cSongs found! Attempting to load...`, "color: #b70018; font-size: medium;");
-			const songStorage = await db.getAllFromIndex("song", "number");
-			console.info(songStorage);
-			return songStorage;
-		} else {
-			console.log(`%cNo database entry found, will parse json...`, "color: #b70018; font-size: medium;");
-			loadSongsFromDB();
-		}
+		console.log(`%cChecking if songs exist already`, "color: #3182ce; font-size: medium;");
+		const _songs = localForage.createInstance({ storeName: "items" });
+		const songsLength = await _songs.length();
+		if (songsLength < SongsDB.length) throw new Error("Items out of sync with latest items");
+
+		console.log(`%cChecking for updates`, "color: #3182ce; font-size: medium;");
+		const _version = localForage.createInstance({ storeName: "version" });
+		if (!_version) throw new Error("No version stored");
+		const versionNumber = (await _version.getItem("value")) as string;
+		if (version !== versionNumber) throw new Error("Version mismatch, sync necessary");
+
+		console.log(`%cSongs found! Attempting to load...`, "color: #3182ce; font-size: medium;");
+		// const songStorage: Song[] = [];
+		// await _songs.iterate(function (value: Song) {
+		// 	songStorage.push(value);
+		// });
+		// console.info(songStorage);
 	} catch (e) {
-		console.warn(e);
-		loadSongsFromDB();
+		console.log(`%cLocal entries outdated or undefined, parsing songs DB...`, "color: #3182ce; font-size: medium;");
+		console.info(e.message);
+		loadNewSongs();
 	}
-};
+}
+
+export function useQuery() {
+	return new URLSearchParams(useLocation().search);
+}

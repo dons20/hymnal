@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext, useCallback, useRef } from "react";
 import { FaSortAlphaDown, FaSortAlphaDownAlt, FaSortNumericDown, FaSortNumericDownAlt } from "react-icons/fa";
+import { DEFAULT_ALPHA_PROPS, DEFAULT_FILTER_PROPS, DEFAULT_NUM_PROPS } from "./defaults";
 import { FixedSizeGrid, GridChildComponentProps } from "react-window";
-import { DEFAULT_ALPHA_PROPS, DEFAULT_NUM_PROPS } from "./defaults";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { useHistory } from "react-router-dom";
 import { Helmet } from "react-helmet";
@@ -23,6 +23,7 @@ import {
 	useColorModeValue,
 	CloseButton,
 	Portal,
+	useMediaQuery,
 } from "@chakra-ui/react";
 import "./SongList.scss";
 
@@ -64,23 +65,26 @@ function SongList() {
 	// TODO: Sync all filter options with local storage as preferences
 
 	/** Local State to handle list behaviour */
-	const [finalList, setFinalList] = useState([...songs!]); // Contains a copy of songs from the context
-	const [filterAlphaProps, setFilterAlphaProps] = useState(DEFAULT_ALPHA_PROPS);
-	const [filterNumberProps, setFilterNumberProps] = useState(DEFAULT_NUM_PROPS);
-	// const [numbers, setNumbers] = useState<NumberP[]>([]); // An array of available song number categories
-	// const [letters, setLetters] = useState<LetterP[]>([]); // An array of available song letter categories
+	const [sortAlphaProps, setSortAlphaProps] = useState(DEFAULT_ALPHA_PROPS);
+	const [sortNumberProps, setSortNumberProps] = useState(DEFAULT_NUM_PROPS);
+	const [filterLetterProps, setFilterLetterProps] = useState(DEFAULT_FILTER_PROPS);
+	const [filterNumberProps, setFilterNumberProps] = useState(DEFAULT_FILTER_PROPS);
+	const [finalList, setFinalList] = useState<Song[]>(
+		sortList(sortAlphaProps.enabled, sortNumberProps.sortDescending, songs, true)
+	); // Contains a copy of songs from the context
 
 	/** Virtualized list props */
 	const wrapperRef = useRef<HTMLDivElement>(null);
-	const numColumns = useRef(window.innerWidth > 950 ? 2 : 1);
+	const [dualColumns] = useMediaQuery("(min-width: 951px)");
+	const numColumns = dualColumns ? 2 : 1;
 	const numRows = useRef(0);
 
-	if (numColumns.current === 2) numRows.current = finalList.length / 2;
+	if (numColumns === 2) numRows.current = Math.ceil(finalList.length / 2);
 	else numRows.current = finalList.length;
 
 	/** Handles Filter Drawer display */
 	const { isOpen, onOpen, onToggle } = useDisclosure();
-	const modalBG = useColorModeValue("white", "gray.800");
+	const modalBG = useColorModeValue("gray.100", "gray.800");
 	const modalColors = useColorModeValue("gray.800", "gray.100");
 
 	/** Triggers navigation to a song at a specified index */
@@ -100,12 +104,14 @@ function SongList() {
 	const createMenu = useCallback(() => {
 		let characters = [],
 			numbers = [];
-		for (let i = 0; i < finalList.length; i++) {
-			characters.push(finalList[i].title.charAt(0));
-			numbers.push(finalList[i].number);
+		// Ensure we're getting numbers in order for later
+		let songsCopy = [...songs!].sort((a, b) => a.number - b.number);
+		for (let i = 0; i < songsCopy.length; i++) {
+			characters.push(songsCopy[i].title.charAt(0));
+			numbers.push(songsCopy[i].number);
 		}
 		return { letters: String.prototype.concat(...new Set(characters)), numbers: numbers };
-	}, [finalList]);
+	}, [songs]);
 
 	const generateMenuOptions = useCallback((): MenuOptionsFnT => {
 		const menuValues = createMenu();
@@ -141,66 +147,80 @@ function SongList() {
 	function filterSongs(props: FilterSongT) {
 		let filtered: Song[] = [];
 		if (props.type === "numbers") {
+			if (!filterNumberProps.enabled) return;
 			filtered = songs!.filter(song => song.number === props.value);
 		} else if (props.type === "range") {
+			if (!filterNumberProps.enabled) return;
 			filtered = songs!.filter(song => song.number >= props.value[0] && song.number <= props.value[1]);
 		} else if (props.type === "letters") {
+			if (!filterLetterProps.enabled) return;
 			filtered = songs!.filter(song => song.title.charAt(0) === props.value);
 		}
 
-		const isAlphabetical = filterAlphaProps.enabled;
-		const sortDescending = isAlphabetical ? filterAlphaProps.sortDescending : filterNumberProps.sortDescending;
-		sortList(filterAlphaProps.enabled, sortDescending, filtered);
+		const isAlphabetical = sortAlphaProps.enabled;
+		const sortDescending = isAlphabetical ? sortAlphaProps.sortDescending : sortNumberProps.sortDescending;
+		sortList(sortAlphaProps.enabled, sortDescending, filtered);
 	}
 
-	/** [Radio Buttons] Handles list filter directional changes */
+	/** [ASC/DESC] Handles list filter directional changes */
 	function handleFilterChange(value: string | number, filterType: FilterT) {
 		const sortDescending = value === "Descending";
+		console.log("Filter time: ", sortDescending);
 
 		if (filterType === FILTER_TYPES.NUM) {
-			setFilterNumberProps(props => ({ ...props, sortDescending: sortDescending }));
-			if (filterNumberProps.enabled) handleFilterToggle(filterType);
+			setSortNumberProps(props => ({ ...props, sortDescending }));
+			if (sortNumberProps.enabled) handleFilterToggle(filterType, sortDescending);
 		}
 
 		if (filterType === FILTER_TYPES.ALPHA) {
-			setFilterAlphaProps(props => ({ ...props, sortDescending: sortDescending }));
-			if (filterAlphaProps.enabled) handleFilterToggle(filterType);
+			setSortAlphaProps(props => ({ ...props, sortDescending }));
+			if (sortAlphaProps.enabled) handleFilterToggle(filterType, sortDescending);
 		}
 	}
 
-	/** [Checkboxes] Handles list filter features enable / disable */
-	function handleFilterToggle(filterType: FilterT) {
-		console.log("Toggle called ", filterType);
+	/** [Enable Options] Handles list filter features enable / disable */
+	function handleFilterToggle(filterType: FilterT, sortDesc?: boolean) {
+		console.log("Toggle called ", filterType, sortDesc);
 		if (filterType !== FILTER_TYPES.FAVE) {
 			const sortAlphabetical = filterType === FILTER_TYPES.ALPHA;
-			const sortDescending = sortAlphabetical
-				? filterAlphaProps.sortDescending
-				: filterNumberProps.sortDescending;
+			let sortDescending: boolean;
+			if (sortDesc !== undefined) sortDescending = sortDesc;
+			else sortDescending = sortAlphabetical ? sortAlphaProps.sortDescending : sortNumberProps.sortDescending;
 
-			console.log(sortDescending);
-			setFilterNumberProps(props => ({ ...props, enabled: !sortAlphabetical }));
-			setFilterAlphaProps(props => ({ ...props, enabled: sortAlphabetical }));
+			console.log("Filter toggle values: ", sortAlphabetical, sortDescending);
+			setSortNumberProps(props => ({ ...props, enabled: !sortAlphabetical }));
+			setSortAlphaProps(props => ({ ...props, enabled: sortAlphabetical }));
 			sortList(sortAlphabetical, sortDescending);
 		} else {
-			const isAlphabetical = filterAlphaProps.enabled;
-			const sortDescending = isAlphabetical ? filterAlphaProps.sortDescending : filterNumberProps.sortDescending;
-			sortList(filterAlphaProps.enabled, sortDescending, songs);
+			const isAlphabetical = sortAlphaProps.enabled;
+			const sortDescending = isAlphabetical ? sortAlphaProps.sortDescending : sortNumberProps.sortDescending;
+			sortList(sortAlphaProps.enabled, sortDescending, songs);
 		}
 	}
 
 	/** Sorts the displayed list using the selected filters */
-	function sortList(sortAlphabetically: boolean, sortDescending: boolean, sourceList?: Song[]) {
+	function sortList(
+		sortAlphabetically: boolean,
+		sortDescending: boolean,
+		sourceList?: Song[],
+		initialize?: boolean
+	): Song[] {
 		const newArray = sourceList ? [...sourceList] : [...finalList];
 
+		console.log(sortAlphabetically, sortDescending);
+
 		if (sortAlphabetically) {
-			if (sortDescending) newArray.sort((a, b) => a.title.localeCompare(b.title));
+			if (!sortDescending) newArray.sort((a, b) => a.title.localeCompare(b.title));
 			else newArray.sort((a, b) => b.title.localeCompare(a.title));
+			console.log(newArray[0]);
 		} else {
-			if (sortDescending) newArray.sort((a, b) => b.number - a.number);
-			else newArray.sort((a, b) => a.number - b.number);
+			if (!sortDescending) newArray.sort((a, b) => a.number - b.number);
+			else newArray.sort((a, b) => b.number - a.number);
 		}
 
-		setFinalList(newArray);
+		if (!initialize) setFinalList(newArray);
+		// For the one time it needs to return something ...
+		return newArray;
 	}
 
 	/** Sets the page title */
@@ -213,9 +233,14 @@ function SongList() {
 		return (
 			<>
 				{values.map(number => (
-					<Radio value={number.start} key={number.start}>
+					<Button
+						key={number.start}
+						onClick={number.callback}
+						size="sm"
+						disabled={!filterNumberProps.enabled}
+					>
 						{number.start} - {number.end}
-					</Radio>
+					</Button>
 				))}
 			</>
 		);
@@ -226,9 +251,14 @@ function SongList() {
 		return (
 			<>
 				{values.map(letter => (
-					<Radio value={letter.value} key={letter.value}>
+					<Button
+						key={letter.value}
+						onClick={letter.callback}
+						size="sm"
+						disabled={!filterLetterProps.enabled}
+					>
 						{letter.value}
-					</Radio>
+					</Button>
 				))}
 			</>
 		);
@@ -236,8 +266,8 @@ function SongList() {
 
 	/** Renders a single cell */
 	const Cell = ({ columnIndex, rowIndex, style, data }: GridChildComponentProps) => {
-		const itemIndex = rowIndex * numColumns.current + columnIndex;
-
+		const itemIndex = rowIndex * numColumns + columnIndex;
+		if (itemIndex >= finalList.length) return null;
 		return (
 			<Box
 				key={data[itemIndex].number}
@@ -245,6 +275,7 @@ function SongList() {
 				onClick={memoDisplaySong}
 				className="listItem"
 				style={style}
+				bg={modalBG}
 			>
 				<Text className="listNumber">#{data[itemIndex].number}</Text>
 				<Text className="listTitle">{data[itemIndex].title}</Text>
@@ -256,7 +287,7 @@ function SongList() {
 		<VStack pl={5} spacing={6}>
 			<RadioGroup
 				name="sorting-type"
-				value={filterAlphaProps.enabled ? FILTER_TYPES.ALPHA : FILTER_TYPES.NUM}
+				value={sortAlphaProps.enabled ? FILTER_TYPES.ALPHA : FILTER_TYPES.NUM}
 				onChange={nextValue => handleFilterToggle(nextValue as FILTER_TYPES)}
 				w="100%"
 			>
@@ -269,15 +300,15 @@ function SongList() {
 							</Radio>
 							<RadioGroup
 								name="sort-alpha"
-								value={filterAlphaProps.sortDescending ? "Descending" : "Ascending"}
+								value={sortAlphaProps.sortDescending ? "Descending" : "Ascending"}
 								onChange={nextValue => handleFilterChange(nextValue, FILTER_TYPES.ALPHA)}
 							>
 								<Stack>
 									<Radio value="Ascending">
-										Ascending <SortAlphaUpIcon />
+										Ascending <SortAlphaDownIcon />
 									</Radio>
 									<Radio value="Descending">
-										Descending <SortAlphaDownIcon />
+										Descending <SortAlphaUpIcon />
 									</Radio>
 								</Stack>
 							</RadioGroup>
@@ -291,15 +322,15 @@ function SongList() {
 							</Radio>
 							<RadioGroup
 								name="sort-numeric"
-								value={filterNumberProps.sortDescending ? "Descending" : "Ascending"}
+								value={sortNumberProps.sortDescending ? "Descending" : "Ascending"}
 								onChange={value => handleFilterChange(value, FILTER_TYPES.NUM)}
 							>
 								<Stack>
 									<Radio value="Ascending">
-										Ascending <SortNumericUpIcon />
+										Ascending <SortNumericDownIcon />
 									</Radio>
 									<Radio value="Descending">
-										Descending <SortNumericDownIcon />
+										Descending <SortNumericUpIcon />
 									</Radio>
 								</Stack>
 							</RadioGroup>
@@ -311,16 +342,17 @@ function SongList() {
 				<Heading fontSize="lg">Filter By Letter</Heading>
 				<Box mt={4}>
 					<Stack>
-						<Checkbox>Enable</Checkbox>
-						<RadioGroup
-							name="filter-letter"
-							defaultValue={FILTER_DIRS.DESCENDING}
-							onChange={value => handleFilterChange(value, FILTER_TYPES.NUM)}
+						<Checkbox
+							defaultChecked={filterLetterProps.enabled}
+							onChange={() => setFilterLetterProps(props => ({ ...props, enabled: !props.enabled }))}
 						>
+							Enable
+						</Checkbox>
+						<Flex flexWrap="wrap">
 							<Stack>
 								<LetterItems />
 							</Stack>
-						</RadioGroup>
+						</Flex>
 					</Stack>
 				</Box>
 			</Box>
@@ -328,19 +360,24 @@ function SongList() {
 				<Heading fontSize="lg">Filter By Range</Heading>
 				<Box mt={4}>
 					<Stack>
-						<Checkbox>Enable</Checkbox>
-						<RadioGroup name="filter-range" onChange={value => handleFilterChange(value, FILTER_TYPES.NUM)}>
+						<Checkbox
+							defaultChecked={filterNumberProps.enabled}
+							onChange={() => setFilterNumberProps(props => ({ ...props, enabled: !props.enabled }))}
+						>
+							Enable
+						</Checkbox>
+						<Flex flexWrap="wrap">
 							<Stack>
 								<NumberItems />
 							</Stack>
-						</RadioGroup>
+						</Flex>
 					</Stack>
 				</Box>
 			</Box>
 			<Box w="100%">
 				<Heading fontSize="lg">Favourites</Heading>
 				<Box mt={4}>
-					<Checkbox value="Favourites" onChange={() => handleFilterToggle(FILTER_TYPES.FAVE)}>
+					<Checkbox value="Favourites" onChange={() => handleFilterToggle(FILTER_TYPES.FAVE)} disabled>
 						Only favourites
 					</Checkbox>
 				</Box>
@@ -354,7 +391,7 @@ function SongList() {
 				<title>{`Hymns | ${meta.title}`}</title>
 			</Helmet>
 
-			<Button onClick={onOpen} pos="absolute" right={-5} top="18%" zIndex={95}>
+			<Button onClick={onOpen} pos="absolute" right={-5} top="12%" zIndex={95}>
 				Filter
 			</Button>
 
@@ -390,7 +427,7 @@ function SongList() {
 							<Heading fontSize={28}>Filters</Heading>
 							<CloseButton onClick={onToggle} />
 						</Flex>
-						<Text fontSize="sm">Last updated: March 23, 2021</Text>
+						<Text fontSize="sm">Last updated: March 24, 2021</Text>
 					</Box>
 					<Box color={modalColors} w="100%">
 						<FilterMenu />
@@ -398,17 +435,18 @@ function SongList() {
 				</VStack>
 			</Slide>
 
-			<Box className="list-wrapper" ref={wrapperRef}>
+			<Box ref={wrapperRef} pos="relative" overflow="hidden">
 				<AutoSizer>
 					{({ height, width }) => (
 						<FixedSizeGrid
 							height={height}
 							width={width}
 							rowHeight={100}
-							columnWidth={window.innerWidth > 950 ? width / 2 - 6 : width - 6}
-							columnCount={numColumns.current}
+							columnWidth={window.innerWidth > 950 ? width / 2 - 8 : width - 8}
+							columnCount={numColumns}
 							rowCount={numRows.current}
 							itemData={finalList}
+							style={{ overflowX: "hidden" }}
 						>
 							{Cell}
 						</FixedSizeGrid>

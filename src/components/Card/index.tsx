@@ -34,13 +34,13 @@ const Card = ({ title, subtitle, primaryLink, primaryLabel, imageSrc, imageAlt }
 
 	return (
 		<Box className="card" bg={boxBG} p="4" shadow="md" borderRadius="sm">
-			<Box d="flex" justifyContent="space-between" alignItems="center">
+			<Box d="flex" justifyContent="space-between" alignItems="center" flexWrap="wrap">
 				<Box>{title}</Box>
 				<Box color={subtitleColor} fontSize="sm" as="span">
 					{subtitle}
 				</Box>
 			</Box>
-			{imageSrc && <Image alt={imageAlt} src={imageSrc} h="100%" w="100%" marginBottom="6" />}
+			{imageSrc && <Image alt={imageAlt} src={imageSrc} h="100%" w="100%" marginBottom="6" minH={280} />}
 			<Button size="md" colorScheme="blue" as={Link} to={primaryLink}>
 				{primaryLabel}
 			</Button>

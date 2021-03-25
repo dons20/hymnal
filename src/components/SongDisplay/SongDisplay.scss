@@ -1,11 +1,8 @@
 .songs > .container {
-	align-content: space-between;
 	display: grid;
 	grid-row: 1 / span 2;
 	grid-auto-rows: max-content;
 	justify-content: center;
-	min-height: 100%;
-	padding: 1.5rem;
 
 	& > .body {
 		margin: 20px auto;

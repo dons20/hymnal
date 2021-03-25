@@ -1,12 +1,12 @@
 // Maintain load order for correct initial loading, modify carefully
 import "react-app-polyfill/stable";
-import { hydrate, render } from "react-dom";
+import { render } from "react-dom";
 import { BrowserRouter } from "react-router-dom";
 import { ChakraProvider, ColorModeScript } from "@chakra-ui/react";
 import { unregister } from "./serviceWorker";
 
 import "focus-visible/dist/focus-visible";
-import "./index.css";
+import "./index.scss";
 
 import { customTheme } from "theme";
 import App from "./App";
@@ -14,7 +14,7 @@ import App from "./App";
 const rootElement = document.getElementById("root");
 
 if (rootElement?.hasChildNodes()) {
-	hydrate(
+	render(
 		<ChakraProvider resetCSS theme={customTheme}>
 			<ColorModeScript initialColorMode={customTheme.config.initialColorMode} />
 			<BrowserRouter>

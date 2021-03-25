@@ -2,17 +2,18 @@ import React, { useReducer, useEffect } from "react";
 import { Route, Switch, Redirect, useLocation } from "react-router-dom";
 import { useSongLoader } from "components/CustomHooks";
 import { isMobile } from "react-device-detect";
-import styles from "./App.module.scss";
-import { withSuspense } from "helpers";
+import { lazyImport } from "helpers";
 import { Loader } from "components";
+import styles from "./App.module.scss";
 
-const Header = withSuspense(React.lazy(() => import("components/Header")));
-const BottomNav = withSuspense(React.lazy(() => import("components/BottomNav")));
-const PictureHeader = withSuspense(React.lazy(() => import("components/PictureHeader")));
+const Header = lazyImport(import("components/Header"));
+const BottomNav = lazyImport(import("components/BottomNav"));
+const PictureHeader = lazyImport(import("components/PictureHeader"));
 
-const Home = withSuspense(React.lazy(() => import("pages/Home")));
-const Songs = withSuspense(React.lazy(() => import("pages/Songs")));
-const Settings = withSuspense(React.lazy(() => import("pages/Settings")));
+const Home = lazyImport(import("pages/Home"));
+const Songs = lazyImport(import("pages/Songs"));
+const Search = lazyImport(import("pages/Search"));
+const Settings = lazyImport(import("pages/Settings"));
 
 const pages = {
 	HOME: "/home",
@@ -99,7 +100,8 @@ function App() {
 							<Switch>
 								<Route path="/home" component={Home} />
 								<Route path="/songs">{songs.length > 1 ? <Songs /> : <Loader />}</Route>
-								<Route path="settings" component={Settings} />
+								<Route path="/search" component={Search} />
+								<Route path="/settings" component={Settings} />
 								<Route>
 									<Redirect to="/home" />
 								</Route>
