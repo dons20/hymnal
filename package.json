@@ -6,8 +6,6 @@
 		"@chakra-ui/react": "^1.3.4",
 		"@emotion/react": "^11.1.5",
 		"@emotion/styled": "^11.1.5",
-		"@n8tb1t/use-scroll-position": "^2.0.3",
-		"axios": "^0.21.1",
 		"focus-visible": "^5.2.0",
 		"framer-motion": "3.10.6",
 		"fuse.js": "^6.4.6",
@@ -32,12 +30,9 @@
 	"scripts": {
 		"start": "react-scripts start",
 		"build": "react-scripts build",
-		"postbuildyy": "react-snap",
 		"test": "react-scripts test",
-		"eject": "react-scripts eject",
 		"install:fe": "yarn install",
-		"analyze": "node scripts/analyze.js",
-		"remote-debug": "remotedebug_ios_webkit_adapter --port=9000"
+		"analyze": "node scripts/analyze.js"
 	},
 	"eslintConfig": {
 		"extends": "react-app"

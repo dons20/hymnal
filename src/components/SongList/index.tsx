@@ -462,7 +462,7 @@ function SongList() {
 	return (
 		<>
 			<Helmet>
-				<title>{`Hymns | ${meta.title}`}</title>
+				<title>{`Hymns for All Times| ${meta.title}`}</title>
 			</Helmet>
 
 			<Button onClick={onOpen} pos="absolute" right={-5} top="12%" zIndex={95}>

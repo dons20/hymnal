@@ -59,7 +59,7 @@ function SongDisplay() {
 	return (
 		<Container className="container" bg={songBG} shadow={songShadow} my={4} py="1rem" px="1.5rem">
 			<Helmet>
-				<title>{`Hymns | ${songToRender!.title}`}</title>
+				<title>{`Hymns for All Times | ${songToRender!.title}`}</title>
 			</Helmet>
 			<Button onClick={backToIndex} pos="fixed" left={-5} top="14%" zIndex={100}>
 				Index
