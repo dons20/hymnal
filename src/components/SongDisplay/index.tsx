@@ -16,7 +16,7 @@ function SongDisplay() {
 	const { songs, dispatch } = useContext(MainContext);
 	const { songID } = useParams<ParamTypes>();
 	const authorColor = useColorModeValue("#555555", "gray.300");
-	const songBG = useColorModeValue("gray.100", "inherit");
+	const songBG = useColorModeValue("gray.50", "inherit");
 	const songShadow = useColorModeValue("md", undefined);
 	const songIndex = parseInt(songID || "1") - 1;
 	const songToRender = songs!.find(song => song.number === songIndex + 1);

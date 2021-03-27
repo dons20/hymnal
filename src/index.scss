@@ -121,21 +121,21 @@ button:-moz-focusring,
 }
 
 ::-webkit-scrollbar-thumb {
-	background-color: #d6dee1;
+	background-color: var(--chakra-colors-whiteAlpha-700);
 	border-radius: 20px;
 	border: 6px solid transparent;
 	background-clip: content-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-	background-color: #a8aebf;
+	background-color: var(--chakra-colors-whiteAlpha-600);
 }
 
 html[style="--chakra-ui-color-mode:light;"] {
 	& ::-webkit-scrollbar-thumb {
-		background-color: #a5acaf;
+		background-color: var(--chakra-colors-blackAlpha-400);
 		&:hover {
-			background-color: #888d9c;
+			background-color: var(--chakra-colors-blackAlpha-300);
 		}
 	}
 }

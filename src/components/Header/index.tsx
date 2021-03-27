@@ -38,7 +38,7 @@ function Header() {
 	const { colorMode, toggleColorMode } = useColorMode();
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const { isOpen: isModalOpen, onOpen: onModalOpen, onClose: onModalClose } = useDisclosure();
-	const fuse = new Fuse(songs!, { keys: ["number", "title"] });
+	const fuse = new Fuse(songs!, { keys: ["number", "title"], minMatchCharLength: 2, threshold: 0.4 });
 	const [query, setQuery] = useState("");
 	const [mobileQuery, setMobileQuery] = useState("");
 	const [queryResults, setQueryResults] = useState<Fuse.FuseResult<Song>[]>([]);
@@ -54,14 +54,21 @@ function Header() {
 		e.preventDefault();
 		if (query.length > 0) searchSongs();
 	};
+	const submitMobileQuery = (e: React.FormEvent<HTMLDivElement>) => {
+		e.preventDefault();
+		if (mobileQuery.length > 0) searchSongs(e, true);
+	};
 
 	const searchSongs = (e?: React.ChangeEvent<any>, mobile?: boolean) => {
 		const shouldSearchMobile = mobile && mobileQuery.length > 0;
 		const shouldSearchDesktop = !mobile && query.length > 0;
 		if (shouldSearchMobile || shouldSearchDesktop) {
 			onClose();
-			history.push(`/search?query=${shouldSearchMobile ? mobileQuery : query}`);
+			onModalClose();
+			setQuery("");
+			setMobileQuery("");
 			setQueryResults([]);
+			history.push(`/search?query=${shouldSearchMobile ? mobileQuery : query}`);
 		}
 	};
 
@@ -78,7 +85,7 @@ function Header() {
 	};
 
 	const handleSearch = useDebouncedCallback((value: string) => {
-		const result = fuse.search(value);
+		const result = fuse.search(value, { limit: 6 });
 		setQueryResults(result.slice(0, 6));
 		if (result.length > 0) onOpen();
 	}, 300);
@@ -182,13 +189,14 @@ function Header() {
 					<ModalCloseButton />
 					<ModalBody>
 						<VStack spacing="4">
-							<InputGroup size="md" as="form" onSubmit={e => searchSongs(e, true)}>
+							<InputGroup size="md" as="form" onSubmit={submitMobileQuery}>
 								<Input
 									type="search"
 									value={mobileQuery}
 									onChange={mobileSearchQueryChange}
 									placeholder="Search songs..."
 									pr="4.5rem"
+									bg={searchBG}
 								/>
 								<InputRightElement>
 									<IconButton
@@ -197,7 +205,6 @@ function Header() {
 										icon={<FaSearch />}
 										aria-label="Search Song Database"
 										onClick={e => searchSongs(e, true)}
-										disabled
 									/>
 								</InputRightElement>
 							</InputGroup>

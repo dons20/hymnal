@@ -2,6 +2,7 @@ import { useColorModeValue } from "@chakra-ui/color-mode";
 import { Box, Image } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import { Button } from "components";
+import Loader from "components/Loader";
 
 interface CardBase {
 	/** A title for the card */
@@ -40,7 +41,19 @@ const Card = ({ title, subtitle, primaryLink, primaryLabel, imageSrc, imageAlt }
 					{subtitle}
 				</Box>
 			</Box>
-			{imageSrc && <Image alt={imageAlt} src={imageSrc} h="100%" w="100%" marginBottom="6" minH={280} />}
+			{imageSrc && (
+				<Image
+					boxSize="280px"
+					objectFit="contain"
+					fallback={<Loader />}
+					alt={imageAlt}
+					src={imageSrc}
+					h="100%"
+					w="100%"
+					marginBottom="6"
+					minH={280}
+				/>
+			)}
 			<Button size="md" colorScheme="blue" as={Link} to={primaryLink}>
 				{primaryLabel}
 			</Button>
