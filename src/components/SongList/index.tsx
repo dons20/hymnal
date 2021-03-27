@@ -23,7 +23,8 @@ import {
 	useColorModeValue,
 	CloseButton,
 	Portal,
-	useMediaQuery,
+	SimpleGrid,
+	Grid,
 } from "@chakra-ui/react";
 import "./SongList.scss";
 
@@ -33,19 +34,16 @@ enum FILTER_TYPES {
 	NUM = "Numerically",
 }
 
-enum FILTER_DIRS {
-	ASCENDING = "Ascending",
-	DESCENDING = "Descending",
-}
-
 type MenuOptionsFnT = [string[], number[][]];
 
 type FilterSongT =
 	| { type: "numbers"; value: number }
 	| { type: "range"; value: number[] }
-	| { type: "letters"; value: string };
+	| { type: "letters"; value: string }
+	| { type: "toggle"; value: "letter" | "range" };
 
 type FilterT = FILTER_TYPES.FAVE | FILTER_TYPES.ALPHA | FILTER_TYPES.NUM;
+// type GetAttrT = { parentNode: { currentTarget: { getAttribute: (arg0: string) => String } } };
 
 const meta = {
 	title: "Hymns Index",
@@ -68,19 +66,13 @@ function SongList() {
 	const [sortAlphaProps, setSortAlphaProps] = useState(DEFAULT_ALPHA_PROPS);
 	const [sortNumberProps, setSortNumberProps] = useState(DEFAULT_NUM_PROPS);
 	const [filterLetterProps, setFilterLetterProps] = useState(DEFAULT_FILTER_PROPS);
-	const [filterNumberProps, setFilterNumberProps] = useState(DEFAULT_FILTER_PROPS);
+	const [filterRangeProps, setFilterRangeProps] = useState(DEFAULT_FILTER_PROPS);
 	const [finalList, setFinalList] = useState<Song[]>(
 		sortList(sortAlphaProps.enabled, sortNumberProps.sortDescending, songs, true)
 	); // Contains a copy of songs from the context
 
 	/** Virtualized list props */
 	const wrapperRef = useRef<HTMLDivElement>(null);
-	const [dualColumns] = useMediaQuery("(min-width: 951px)");
-	const numColumns = dualColumns ? 2 : 1;
-	const numRows = useRef(0);
-
-	if (numColumns === 2) numRows.current = Math.ceil(finalList.length / 2);
-	else numRows.current = finalList.length;
 
 	/** Handles Filter Drawer display */
 	const { isOpen, onOpen, onToggle } = useDisclosure();
@@ -90,7 +82,7 @@ function SongList() {
 	/** Triggers navigation to a song at a specified index */
 	const memoDisplaySong = useCallback(
 		e => {
-			function displaySong(e: MouseEventInit & { currentTarget: { getAttribute: (arg0: string) => String } }) {
+			function displaySong(e: React.MouseEvent<HTMLDivElement>) {
 				const songID = e.currentTarget.getAttribute("data-song-id");
 				history.push(`${process.env.PUBLIC_URL}/songs/${songID}`);
 			}
@@ -107,7 +99,8 @@ function SongList() {
 		// Ensure we're getting numbers in order for later
 		let songsCopy = [...songs!].sort((a, b) => a.number - b.number);
 		for (let i = 0; i < songsCopy.length; i++) {
-			characters.push(songsCopy[i].title.charAt(0));
+			const nextLetter = songsCopy[i].title.match("[a-zA-Z]")?.[0];
+			if (nextLetter) characters.push(nextLetter);
 			numbers.push(songsCopy[i].number);
 		}
 		return { letters: String.prototype.concat(...new Set(characters)), numbers: numbers };
@@ -115,7 +108,7 @@ function SongList() {
 
 	const generateMenuOptions = useCallback((): MenuOptionsFnT => {
 		const menuValues = createMenu();
-		let letters = menuValues.letters.replace(/\W/, "").split("").sort();
+		let letters = menuValues.letters.split("").sort();
 		let numbers = [];
 		for (let i = 0; i < menuValues.numbers.length; i += 100) {
 			numbers.push(menuValues.numbers.slice(i, i + 100));
@@ -143,51 +136,99 @@ function SongList() {
 			end: num[1],
 		}));
 
-	/** Filters list of songs by criteria */
+	/**
+	 * Filters list of songs by criteria
+	 * Kinda difficult to read
+	 * TODO: Write tests covering all use cases
+	 * Maybe improve readability
+	 */
 	function filterSongs(props: FilterSongT) {
-		let filtered: Song[] = [];
+		let filteredList: Song[] | undefined;
 		if (props.type === "numbers") {
-			if (!filterNumberProps.enabled) return;
-			filtered = songs!.filter(song => song.number === props.value);
+			if (!filterRangeProps.enabled) return;
+			setFilterRangeProps(_props => ({ ..._props, currValue: props.value.toString() }));
+			filteredList = songs!.filter(song => song.number === props.value);
+			if (filterLetterProps.enabled) filteredList = filterByLetter(filteredList, filterLetterProps.currValue);
 		} else if (props.type === "range") {
-			if (!filterNumberProps.enabled) return;
-			filtered = songs!.filter(song => song.number >= props.value[0] && song.number <= props.value[1]);
+			if (!filterRangeProps.enabled) return;
+			setFilterRangeProps(_props => ({ ..._props, currValue: props.value.toString() }));
+			filteredList = songs!.filter(song => song.number >= props.value[0] && song.number <= props.value[1]);
+			if (filterLetterProps.enabled) filteredList = filterByLetter(filteredList, filterLetterProps.currValue);
 		} else if (props.type === "letters") {
 			if (!filterLetterProps.enabled) return;
-			filtered = songs!.filter(song => song.title.charAt(0) === props.value);
+			setFilterLetterProps(_props => ({ ..._props, currValue: props.value.toString() }));
+			filteredList = filterByLetter(songs!, props.value);
+			if (filterRangeProps.enabled) filteredList = filterByRange(filteredList, filterRangeProps.currValue);
+		} else if (props.type === "toggle") {
+			if (props.value === "letter") {
+				// Checks for outgoing value (it will be disabled after this function is complete)
+				if (filterLetterProps.enabled) {
+					filteredList = songs!;
+					if (filterRangeProps.enabled)
+						filteredList = filterByRange(filteredList, filterRangeProps.currValue);
+				} else if (filterLetterProps.currValue) {
+					filteredList = filterByLetter(songs!, filterLetterProps.currValue);
+					if (filterRangeProps.enabled) {
+						filteredList = filterByRange(filteredList, filterRangeProps.currValue);
+					}
+				}
+				setFilterLetterProps(props => ({ ...props, enabled: !props.enabled }));
+			} else {
+				if (filterRangeProps.enabled) {
+					filteredList = songs!;
+					if (filterLetterProps.enabled)
+						filteredList = filterByLetter(filteredList, filterLetterProps.currValue);
+				} else if (filterRangeProps.currValue) {
+					// Handle cases of dual filters enabled
+					filteredList = filterByRange(songs!, filterRangeProps.currValue);
+					if (filterLetterProps.enabled)
+						filteredList = filterByLetter(filteredList, filterLetterProps.currValue);
+				}
+				setFilterRangeProps(props => ({ ...props, enabled: !props.enabled }));
+			}
 		}
 
 		const isAlphabetical = sortAlphaProps.enabled;
 		const sortDescending = isAlphabetical ? sortAlphaProps.sortDescending : sortNumberProps.sortDescending;
-		sortList(sortAlphaProps.enabled, sortDescending, filtered);
+		sortList(sortAlphaProps.enabled, sortDescending, filteredList);
+	}
+
+	function filterByLetter(sourceArray: Song[], matchValue: string | null) {
+		if (!matchValue) return sourceArray;
+		return sourceArray.filter(song => {
+			const firstValidChar = song.title.match("[a-zA-Z]");
+			return firstValidChar?.toString() === matchValue;
+		});
+	}
+	function filterByRange(sourceArray: Song[], matchValue?: string | null) {
+		if (!matchValue) return sourceArray;
+		const [arg1, arg2] = matchValue.split(",");
+		return sourceArray.filter(song => song.number >= parseInt(arg1) && song.number <= parseInt(arg2));
 	}
 
 	/** [ASC/DESC] Handles list filter directional changes */
-	function handleFilterChange(value: string | number, filterType: FilterT) {
+	function handleSortChange(value: string | number, filterType: FilterT) {
 		const sortDescending = value === "Descending";
-		console.log("Filter time: ", sortDescending);
 
 		if (filterType === FILTER_TYPES.NUM) {
 			setSortNumberProps(props => ({ ...props, sortDescending }));
-			if (sortNumberProps.enabled) handleFilterToggle(filterType, sortDescending);
+			if (sortNumberProps.enabled) handleSortToggle(filterType, sortDescending);
 		}
 
 		if (filterType === FILTER_TYPES.ALPHA) {
 			setSortAlphaProps(props => ({ ...props, sortDescending }));
-			if (sortAlphaProps.enabled) handleFilterToggle(filterType, sortDescending);
+			if (sortAlphaProps.enabled) handleSortToggle(filterType, sortDescending);
 		}
 	}
 
 	/** [Enable Options] Handles list filter features enable / disable */
-	function handleFilterToggle(filterType: FilterT, sortDesc?: boolean) {
-		console.log("Toggle called ", filterType, sortDesc);
+	function handleSortToggle(filterType: FilterT, sortDesc?: boolean) {
 		if (filterType !== FILTER_TYPES.FAVE) {
 			const sortAlphabetical = filterType === FILTER_TYPES.ALPHA;
 			let sortDescending: boolean;
 			if (sortDesc !== undefined) sortDescending = sortDesc;
 			else sortDescending = sortAlphabetical ? sortAlphaProps.sortDescending : sortNumberProps.sortDescending;
 
-			console.log("Filter toggle values: ", sortAlphabetical, sortDescending);
 			setSortNumberProps(props => ({ ...props, enabled: !sortAlphabetical }));
 			setSortAlphaProps(props => ({ ...props, enabled: sortAlphabetical }));
 			sortList(sortAlphabetical, sortDescending);
@@ -207,11 +248,23 @@ function SongList() {
 	): Song[] {
 		const newArray = sourceList ? [...sourceList] : [...finalList];
 
-		console.log(sortAlphabetically, sortDescending);
-
 		if (sortAlphabetically) {
-			if (!sortDescending) newArray.sort((a, b) => a.title.localeCompare(b.title));
-			else newArray.sort((a, b) => b.title.localeCompare(a.title));
+			if (!sortDescending)
+				newArray.sort((a, b) => {
+					const firstCharMatch = a.title.match("[a-zA-Z]")?.index;
+					const aSubstr = a.title.substr(firstCharMatch || 0);
+					const secondCharMatch = b.title.match("[a-zA-Z]")?.index;
+					const bSubstr = b.title.substr(secondCharMatch || 0);
+					return aSubstr.localeCompare(bSubstr);
+				});
+			else
+				newArray.sort((a, b) => {
+					const firstCharMatch = a.title.match("[a-zA-Z]")?.index;
+					const aSubstr = a.title.substr(firstCharMatch || 0);
+					const secondCharMatch = b.title.match("[a-zA-Z]")?.index;
+					const bSubstr = b.title.substr(secondCharMatch || 0);
+					return bSubstr.localeCompare(aSubstr);
+				});
 			console.log(newArray[0]);
 		} else {
 			if (!sortDescending) newArray.sort((a, b) => a.number - b.number);
@@ -232,16 +285,22 @@ function SongList() {
 		const values = createNumbers();
 		return (
 			<>
-				{values.map(number => (
-					<Button
-						key={number.start}
-						onClick={number.callback}
-						size="sm"
-						disabled={!filterNumberProps.enabled}
-					>
-						{number.start} - {number.end}
-					</Button>
-				))}
+				{values.map(number => {
+					const displayValue = `${number.start} - ${number.end}`;
+					const checkValue = [[number.start], [number.end]].toString();
+					return (
+						<Button
+							key={number.start}
+							onClick={number.callback}
+							size="sm"
+							disabled={!filterRangeProps.enabled}
+							border={filterRangeProps.currValue === checkValue ? "3px solid" : undefined}
+							borderColor="yellow.300"
+						>
+							{displayValue}
+						</Button>
+					);
+				})}
 			</>
 		);
 	};
@@ -256,6 +315,8 @@ function SongList() {
 						onClick={letter.callback}
 						size="sm"
 						disabled={!filterLetterProps.enabled}
+						border={filterLetterProps.currValue === letter.value ? "3px solid" : undefined}
+						borderColor="yellow.300"
 					>
 						{letter.value}
 					</Button>
@@ -266,19 +327,36 @@ function SongList() {
 
 	/** Renders a single cell */
 	const Cell = ({ columnIndex, rowIndex, style, data }: GridChildComponentProps) => {
-		const itemIndex = rowIndex * numColumns + columnIndex;
+		const maxColumns = 2;
+		const itemWidth = 700;
+		const columnCount = Math.min(Math.max(Math.ceil(window.innerWidth / itemWidth), 1), maxColumns);
+		const itemIndex = rowIndex * columnCount + columnIndex;
 		if (itemIndex >= finalList.length) return null;
 		return (
 			<Box
 				key={data[itemIndex].number}
-				data-song-id={data[itemIndex].number}
-				onClick={memoDisplaySong}
-				className="listItem"
 				style={style}
-				bg={modalBG}
+				py={1}
+				pl={3}
+				alignItems="center"
+				textAlign="left"
+				userSelect="none"
+				ml={itemIndex % 2 ? 1 : 0}
 			>
-				<Text className="listNumber">#{data[itemIndex].number}</Text>
-				<Text className="listTitle">{data[itemIndex].title}</Text>
+				<Grid
+					className="listItem"
+					margin="auto"
+					py={0}
+					bg={modalBG}
+					onClick={memoDisplaySong}
+					templateColumns="80px 1fr"
+					shadow="md"
+					borderRadius="md"
+					data-song-id={data[itemIndex].number}
+				>
+					<Text className="listNumber">#{data[itemIndex].number}</Text>
+					<Text className="listTitle">{data[itemIndex].title}</Text>
+				</Grid>
 			</Box>
 		);
 	};
@@ -288,7 +366,7 @@ function SongList() {
 			<RadioGroup
 				name="sorting-type"
 				value={sortAlphaProps.enabled ? FILTER_TYPES.ALPHA : FILTER_TYPES.NUM}
-				onChange={nextValue => handleFilterToggle(nextValue as FILTER_TYPES)}
+				onChange={nextValue => handleSortToggle(nextValue as FILTER_TYPES)}
 				w="100%"
 			>
 				<Stack>
@@ -301,13 +379,13 @@ function SongList() {
 							<RadioGroup
 								name="sort-alpha"
 								value={sortAlphaProps.sortDescending ? "Descending" : "Ascending"}
-								onChange={nextValue => handleFilterChange(nextValue, FILTER_TYPES.ALPHA)}
+								onChange={nextValue => handleSortChange(nextValue, FILTER_TYPES.ALPHA)}
 							>
 								<Stack>
-									<Radio value="Ascending">
+									<Radio value="Ascending" disabled={!sortAlphaProps.enabled}>
 										Ascending <SortAlphaDownIcon />
 									</Radio>
-									<Radio value="Descending">
+									<Radio value="Descending" disabled={!sortAlphaProps.enabled}>
 										Descending <SortAlphaUpIcon />
 									</Radio>
 								</Stack>
@@ -323,13 +401,13 @@ function SongList() {
 							<RadioGroup
 								name="sort-numeric"
 								value={sortNumberProps.sortDescending ? "Descending" : "Ascending"}
-								onChange={value => handleFilterChange(value, FILTER_TYPES.NUM)}
+								onChange={value => handleSortChange(value, FILTER_TYPES.NUM)}
 							>
 								<Stack>
-									<Radio value="Ascending">
+									<Radio value="Ascending" disabled={!sortNumberProps.enabled}>
 										Ascending <SortNumericDownIcon />
 									</Radio>
-									<Radio value="Descending">
+									<Radio value="Descending" disabled={!sortNumberProps.enabled}>
 										Descending <SortNumericUpIcon />
 									</Radio>
 								</Stack>
@@ -344,15 +422,13 @@ function SongList() {
 					<Stack>
 						<Checkbox
 							defaultChecked={filterLetterProps.enabled}
-							onChange={() => setFilterLetterProps(props => ({ ...props, enabled: !props.enabled }))}
+							onChange={() => filterSongs({ type: "toggle", value: "letter" })}
 						>
 							Enable
 						</Checkbox>
-						<Flex flexWrap="wrap">
-							<Stack>
-								<LetterItems />
-							</Stack>
-						</Flex>
+						<SimpleGrid minChildWidth="30px" spacing="10px">
+							<LetterItems />
+						</SimpleGrid>
 					</Stack>
 				</Box>
 			</Box>
@@ -361,23 +437,21 @@ function SongList() {
 				<Box mt={4}>
 					<Stack>
 						<Checkbox
-							defaultChecked={filterNumberProps.enabled}
-							onChange={() => setFilterNumberProps(props => ({ ...props, enabled: !props.enabled }))}
+							defaultChecked={filterRangeProps.enabled}
+							onChange={() => filterSongs({ type: "toggle", value: "range" })}
 						>
 							Enable
 						</Checkbox>
-						<Flex flexWrap="wrap">
-							<Stack>
-								<NumberItems />
-							</Stack>
-						</Flex>
+						<SimpleGrid minChildWidth="60px" spacing="10px">
+							<NumberItems />
+						</SimpleGrid>
 					</Stack>
 				</Box>
 			</Box>
 			<Box w="100%">
 				<Heading fontSize="lg">Favourites</Heading>
 				<Box mt={4}>
-					<Checkbox value="Favourites" onChange={() => handleFilterToggle(FILTER_TYPES.FAVE)} disabled>
+					<Checkbox value="Favourites" onChange={() => handleSortToggle(FILTER_TYPES.FAVE)} disabled>
 						Only favourites
 					</Checkbox>
 				</Box>
@@ -388,7 +462,7 @@ function SongList() {
 	return (
 		<>
 			<Helmet>
-				<title>{`Hymns | ${meta.title}`}</title>
+				<title>{`Hymns for All Times| ${meta.title}`}</title>
 			</Helmet>
 
 			<Button onClick={onOpen} pos="absolute" right={-5} top="12%" zIndex={95}>
@@ -419,7 +493,7 @@ function SongList() {
 					w="300px"
 					right={0}
 					pos="absolute"
-					overflowY="scroll"
+					overflowY="auto"
 					zIndex={100}
 				>
 					<Box p={5} shadow="md" borderWidth="1px" bg="blue.500" w="100%" color="white">
@@ -427,30 +501,34 @@ function SongList() {
 							<Heading fontSize={28}>Filters</Heading>
 							<CloseButton onClick={onToggle} />
 						</Flex>
-						<Text fontSize="sm">Last updated: March 24, 2021</Text>
 					</Box>
-					<Box color={modalColors} w="100%">
+					<Box pr={5} color={modalColors} w="100%">
 						<FilterMenu />
 					</Box>
 				</VStack>
 			</Slide>
 
-			<Box ref={wrapperRef} pos="relative" overflow="hidden">
+			<Box ref={wrapperRef} pos="relative" overflow="hidden" h="100%">
 				<AutoSizer>
-					{({ height, width }) => (
-						<FixedSizeGrid
-							height={height}
-							width={width}
-							rowHeight={100}
-							columnWidth={window.innerWidth > 950 ? width / 2 - 8 : width - 8}
-							columnCount={numColumns}
-							rowCount={numRows.current}
-							itemData={finalList}
-							style={{ overflowX: "hidden" }}
-						>
-							{Cell}
-						</FixedSizeGrid>
-					)}
+					{({ height, width }) => {
+						const maxColumns = 2;
+						const itemWidth = 700;
+						const columnCount = Math.min(Math.max(Math.ceil(width / itemWidth), 1), maxColumns);
+						return (
+							<FixedSizeGrid
+								height={height}
+								width={width}
+								rowHeight={90}
+								columnWidth={width / columnCount}
+								columnCount={columnCount}
+								rowCount={Math.ceil(finalList.length / columnCount)}
+								itemData={finalList}
+								style={{ overflowX: "hidden" }}
+							>
+								{Cell}
+							</FixedSizeGrid>
+						);
+					}}
 				</AutoSizer>
 			</Box>
 		</>

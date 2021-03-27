@@ -1,6 +1,5 @@
 import React, { Suspense } from "react";
 import { SongsDB, version } from "data/songs";
-import { useLocation } from "react-router";
 import localForage from "localforage";
 import { Loader } from "components";
 
@@ -78,6 +77,6 @@ export async function checkDB() {
 	}
 }
 
-export function useQuery() {
-	return new URLSearchParams(useLocation().search);
+export function useQuery(search: string) {
+	return new URLSearchParams(search);
 }

@@ -24,7 +24,7 @@ function HomeScreen() {
 	return (
 		<>
 			<Helmet>
-				<title>{`Hymns | ${meta.page}`}</title>
+				<title>{`Hymns for All Times| ${meta.page}`}</title>
 			</Helmet>
 			<Box bg={pageBG} h="100%">
 				<SimpleGrid
