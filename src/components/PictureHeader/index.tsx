@@ -4,7 +4,7 @@ import "./PictureHeader.scss";
 
 function PictureHeader() {
 	const { meta } = useMainContext();
-	const headerOverlay = useColorModeValue("gray.800", "gray.800");
+	const headerOverlay = useColorModeValue("#0d222f", "#061a2b");
 
 	return (
 		<Box className="picture-header" bgColor={headerOverlay}>

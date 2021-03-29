@@ -13,18 +13,17 @@ import "./SongList.scss";
 import type {
 	Icon as IconType,
 	Text as TextType,
+	Flex as FlexType,
+	Grid as GridType,
 	Stack as StackType,
 	Radio as RadioType,
+	Slide as SlideType,
+	VStack as VStackType,
+	Portal as PortalType,
+	Heading as HeadingType,
 	Checkbox as CheckboxType,
 	IconButton as IconButtonType,
-	Heading as HeadingType,
-	Slide as SlideType,
-	Portal as PortalType,
-	VStack as VStackType,
-	Flex as FlexType,
 	CloseButton as CloseButtonType,
-	SimpleGrid as SimpleGridType,
-	Grid as GridType,
 } from "@chakra-ui/react/dist/types/index";
 
 /* Lazy Base Imports */
@@ -40,7 +39,6 @@ const PortalImport = lazy(() => import("@chakra-ui/react").then(module => ({ def
 const VStackImport = lazy(() => import("@chakra-ui/react").then(module => ({ default: module.VStack })));
 const FlexImport = lazy(() => import("@chakra-ui/react").then(module => ({ default: module.Flex })));
 const CloseButtonImport = lazy(() => import("@chakra-ui/react").then(module => ({ default: module.CloseButton })));
-const SimpleGridImport = lazy(() => import("@chakra-ui/react").then(module => ({ default: module.SimpleGrid })));
 const GridImport = lazy(() => import("@chakra-ui/react").then(module => ({ default: module.Grid })));
 const FixedSizeGridImport = lazy(() => import("react-window").then(module => ({ default: module.FixedSizeGrid })));
 const AutoSizerImport = lazy(() => import("react-virtualized-auto-sizer"));
@@ -58,7 +56,6 @@ const Portal = withSuspense<typeof PortalType, null>(PortalImport, null);
 const VStack = withSuspense<typeof VStackType, null>(VStackImport, null);
 const Flex = withSuspense<typeof FlexType, undefined>(FlexImport);
 const CloseButton = withSuspense<typeof CloseButtonType, undefined>(CloseButtonImport);
-const SimpleGrid = withSuspense<typeof SimpleGridType, undefined>(SimpleGridImport);
 const Grid = withSuspense<typeof GridType, null>(GridImport, null);
 const AutoSizer = withSuspense<typeof AutoSizerImport, null>(AutoSizerImport, null);
 const FixedSizeGrid = withSuspense<typeof FixedSizeGridImport, null>(FixedSizeGridImport, null);
@@ -351,6 +348,8 @@ function SongList() {
 					const checkValue = [[number.start], [number.end]].toString();
 					return (
 						<Button
+							minWidth="60px"
+							margin="5px"
 							key={number.start}
 							onClick={number.callback}
 							size="sm"
@@ -372,6 +371,9 @@ function SongList() {
 			<>
 				{values.map(letter => (
 					<Button
+						width="30px"
+						mr="10px"
+						mb="10px"
 						key={letter.value}
 						onClick={letter.callback}
 						size="sm"
@@ -444,29 +446,7 @@ function SongList() {
 				onChange={nextValue => handleSortToggle(nextValue as FILTER_TYPES)}
 				w="100%"
 			>
-				<Stack>
-					<Box w="100%">
-						<Heading fontSize="lg">Sort Alphabetically</Heading>
-						<Box mt={4}>
-							<Radio value={FILTER_TYPES.ALPHA} name="sorting-type">
-								Enable
-							</Radio>
-							<RadioGroup
-								name="sort-alpha"
-								value={sortAlphaProps.sortDescending ? "Descending" : "Ascending"}
-								onChange={nextValue => handleSortChange(nextValue, FILTER_TYPES.ALPHA)}
-							>
-								<Stack>
-									<Radio value="Ascending" disabled={!sortAlphaProps.enabled}>
-										Ascending <SortAlphaDownIcon />
-									</Radio>
-									<Radio value="Descending" disabled={!sortAlphaProps.enabled}>
-										Descending <SortAlphaUpIcon />
-									</Radio>
-								</Stack>
-							</RadioGroup>
-						</Box>
-					</Box>
+				<Stack spacing={6}>
 					<Box w="100%">
 						<Heading fontSize="lg">Sort Numerically</Heading>
 						<Box mt={4}>
@@ -489,6 +469,28 @@ function SongList() {
 							</RadioGroup>
 						</Box>
 					</Box>
+					<Box w="100%">
+						<Heading fontSize="lg">Sort Alphabetically</Heading>
+						<Box mt={4}>
+							<Radio value={FILTER_TYPES.ALPHA} name="sorting-type">
+								Enable
+							</Radio>
+							<RadioGroup
+								name="sort-alpha"
+								value={sortAlphaProps.sortDescending ? "Descending" : "Ascending"}
+								onChange={nextValue => handleSortChange(nextValue, FILTER_TYPES.ALPHA)}
+							>
+								<Stack>
+									<Radio value="Ascending" disabled={!sortAlphaProps.enabled}>
+										Ascending <SortAlphaDownIcon />
+									</Radio>
+									<Radio value="Descending" disabled={!sortAlphaProps.enabled}>
+										Descending <SortAlphaUpIcon />
+									</Radio>
+								</Stack>
+							</RadioGroup>
+						</Box>
+					</Box>
 				</Stack>
 			</RadioGroup>
 			<Box w="100%">
@@ -501,9 +503,9 @@ function SongList() {
 						>
 							Enable
 						</Checkbox>
-						<SimpleGrid minChildWidth="30px" spacing="10px">
+						<Flex flexWrap="wrap">
 							<LetterItems />
-						</SimpleGrid>
+						</Flex>
 					</Stack>
 				</Box>
 			</Box>
@@ -517,9 +519,9 @@ function SongList() {
 						>
 							Enable
 						</Checkbox>
-						<SimpleGrid minChildWidth="60px" spacing="10px">
+						<Flex flexWrap="wrap">
 							<NumberItems />
-						</SimpleGrid>
+						</Flex>
 					</Stack>
 				</Box>
 			</Box>
