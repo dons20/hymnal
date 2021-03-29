@@ -7,7 +7,7 @@
 		"@emotion/react": "^11.1.5",
 		"@emotion/styled": "^11.1.5",
 		"focus-visible": "^5.2.0",
-		"framer-motion": "3.10.6",
+		"framer-motion": "^4.0.3",
 		"fuse.js": "^6.4.6",
 		"localforage": "^1.9.0",
 		"react": "^17.0.1",
@@ -31,7 +31,7 @@
 		"start": "react-scripts start",
 		"build": "react-scripts build",
 		"test": "react-scripts test",
-		"install:fe": "yarn install",
+		"serve": "serve -s build",
 		"analyze": "node scripts/analyze.js"
 	},
 	"eslintConfig": {

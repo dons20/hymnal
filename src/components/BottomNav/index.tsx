@@ -4,8 +4,7 @@ import { useLocation, useHistory } from "react-router-dom";
 import { useScrollPosition } from "components/CustomHooks";
 import { useColorModeValue } from "@chakra-ui/color-mode";
 import { useMediaQuery } from "@chakra-ui/media-query";
-import { Collapse } from "@chakra-ui/transition";
-import { IoMdSettings } from "react-icons/io";
+import { isMobile } from "react-device-detect";
 import { Box, Text } from "@chakra-ui/layout";
 import { Button } from "components";
 import "./BottomNav.scss";
@@ -26,9 +25,8 @@ function MobileNavBar() {
 	const prevPath = useRef<string | null>(null);
 	const [hidden] = useState(false);
 	const [transitioning] = useState(false);
-	const [showMobileMenu] = useMediaQuery("(max-width: 650px)");
 	const [iconsOnly] = useMediaQuery("(max-width: 475px)");
-	const footerBg = useColorModeValue("blue.500", "blue.600");
+	const footerBg = useColorModeValue("blue.600", "blue.600");
 	const footerColors = useColorModeValue("gray.100", "gray.100");
 
 	const tabValues = [
@@ -39,18 +37,13 @@ function MobileNavBar() {
 		},
 		{
 			title: "Songs",
-			url: "/songs",
+			url: "/songs/index",
 			icon: <FaItunesNote />,
 		},
 		{
 			title: "Favourites",
-			url: "/favourites",
+			url: "/songs/favourites",
 			icon: <FaStar />,
-		},
-		{
-			title: "Settings",
-			url: "/settings",
-			icon: <IoMdSettings />,
 		},
 	];
 
@@ -108,24 +101,22 @@ function MobileNavBar() {
 	}
 
 	return (
-		<Collapse in={showMobileMenu} animateOpacity>
-			<Box className={`bottom-nav${showMobileMenu ? "" : " --hidden"}`} color={footerColors} bg={footerBg}>
-				{tabValues.map(tab => (
-					<Button
-						leftIcon={tab.icon}
-						aria-label={tab.title}
-						onClick={handleTabBarPress}
-						key={tab.title}
-						color={footerColors}
-						bg="transparent"
-						w="25%"
-						p={0}
-					>
-						{!iconsOnly && <Text>{tab.title}</Text>}
-					</Button>
-				))}
-			</Box>
-		</Collapse>
+		<Box className={`bottom-nav${isMobile ? "" : " --hidden"}`} color={footerColors} bg={footerBg}>
+			{tabValues.map(tab => (
+				<Button
+					data-url={tab.url}
+					leftIcon={tab.icon}
+					aria-label={tab.title}
+					onClick={handleTabBarPress}
+					key={tab.title}
+					color={footerColors}
+					bg="transparent"
+					px={10}
+				>
+					{!iconsOnly && <Text>{tab.title}</Text>}
+				</Button>
+			))}
+		</Box>
 	);
 }
 

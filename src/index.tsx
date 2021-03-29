@@ -13,27 +13,15 @@ import App from "./App";
 
 const rootElement = document.getElementById("root");
 
-if (rootElement?.hasChildNodes()) {
-	render(
-		<ChakraProvider resetCSS theme={customTheme}>
-			<ColorModeScript initialColorMode={customTheme.config.initialColorMode} />
-			<BrowserRouter>
-				<App />
-			</BrowserRouter>
-		</ChakraProvider>,
-		rootElement
-	);
-} else {
-	render(
-		<ChakraProvider resetCSS theme={customTheme}>
-			<ColorModeScript initialColorMode={customTheme.config.initialColorMode} />
-			<BrowserRouter>
-				<App />
-			</BrowserRouter>
-		</ChakraProvider>,
-		rootElement
-	);
-}
+render(
+	<ChakraProvider resetCSS theme={customTheme}>
+		<ColorModeScript initialColorMode={customTheme.config.initialColorMode} />
+		<BrowserRouter>
+			<App />
+		</BrowserRouter>
+	</ChakraProvider>,
+	rootElement
+);
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

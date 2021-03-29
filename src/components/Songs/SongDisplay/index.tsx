@@ -1,10 +1,10 @@
-import { useContext, useEffect, Fragment, useMemo } from "react";
+import { useEffect, Fragment, useMemo } from "react";
 import { useColorModeValue } from "@chakra-ui/color-mode";
 import { useHistory, useParams } from "react-router-dom";
 import { Box, Container, Text } from "@chakra-ui/layout";
 import { Helmet } from "react-helmet";
+import { useMainContext } from "App";
 import { Button } from "components";
-import { MainContext } from "App";
 import "./SongDisplay.scss";
 
 type ParamTypes = {
@@ -13,24 +13,24 @@ type ParamTypes = {
 
 function SongDisplay() {
 	const history = useHistory();
-	const { songs, dispatch } = useContext(MainContext);
 	const { songID } = useParams<ParamTypes>();
+	const { songs, dispatch } = useMainContext();
 	const authorColor = useColorModeValue("#555555", "gray.300");
 	const songBG = useColorModeValue("gray.50", "inherit");
 	const songShadow = useColorModeValue("md", undefined);
 	const songIndex = parseInt(songID || "1") - 1;
-	const songToRender = songs!.find(song => song.number === songIndex + 1);
+	const songToRender = songs.find(song => song.number === songIndex + 1);
 
 	const songBody = useMemo(() => {
 		return (
-			songs!.length > 1 &&
-			songToRender!.verse.map((verse, i) => {
-				if (i === 1 && songToRender!.chorus) {
+			songs.length > 1 &&
+			songToRender?.verse.map((verse, i) => {
+				if (i === 1 && songToRender.chorus) {
 					return (
 						<Fragment key={i}>
 							<Box className="chorus">
 								<span className="label">Chorus</span>
-								{songToRender!.chorus}
+								{songToRender.chorus}
 							</Box>
 							<Box className="verse">
 								<span className="label">Verse {i + 1}</span>
@@ -53,7 +53,7 @@ function SongDisplay() {
 	const backToIndex = () => history.push(`${process.env.PUBLIC_URL}/songs/index`);
 
 	useEffect(() => {
-		if (songs!.length > 1) dispatch!({ type: "setTitle", payload: songToRender!.title });
+		if (songs.length > 1) dispatch!({ type: "setTitle", payload: songToRender!.title });
 	}, [dispatch, songs, songToRender]);
 
 	return (

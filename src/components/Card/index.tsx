@@ -43,11 +43,14 @@ const Card = ({ title, subtitle, primaryLink, primaryLabel, imageSrc, imageAlt }
 			</Box>
 			{imageSrc && (
 				<Image
+					loading="lazy"
 					boxSize="280px"
 					objectFit="contain"
 					fallback={<Loader />}
 					alt={imageAlt}
 					src={imageSrc}
+					htmlHeight="300px"
+					htmlWidth="300px"
 					h="100%"
 					w="100%"
 					marginBottom="6"

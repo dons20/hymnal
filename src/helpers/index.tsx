@@ -1,41 +1,41 @@
 import React, { Suspense } from "react";
 import { SongsDB, version } from "data/songs";
-import localForage from "localforage";
 import { Loader } from "components";
 
-export const withSuspense = <P extends React.ReactNode & object, Q extends React.ReactNode & object>(
-	LazyComponent: React.FC<P>,
-	FallbackComponent?: React.FC<Q>
-) => {
-	return (props: React.ReactNode) => (
-		<Suspense
-			fallback={
-				FallbackComponent ? (
-					<FallbackComponent {...(props as Q)} />
-				) : (
-					<Loader />
-					// <Spinner thickness="4px" speed="0.65s" emptyColor="gray.200" color="blue.500" size="xl" />
-				)
-			}
-		>
-			<LazyComponent {...(props as P)} />
-		</Suspense>
-	);
-};
+export const withSuspense = <P extends React.FC | Function, Q>(
+	// @ts-ignore Need to find a way to fix the return types here
+	LazyComponent: React.JSXElementConstructor<P> | React.LazyExoticComponent<P> | P,
+	FallbackComponent?: React.FC<Q> | null
+): P => {
+	// @ts-ignore Need to find a way to fix the return types here
+	return (props: P, props2: Q) => {
+		let fallbackLoader = <></>;
+		if (FallbackComponent === undefined) fallbackLoader = <Loader />;
+		if (FallbackComponent) fallbackLoader = <FallbackComponent {...props2} />;
 
-export const lazyImport = (importPromise: Promise<any>) => withSuspense(React.lazy(() => importPromise));
+		return (
+			<Suspense fallback={fallbackLoader}>
+				{/** @ts-ignore Need to find a way to fix the return types here */}
+				<LazyComponent {...props} />
+			</Suspense>
+		);
+	};
+};
 
 /**
  * Loads songs from JSON and stores them locally
  */
 export async function loadNewSongs() {
+	const localForage = await import("localforage");
 	const _songs = localForage.createInstance({ storeName: "items" });
 	const _version = localForage.createInstance({ storeName: "version" });
+	const favourites = localForage.createInstance({ storeName: "favourites" });
 
 	try {
 		await Promise.all([
 			SongsDB.forEach((song, i) => _songs.setItem(`${i}`, { ...song }).catch(e => console.info(e))),
 			_version.setItem("value", version).catch(e => console.info(e)),
+			favourites.clear(),
 		]);
 	} catch (err) {
 		console.info(err.message);
@@ -47,6 +47,7 @@ export async function loadNewSongs() {
  */
 export async function checkDB() {
 	const dbName = "Songs";
+	const localForage = await import("localforage");
 	localForage.config({
 		name: dbName,
 		description: "Stores the songs db and its version number",
@@ -65,11 +66,6 @@ export async function checkDB() {
 		if (version !== versionNumber) throw new Error("Version mismatch, sync necessary");
 
 		console.log(`%cSongs found! Attempting to load...`, "color: #3182ce; font-size: medium;");
-		// const songStorage: Song[] = [];
-		// await _songs.iterate(function (value: Song) {
-		// 	songStorage.push(value);
-		// });
-		// console.info(songStorage);
 	} catch (e) {
 		console.log(`%cLocal entries outdated or undefined, parsing songs DB...`, "color: #3182ce; font-size: medium;");
 		console.info(e.message);
@@ -79,4 +75,34 @@ export async function checkDB() {
 
 export function useQuery(search: string) {
 	return new URLSearchParams(search);
+}
+
+/**
+ * A helper to create a Context and Provider with no upfront default value, and
+ * without having to check for undefined all the time.
+ */
+export function createCtx<A extends {} | null>() {
+	const ctx = React.createContext<A | undefined>(undefined);
+	function useCtx() {
+		const c = React.useContext(ctx);
+		if (c === undefined) throw new Error("useCtx must be inside a Provider with a value");
+		return c;
+	}
+	return [useCtx, ctx.Provider] as const; // 'as const' makes TypeScript infer a tuple
+}
+
+export async function updateFavesDB(indexes: number[]) {
+	const name = "Songs";
+	const storeName = "Favourites";
+	const localForage = await import("localforage");
+
+	localForage.config({
+		name,
+		storeName,
+		description: "Your favourite songs",
+	});
+
+	for (let i = 0; i < indexes.length; i++) {
+		await localForage.setItem(`${indexes[i]}`, indexes[i]);
+	}
 }
