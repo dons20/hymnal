@@ -1,8 +1,8 @@
-import { useContext, useEffect } from "react";
+import { useEffect } from "react";
 import { Box, SimpleGrid, useColorModeValue } from "@chakra-ui/react";
 import { Helmet } from "react-helmet";
 import { Card } from "components";
-import { MainContext } from "App";
+import { useMainContext } from "App";
 
 import favourites from "img/favourites.svg";
 import songs from "img/songs.svg";
@@ -14,7 +14,7 @@ const meta = {
 };
 
 function HomeScreen() {
-	const { pages, dispatch } = useContext(MainContext);
+	const { pages, dispatch } = useMainContext();
 	const pageBG = useColorModeValue("#f5f5f5", "gray.800");
 
 	useEffect(() => {
@@ -24,7 +24,7 @@ function HomeScreen() {
 	return (
 		<>
 			<Helmet>
-				<title>{`Hymns for All Times| ${meta.page}`}</title>
+				<title>{`Hymns for All Times | ${meta.page}`}</title>
 			</Helmet>
 			<Box bg={pageBG} h="100%">
 				<SimpleGrid
@@ -39,7 +39,7 @@ function HomeScreen() {
 						subtitle="View a listing of all songs"
 						imageSrc={songs}
 						imageAlt="Placeholder for Songs"
-						primaryLink={pages!.INDEX}
+						primaryLink={pages.INDEX}
 						primaryLabel="View Songs"
 					/>
 
@@ -48,7 +48,7 @@ function HomeScreen() {
 						subtitle="View your favourite songs"
 						imageSrc={favourites}
 						imageAlt="Placeholder for Favourites"
-						primaryLink={pages!.FAVOURITES}
+						primaryLink={pages.FAVOURITES}
 						primaryLabel="View Favourites"
 					/>
 				</SimpleGrid>

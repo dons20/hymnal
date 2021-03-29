@@ -1,4 +1,4 @@
-import { useCallback, useContext, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Input, InputGroup, InputRightElement } from "@chakra-ui/input";
 import { Box, Container, Grid, Text } from "@chakra-ui/layout";
 import { useColorModeValue } from "@chakra-ui/color-mode";
@@ -9,15 +9,21 @@ import { useDebouncedCallback } from "use-debounce";
 import { IconButton } from "@chakra-ui/button";
 import { FixedSizeGrid } from "react-window";
 import { FaSearch } from "react-icons/fa";
+import { Helmet } from "react-helmet";
+import { useMainContext } from "App";
 import { useQuery } from "helpers";
-import { MainContext } from "App";
 import Fuse from "fuse.js";
 import "./Search.scss";
+
+const meta = {
+	title: "Search",
+	page: "Search",
+};
 
 function Search() {
 	const history = useHistory();
 	const location = useLocation();
-	const { songs } = useContext(MainContext);
+	const { songs, dispatch } = useMainContext();
 	const routerQuery = useQuery(location.search);
 	const extractedQuery = routerQuery.get("query");
 	const fuse = new Fuse(songs!, { keys: ["number", "title"], minMatchCharLength: 1, threshold: 0.4 });
@@ -94,49 +100,58 @@ function Search() {
 		);
 	};
 
-	return (
-		<Grid pt="10" templateRows="auto 1fr" h="100%" bg={pageBG}>
-			<Container centerContent>
-				<InputGroup size="lg" as="form" onSubmit={submitQuery} w="90%" mb="5">
-					<Input
-						defaultValue={extractedQuery || searchQuery}
-						onChange={searchQueryChange}
-						type="search"
-						placeholder="Search songs..."
-						pr="4.5rem"
-						backgroundColor={cellBG}
-					/>
-					<InputRightElement>
-						<IconButton
-							size="sm"
-							h="1.75rem"
-							icon={<FaSearch />}
-							aria-label="Search Song Database"
-							onClick={searchQueryChange}
-						/>
-					</InputRightElement>
-				</InputGroup>
-			</Container>
+	useEffect(() => {
+		dispatch!({ type: "setTitle", payload: meta.title });
+	}, [dispatch]);
 
-			<Box ref={wrapperRef} pos="relative" overflow="hidden" h="100%">
-				<AutoSizer>
-					{({ height, width }) => (
-						<FixedSizeGrid
-							height={height}
-							width={width}
-							rowHeight={100}
-							columnWidth={width - window.innerWidth * 0.07}
-							columnCount={numColumns.current}
-							rowCount={numRows}
-							itemData={searchResults}
-							style={{ overflowX: "hidden" }}
-						>
-							{Cell}
-						</FixedSizeGrid>
-					)}
-				</AutoSizer>
-			</Box>
-		</Grid>
+	return (
+		<>
+			<Helmet>
+				<title>{`Hymns for All Times | ${meta.page}`}</title>
+			</Helmet>
+			<Grid pt="10" templateRows="auto 1fr" h="100%" bg={pageBG}>
+				<Container centerContent>
+					<InputGroup size="lg" as="form" onSubmit={submitQuery} w="90%" mb="5">
+						<Input
+							defaultValue={extractedQuery || searchQuery}
+							onChange={searchQueryChange}
+							type="search"
+							placeholder="Search songs..."
+							pr="4.5rem"
+							backgroundColor={cellBG}
+						/>
+						<InputRightElement>
+							<IconButton
+								size="sm"
+								h="1.75rem"
+								icon={<FaSearch />}
+								aria-label="Search Song Database"
+								onClick={searchQueryChange}
+							/>
+						</InputRightElement>
+					</InputGroup>
+				</Container>
+
+				<Box ref={wrapperRef} pos="relative" overflow="hidden" h="100%">
+					<AutoSizer>
+						{({ height, width }) => (
+							<FixedSizeGrid
+								height={height}
+								width={width}
+								rowHeight={100}
+								columnWidth={width - window.innerWidth * 0.07}
+								columnCount={numColumns.current}
+								rowCount={numRows}
+								itemData={searchResults}
+								style={{ overflowX: "hidden" }}
+							>
+								{Cell}
+							</FixedSizeGrid>
+						)}
+					</AutoSizer>
+				</Box>
+			</Grid>
+		</>
 	);
 }
 

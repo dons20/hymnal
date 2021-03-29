@@ -1,0 +1,3 @@
+User-agent: *
+Disallow:
+Sitemap: https://hymnal.claytoninnovations.com/sitemap.xml

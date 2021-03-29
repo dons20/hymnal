@@ -16,10 +16,9 @@
 
 	& > .header {
 		align-items: center;
-		column-gap: 2rem;
+		gap: 15px;
 		display: grid;
 		font-weight: bold;
-		grid-template-columns: auto 1fr;
 		margin: auto;
 		max-width: 1000px;
 		width: 100%;
@@ -35,5 +34,11 @@
 		font-style: italic;
 		font-size: calc(10px + 1vmin);
 		font-weight: 600;
+	}
+
+	@media only screen and (min-width: 550px) {
+		& > .header {
+			grid-template-columns: auto 1fr 50px;
+		}
 	}
 }

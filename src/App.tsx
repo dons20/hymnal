@@ -1,19 +1,23 @@
-import React, { useReducer, useEffect } from "react";
+import React, { useReducer, useEffect, lazy } from "react";
 import { Route, Switch, Redirect, useLocation } from "react-router-dom";
 import { useSongLoader } from "components/CustomHooks";
-import { isMobile } from "react-device-detect";
-import { lazyImport } from "helpers";
-import { Loader } from "components";
+import { withSuspense, createCtx } from "helpers";
 import styles from "./App.module.scss";
 
-const Header = lazyImport(import("components/Header"));
-const BottomNav = lazyImport(import("components/BottomNav"));
-const PictureHeader = lazyImport(import("components/PictureHeader"));
+const Loader = withSuspense(lazy(() => import("components/Loader")));
+const Header = withSuspense(
+	lazy(() => import("components/Header")),
+	null
+);
+const BottomNav = withSuspense(lazy(() => import("components/BottomNav")));
+const PictureHeader = withSuspense(
+	lazy(() => import("components/PictureHeader")),
+	null
+);
 
-const Home = lazyImport(import("pages/Home"));
-const Songs = lazyImport(import("pages/Songs"));
-const Search = lazyImport(import("pages/Search"));
-const Settings = lazyImport(import("pages/Settings"));
+const Home = withSuspense(lazy(() => import("pages/Home")));
+const Songs = withSuspense(lazy(() => import("pages/Songs")));
+const Search = withSuspense(lazy(() => import("pages/Search")));
 
 const pages = {
 	HOME: "/home",
@@ -34,10 +38,12 @@ type State = {
 };
 
 type CTX = {
-	dispatch?: React.Dispatch<ACTIONTYPE>;
-	songs?: Song[];
-	pages?: typeof pages;
-	meta?: State;
+	dispatch: React.Dispatch<ACTIONTYPE>;
+	songs: Song[];
+	favourites: number[];
+	setFavourites: React.Dispatch<React.SetStateAction<number[]>>;
+	pages: typeof pages;
+	meta: State;
 };
 
 const initialAppState = {
@@ -67,11 +73,11 @@ const ScrollRestoration = () => {
 	return null;
 };
 
-export const MainContext = React.createContext<CTX>({});
+export const [useMainContext, MainContextProvider] = createCtx<CTX>();
 
 function App() {
 	const [state, dispatch] = useReducer(reducer, initialAppState);
-	const songs = useSongLoader();
+	const { songs, favourites, setFavourites } = useSongLoader();
 
 	function handleOrientationChange() {
 		dispatch({ type: "setWidth", payload: document.body.getBoundingClientRect().width });
@@ -88,7 +94,7 @@ function App() {
 	}, []);
 
 	return (
-		<MainContext.Provider value={{ meta: state, dispatch, songs, pages }}>
+		<MainContextProvider value={{ meta: state, dispatch, songs, pages, favourites, setFavourites }}>
 			<div className={styles.root}>
 				<section className={styles.app_body}>
 					<Header />
@@ -101,7 +107,9 @@ function App() {
 								<Route path="/home" component={Home} />
 								<Route path="/songs">{songs.length > 1 ? <Songs /> : <Loader />}</Route>
 								<Route path="/search" component={Search} />
-								<Route path="/settings" component={Settings} />
+								<Route path="/favourites">
+									<Redirect to="/songs/favourites" />
+								</Route>
 								<Route>
 									<Redirect to="/home" />
 								</Route>
@@ -109,10 +117,10 @@ function App() {
 						</div>
 					</main>
 
-					{/* Bottom Navigation on mobile */ isMobile ? <BottomNav /> : null}
+					<BottomNav />
 				</section>
 			</div>
-		</MainContext.Provider>
+		</MainContextProvider>
 	);
 }
 

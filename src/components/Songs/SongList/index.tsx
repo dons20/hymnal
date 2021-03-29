@@ -1,32 +1,66 @@
-import { useState, useEffect, useContext, useCallback, useRef } from "react";
-import { FaSortAlphaDown, FaSortAlphaDownAlt, FaSortNumericDown, FaSortNumericDownAlt } from "react-icons/fa";
+import { useState, useEffect, useCallback, useRef, lazy } from "react";
+import { FaHeart, FaSortAlphaDown, FaSortAlphaDownAlt, FaSortNumericDown, FaSortNumericDownAlt } from "react-icons/fa";
 import { DEFAULT_ALPHA_PROPS, DEFAULT_FILTER_PROPS, DEFAULT_NUM_PROPS } from "./defaults";
-import { FixedSizeGrid, GridChildComponentProps } from "react-window";
-import AutoSizer from "react-virtualized-auto-sizer";
+import { useDisclosure, RadioGroup, useColorModeValue, Box } from "@chakra-ui/react";
+import type { GridChildComponentProps } from "react-window";
+import { updateFavesDB, withSuspense } from "helpers";
 import { useHistory } from "react-router-dom";
 import { Helmet } from "react-helmet";
-import { Button } from "components";
-import { MainContext } from "App";
-import {
-	Icon,
-	Box,
-	Text,
-	useDisclosure,
-	Stack,
-	Checkbox,
-	RadioGroup,
-	Radio,
-	Heading,
-	Slide,
-	VStack,
-	Flex,
-	useColorModeValue,
-	CloseButton,
-	Portal,
-	SimpleGrid,
-	Grid,
-} from "@chakra-ui/react";
+import { useMainContext } from "App";
 import "./SongList.scss";
+
+/* Types necessary for lazy loaded components */
+import type {
+	Icon as IconType,
+	Text as TextType,
+	Flex as FlexType,
+	Grid as GridType,
+	Stack as StackType,
+	Radio as RadioType,
+	Slide as SlideType,
+	VStack as VStackType,
+	Portal as PortalType,
+	Heading as HeadingType,
+	Checkbox as CheckboxType,
+	IconButton as IconButtonType,
+	CloseButton as CloseButtonType,
+} from "@chakra-ui/react/dist/types/index";
+
+/* Lazy Base Imports */
+const IconImport = lazy(() => import("@chakra-ui/react").then(module => ({ default: module.Icon })));
+const IconButtonImport = lazy(() => import("@chakra-ui/react").then(module => ({ default: module.IconButton })));
+const TextImport = lazy(() => import("@chakra-ui/react").then(module => ({ default: module.Text })));
+const StackImport = lazy(() => import("@chakra-ui/react").then(module => ({ default: module.Stack })));
+const CheckboxImport = lazy(() => import("@chakra-ui/react").then(module => ({ default: module.Checkbox })));
+const RadioImport = lazy(() => import("@chakra-ui/react").then(module => ({ default: module.Radio })));
+const HeadingImport = lazy(() => import("@chakra-ui/react").then(module => ({ default: module.Heading })));
+const SlideImport = lazy(() => import("@chakra-ui/react").then(module => ({ default: module.Slide })));
+const PortalImport = lazy(() => import("@chakra-ui/react").then(module => ({ default: module.Portal })));
+const VStackImport = lazy(() => import("@chakra-ui/react").then(module => ({ default: module.VStack })));
+const FlexImport = lazy(() => import("@chakra-ui/react").then(module => ({ default: module.Flex })));
+const CloseButtonImport = lazy(() => import("@chakra-ui/react").then(module => ({ default: module.CloseButton })));
+const GridImport = lazy(() => import("@chakra-ui/react").then(module => ({ default: module.Grid })));
+const FixedSizeGridImport = lazy(() => import("react-window").then(module => ({ default: module.FixedSizeGrid })));
+const AutoSizerImport = lazy(() => import("react-virtualized-auto-sizer"));
+
+/* With Suspense Wrapper */
+const Text = withSuspense<typeof TextType, undefined>(TextImport);
+const Icon = withSuspense<typeof IconType, undefined>(IconImport);
+const IconButton = withSuspense<typeof IconButtonType, undefined>(IconButtonImport);
+const Stack = withSuspense<typeof StackType, undefined>(StackImport);
+const Checkbox = withSuspense<typeof CheckboxType, undefined>(CheckboxImport);
+const Radio = withSuspense<typeof RadioType, undefined>(RadioImport);
+const Heading = withSuspense<typeof HeadingType, undefined>(HeadingImport);
+const Slide = withSuspense<typeof SlideType, null>(SlideImport, null);
+const Portal = withSuspense<typeof PortalType, null>(PortalImport, null);
+const VStack = withSuspense<typeof VStackType, null>(VStackImport, null);
+const Flex = withSuspense<typeof FlexType, undefined>(FlexImport);
+const CloseButton = withSuspense<typeof CloseButtonType, undefined>(CloseButtonImport);
+const Grid = withSuspense<typeof GridType, null>(GridImport, null);
+const AutoSizer = withSuspense<typeof AutoSizerImport, null>(AutoSizerImport, null);
+const FixedSizeGrid = withSuspense<typeof FixedSizeGridImport, null>(FixedSizeGridImport, null);
+
+const Button = withSuspense(lazy(() => import("components/Button")));
 
 enum FILTER_TYPES {
 	FAVE = "Favourites",
@@ -43,7 +77,6 @@ type FilterSongT =
 	| { type: "toggle"; value: "letter" | "range" };
 
 type FilterT = FILTER_TYPES.FAVE | FILTER_TYPES.ALPHA | FILTER_TYPES.NUM;
-// type GetAttrT = { parentNode: { currentTarget: { getAttribute: (arg0: string) => String } } };
 
 const meta = {
 	title: "Hymns Index",
@@ -58,7 +91,7 @@ const SortNumericUpIcon: typeof Icon = () => <Icon as={FaSortNumericDownAlt} />;
 function SongList() {
 	/** Core, Context, Routing */
 	const history = useHistory();
-	const { songs, dispatch } = useContext(MainContext);
+	const { songs, favourites, setFavourites, dispatch } = useMainContext();
 
 	// TODO: Sync all filter options with local storage as preferences
 
@@ -67,6 +100,7 @@ function SongList() {
 	const [sortNumberProps, setSortNumberProps] = useState(DEFAULT_NUM_PROPS);
 	const [filterLetterProps, setFilterLetterProps] = useState(DEFAULT_FILTER_PROPS);
 	const [filterRangeProps, setFilterRangeProps] = useState(DEFAULT_FILTER_PROPS);
+	const [filterByFaves, setFilterByFaves] = useState(false);
 	const [finalList, setFinalList] = useState<Song[]>(
 		sortList(sortAlphaProps.enabled, sortNumberProps.sortDescending, songs, true)
 	); // Contains a copy of songs from the context
@@ -76,8 +110,25 @@ function SongList() {
 
 	/** Handles Filter Drawer display */
 	const { isOpen, onOpen, onToggle } = useDisclosure();
+
+	/** Mode responsive colors */
 	const modalBG = useColorModeValue("gray.100", "gray.800");
 	const modalColors = useColorModeValue("gray.800", "gray.100");
+	const favActiveIconColor = useColorModeValue("var(--chakra-colors-red-500)", "var(--chakra-colors-red-300)");
+	const favIconColor = useColorModeValue("var(--chakra-colors-gray-600)", "var(--chakra-colors-gray-500)");
+	const favActiveIconBG = useColorModeValue("var(--chakra-colors-red-50)", "");
+
+	const toggleFavourite = (number: number) => {
+		let faves = [];
+		if (favourites.includes(number - 1)) {
+			faves = favourites.filter(fave => fave !== number - 1);
+			setFavourites(faves);
+		} else {
+			faves = [...favourites, number - 1];
+			setFavourites(faves);
+		}
+		updateFavesDB(faves);
+	};
 
 	/** Triggers navigation to a song at a specified index */
 	const memoDisplaySong = useCallback(
@@ -147,12 +198,12 @@ function SongList() {
 		if (props.type === "numbers") {
 			if (!filterRangeProps.enabled) return;
 			setFilterRangeProps(_props => ({ ..._props, currValue: props.value.toString() }));
-			filteredList = songs!.filter(song => song.number === props.value);
+			filteredList = songs.filter(song => song.number === props.value);
 			if (filterLetterProps.enabled) filteredList = filterByLetter(filteredList, filterLetterProps.currValue);
 		} else if (props.type === "range") {
 			if (!filterRangeProps.enabled) return;
 			setFilterRangeProps(_props => ({ ..._props, currValue: props.value.toString() }));
-			filteredList = songs!.filter(song => song.number >= props.value[0] && song.number <= props.value[1]);
+			filteredList = songs.filter(song => song.number >= props.value[0] && song.number <= props.value[1]);
 			if (filterLetterProps.enabled) filteredList = filterByLetter(filteredList, filterLetterProps.currValue);
 		} else if (props.type === "letters") {
 			if (!filterLetterProps.enabled) return;
@@ -186,6 +237,10 @@ function SongList() {
 				}
 				setFilterRangeProps(props => ({ ...props, enabled: !props.enabled }));
 			}
+		}
+
+		if (filterByFaves && filteredList) {
+			filteredList = filteredList.filter(item => favourites.includes(item.number - 1));
 		}
 
 		const isAlphabetical = sortAlphaProps.enabled;
@@ -233,9 +288,12 @@ function SongList() {
 			setSortAlphaProps(props => ({ ...props, enabled: sortAlphabetical }));
 			sortList(sortAlphabetical, sortDescending);
 		} else {
-			const isAlphabetical = sortAlphaProps.enabled;
-			const sortDescending = isAlphabetical ? sortAlphaProps.sortDescending : sortNumberProps.sortDescending;
-			sortList(sortAlphaProps.enabled, sortDescending, songs);
+			let targetList = filterByFaves ? songs : finalList;
+			setFilterByFaves(!filterByFaves);
+			let sortDescending: boolean;
+			sortDescending = sortAlphaProps.enabled ? sortAlphaProps.sortDescending : sortNumberProps.sortDescending;
+			if (!filterByFaves) targetList = targetList.filter(item => favourites.includes(item.number - 1));
+			sortList(sortAlphaProps.enabled, sortDescending, targetList);
 		}
 	}
 
@@ -272,7 +330,7 @@ function SongList() {
 		}
 
 		if (!initialize) setFinalList(newArray);
-		// For the one time it needs to return something ...
+		// For the few times it needs to return a value
 		return newArray;
 	}
 
@@ -290,6 +348,8 @@ function SongList() {
 					const checkValue = [[number.start], [number.end]].toString();
 					return (
 						<Button
+							minWidth="60px"
+							margin="5px"
 							key={number.start}
 							onClick={number.callback}
 							size="sm"
@@ -311,6 +371,9 @@ function SongList() {
 			<>
 				{values.map(letter => (
 					<Button
+						width="30px"
+						mr="10px"
+						mb="10px"
 						key={letter.value}
 						onClick={letter.callback}
 						size="sm"
@@ -328,34 +391,48 @@ function SongList() {
 	/** Renders a single cell */
 	const Cell = ({ columnIndex, rowIndex, style, data }: GridChildComponentProps) => {
 		const maxColumns = 2;
-		const itemWidth = 700;
+		const itemWidth = 800;
 		const columnCount = Math.min(Math.max(Math.ceil(window.innerWidth / itemWidth), 1), maxColumns);
 		const itemIndex = rowIndex * columnCount + columnIndex;
 		if (itemIndex >= finalList.length) return null;
+
+		const isFavourite = favourites.includes(data[itemIndex].number - 1);
 		return (
 			<Box
 				key={data[itemIndex].number}
 				style={style}
 				py={1}
 				pl={3}
+				ml={columnCount > 1 ? 5 : 0}
+				mt={2}
 				alignItems="center"
 				textAlign="left"
-				userSelect="none"
-				ml={itemIndex % 2 ? 1 : 0}
 			>
-				<Grid
-					className="listItem"
-					margin="auto"
-					py={0}
-					bg={modalBG}
-					onClick={memoDisplaySong}
-					templateColumns="80px 1fr"
-					shadow="md"
-					borderRadius="md"
-					data-song-id={data[itemIndex].number}
-				>
-					<Text className="listNumber">#{data[itemIndex].number}</Text>
-					<Text className="listTitle">{data[itemIndex].title}</Text>
+				<Grid alignItems="center" bg={modalBG} shadow="md" borderRadius="md" h="100%" pos="relative">
+					<Grid
+						borderRadius="md"
+						className="listItem"
+						onClick={memoDisplaySong}
+						templateColumns="55px 1fr 50px"
+						data-song-id={data[itemIndex].number}
+						px={5}
+					>
+						<Text className="listNumber">#{data[itemIndex].number}</Text>
+						<Text className="listTitle">{data[itemIndex].title}</Text>
+					</Grid>
+					<IconButton
+						colorScheme={isFavourite ? "red" : "gray"}
+						bgColor={isFavourite ? favActiveIconBG : modalBG}
+						_hover={{ shadow: "md" }}
+						icon={<FaHeart color={isFavourite ? favActiveIconColor : favIconColor} />}
+						aria-label="Add to Favourites"
+						size="lg"
+						variant="outline"
+						className="faveIcon"
+						pos="absolute"
+						right="10px"
+						onClick={() => toggleFavourite(data[itemIndex].number)}
+					/>
 				</Grid>
 			</Box>
 		);
@@ -369,29 +446,7 @@ function SongList() {
 				onChange={nextValue => handleSortToggle(nextValue as FILTER_TYPES)}
 				w="100%"
 			>
-				<Stack>
-					<Box w="100%">
-						<Heading fontSize="lg">Sort Alphabetically</Heading>
-						<Box mt={4}>
-							<Radio value={FILTER_TYPES.ALPHA} name="sorting-type">
-								Enable
-							</Radio>
-							<RadioGroup
-								name="sort-alpha"
-								value={sortAlphaProps.sortDescending ? "Descending" : "Ascending"}
-								onChange={nextValue => handleSortChange(nextValue, FILTER_TYPES.ALPHA)}
-							>
-								<Stack>
-									<Radio value="Ascending" disabled={!sortAlphaProps.enabled}>
-										Ascending <SortAlphaDownIcon />
-									</Radio>
-									<Radio value="Descending" disabled={!sortAlphaProps.enabled}>
-										Descending <SortAlphaUpIcon />
-									</Radio>
-								</Stack>
-							</RadioGroup>
-						</Box>
-					</Box>
+				<Stack spacing={6}>
 					<Box w="100%">
 						<Heading fontSize="lg">Sort Numerically</Heading>
 						<Box mt={4}>
@@ -414,6 +469,28 @@ function SongList() {
 							</RadioGroup>
 						</Box>
 					</Box>
+					<Box w="100%">
+						<Heading fontSize="lg">Sort Alphabetically</Heading>
+						<Box mt={4}>
+							<Radio value={FILTER_TYPES.ALPHA} name="sorting-type">
+								Enable
+							</Radio>
+							<RadioGroup
+								name="sort-alpha"
+								value={sortAlphaProps.sortDescending ? "Descending" : "Ascending"}
+								onChange={nextValue => handleSortChange(nextValue, FILTER_TYPES.ALPHA)}
+							>
+								<Stack>
+									<Radio value="Ascending" disabled={!sortAlphaProps.enabled}>
+										Ascending <SortAlphaDownIcon />
+									</Radio>
+									<Radio value="Descending" disabled={!sortAlphaProps.enabled}>
+										Descending <SortAlphaUpIcon />
+									</Radio>
+								</Stack>
+							</RadioGroup>
+						</Box>
+					</Box>
 				</Stack>
 			</RadioGroup>
 			<Box w="100%">
@@ -426,9 +503,9 @@ function SongList() {
 						>
 							Enable
 						</Checkbox>
-						<SimpleGrid minChildWidth="30px" spacing="10px">
+						<Flex flexWrap="wrap">
 							<LetterItems />
-						</SimpleGrid>
+						</Flex>
 					</Stack>
 				</Box>
 			</Box>
@@ -442,16 +519,20 @@ function SongList() {
 						>
 							Enable
 						</Checkbox>
-						<SimpleGrid minChildWidth="60px" spacing="10px">
+						<Flex flexWrap="wrap">
 							<NumberItems />
-						</SimpleGrid>
+						</Flex>
 					</Stack>
 				</Box>
 			</Box>
 			<Box w="100%">
 				<Heading fontSize="lg">Favourites</Heading>
 				<Box mt={4}>
-					<Checkbox value="Favourites" onChange={() => handleSortToggle(FILTER_TYPES.FAVE)} disabled>
+					<Checkbox
+						defaultChecked={filterByFaves}
+						value="Favourites"
+						onChange={() => handleSortToggle(FILTER_TYPES.FAVE)}
+					>
 						Only favourites
 					</Checkbox>
 				</Box>
@@ -462,7 +543,7 @@ function SongList() {
 	return (
 		<>
 			<Helmet>
-				<title>{`Hymns for All Times| ${meta.title}`}</title>
+				<title>{`Hymns for All Times | ${meta.title}`}</title>
 			</Helmet>
 
 			<Button onClick={onOpen} pos="absolute" right={-5} top="12%" zIndex={95}>
@@ -512,18 +593,19 @@ function SongList() {
 				<AutoSizer>
 					{({ height, width }) => {
 						const maxColumns = 2;
-						const itemWidth = 700;
+						const itemWidth = 800;
 						const columnCount = Math.min(Math.max(Math.ceil(width / itemWidth), 1), maxColumns);
 						return (
 							<FixedSizeGrid
 								height={height}
 								width={width}
 								rowHeight={90}
-								columnWidth={width / columnCount}
+								columnWidth={width / columnCount - 30}
 								columnCount={columnCount}
 								rowCount={Math.ceil(finalList.length / columnCount)}
 								itemData={finalList}
 								style={{ overflowX: "hidden" }}
+								overscanRowCount={2}
 							>
 								{Cell}
 							</FixedSizeGrid>

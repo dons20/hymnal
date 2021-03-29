@@ -55,3 +55,4 @@ yarn-error.log*
 
 # extras
 /placeholders
+chrome_local

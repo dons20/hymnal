@@ -2,9 +2,10 @@ import { useEffect, useState } from "react";
 
 const dbName = "Songs";
 
-/** @deprecated Should probably read from db directly... */
+/** deprecated Should probably read from db directly... */
 function useSongLoader(_id = 0) {
 	const [songs, setSongs] = useState<Song[]>([]);
+	const [favourites, setFavourites] = useState<number[]>([]);
 
 	/**
 	 * Initiates the process of loading songs from the db
@@ -77,13 +78,37 @@ function useSongLoader(_id = 0) {
 			}
 		}
 
+		async function loadFavourites() {
+			const name = "Songs";
+			const storeName = "Favourites";
+			const localForage = await import("localforage");
+
+			localForage.config({
+				name,
+				storeName,
+				description: "Your favourite songs",
+			});
+
+			try {
+				const favourites: number[] = [];
+				await localForage.iterate(function (value: number) {
+					favourites.push(value);
+				});
+				setFavourites(favourites);
+			} catch (e) {
+				console.log("Error obtaining favourites");
+				console.info(e.message);
+			}
+		}
+
 		if (songs.length <= 1) {
 			console.log("%cLoading Songs...", "color: #3182ce; font-size: large; font-weight: bold");
 			checkDB();
+			loadFavourites();
 		}
 	}, [songs.length]);
 
-	return songs;
+	return { songs, favourites, setFavourites };
 }
 
 export default useSongLoader;

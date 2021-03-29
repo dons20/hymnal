@@ -1,9 +1,9 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import { FaSearch, FaSun, FaMoon, FaHome, FaBars } from "react-icons/fa";
 import { useDebouncedCallback } from "use-debounce";
 import { useHistory } from "react-router-dom";
 import { Button } from "components";
-import { MainContext } from "App";
+import { useMainContext } from "App";
 import Fuse from "fuse.js";
 import {
 	Box,
@@ -34,7 +34,7 @@ import "./Header.scss";
 
 function Header() {
 	const history = useHistory();
-	const { songs } = useContext(MainContext);
+	const { songs } = useMainContext();
 	const { colorMode, toggleColorMode } = useColorMode();
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const { isOpen: isModalOpen, onOpen: onModalOpen, onClose: onModalClose } = useDisclosure();
@@ -98,7 +98,7 @@ function Header() {
 
 	return (
 		<Box className="page-header" p={4} bg={headerBG}>
-			<Grid templateColumns="max-content 1fr" alignItems="center" gap={10} justifyContent="space-between">
+			<Grid templateColumns="auto 1fr" alignItems="center" gap={10} justifyContent="space-between" px={5}>
 				<Heading size="md" onClick={back} cursor="pointer" display="flex" alignItems="center" width="auto">
 					Hymns for All Times
 					<Icon as={FaHome} size={20} ml={3} />
@@ -149,7 +149,7 @@ function Header() {
 						bg={resultsBG}
 						pos="absolute"
 						zIndex={105}
-						top={20}
+						top="60px"
 						right="65"
 						w={350}
 						px={5}

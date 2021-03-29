@@ -1,34 +1,23 @@
 {
-  "extends": "@tsconfig/recommended/tsconfig.json",
-  "compilerOptions": {
-    "skipLibCheck": true,
-    "jsx": "react-jsx",
-    "baseUrl": "src",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
-    "allowJs": true,
-    "allowSyntheticDefaultImports": true,
-    "noFallthroughCasesInSwitch": true,
-    "module": "esnext",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true
-  },
-  "typeAcquisition": {
-    "enable": true,
-    "exclude": [
-      "dotenv"
-    ]
-  },
-  "include": [
-    "src/**/*"
-  ],
-  "exclude": [
-    "**/*.test.ts",
-    "**/node_modules/**/*"
-  ]
+	"extends": "@tsconfig/recommended/tsconfig.json",
+	"compilerOptions": {
+		"skipLibCheck": true,
+		"jsx": "react-jsx",
+		"baseUrl": "src",
+		"lib": ["dom", "dom.iterable", "esnext"],
+		"allowJs": true,
+		"allowSyntheticDefaultImports": true,
+		"noFallthroughCasesInSwitch": true,
+		"module": "esnext",
+		"moduleResolution": "node",
+		"resolveJsonModule": true,
+		"isolatedModules": true,
+		"noEmit": true
+	},
+	"typeAcquisition": {
+		"enable": true,
+		"exclude": ["dotenv"]
+	},
+	"include": ["src/**/*"],
+	"exclude": ["**/*.test.ts", "**/node_modules/**/*", "**/chrome_local/**/*"]
 }
