@@ -82,12 +82,13 @@ function Search() {
 				cursor="default"
 			>
 				<Grid
-					p={5}
+					px={3}
+					py={5}
 					maxW="800px"
 					margin="auto"
 					bg={cellBG}
 					onClick={memoDisplaySong}
-					templateColumns="80px 1fr"
+					templateColumns="40px 1fr"
 					shadow="md"
 					borderRadius="md"
 					className="gridItem"
@@ -109,7 +110,7 @@ function Search() {
 			<Helmet>
 				<title>{`Hymns for All Times | ${meta.page}`}</title>
 			</Helmet>
-			<Grid pt="10" templateRows="auto 1fr" h="100%" bg={pageBG}>
+			<Grid pt={7} templateRows="auto 1fr" h="100%" bg={pageBG}>
 				<Container centerContent>
 					<InputGroup size="lg" as="form" onSubmit={submitQuery} w="90%" mb="5">
 						<Input

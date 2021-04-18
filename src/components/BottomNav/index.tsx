@@ -5,13 +5,13 @@ import { useColorModeValue } from "@chakra-ui/color-mode";
 import { useMediaQuery } from "@chakra-ui/media-query";
 import { isMobile } from "react-device-detect";
 import { Box, Text } from "@chakra-ui/layout";
-import { Button } from "components";
+import Button from "components/Button";
 import "./BottomNav.scss";
 
 function MobileNavBar() {
 	const { pathname } = useLocation();
 	const history = useHistory();
-	const [scrollingDown, setScrollingDown] = useState(false);
+	const [scrollingDown, setScrollingDown] = useState(true);
 	const prevPath = useRef<string | null>(null);
 	const scrollPos = useRef(document.body.getBoundingClientRect().top);
 	const [iconsOnly] = useMediaQuery("(max-width: 475px)");
@@ -38,7 +38,6 @@ function MobileNavBar() {
 
 	useEffect(() => {
 		// Initial state
-		// var scrollPos = 0;
 		const scrollEventHandler = () => {
 			// detects new state and compares it with the new one
 			if (document.body.getBoundingClientRect().top > scrollPos.current) setScrollingDown(false);
@@ -73,7 +72,7 @@ function MobileNavBar() {
 			{tabValues.map(tab => (
 				<Button
 					data-url={tab.url}
-					leftIcon={tab.icon}
+					leftIcon={!iconsOnly ? tab.icon : undefined}
 					aria-label={tab.title}
 					onClick={handleTabBarPress}
 					key={tab.title}
@@ -81,6 +80,7 @@ function MobileNavBar() {
 					bg="transparent"
 					px={10}
 				>
+					{iconsOnly && <>{tab.icon}</>}
 					{!iconsOnly && <Text>{tab.title}</Text>}
 				</Button>
 			))}

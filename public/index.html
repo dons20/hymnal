@@ -54,9 +54,17 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			rel="preload"
+			as="style"
+			href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=PT+Sans&display=swap"
+		/>
 		<link
 			href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=PT+Sans&display=swap"
 			rel="stylesheet"
+			media="print"
+			onload="this.onload=null;this.removeAttribute('media');"
 		/>
 		<title>Hymns for all Times</title>
 	</head>

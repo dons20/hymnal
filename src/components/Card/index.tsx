@@ -31,7 +31,7 @@ type CardP = CardWithImage | CardWithoutImage;
 
 const Card = ({ title, subtitle, primaryLink, primaryLabel, imageSrc, imageAlt }: CardP) => {
 	const boxBG = useColorModeValue("white", "gray.600");
-	const subtitleColor = useColorModeValue("gray.500", "gray.200");
+	const subtitleColor = useColorModeValue("gray.600", "gray.200");
 
 	return (
 		<Box className="card" bg={boxBG} p="4" shadow="md" borderRadius="sm">

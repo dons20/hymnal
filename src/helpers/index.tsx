@@ -2,7 +2,7 @@ import React, { Suspense } from "react";
 import { SongsDB, version } from "data/songs";
 import { Loader } from "components";
 
-export const withSuspense = <P extends React.FC | Function, Q>(
+export const withSuspense = <P extends React.FC | Function, Q = void>(
 	// @ts-ignore Need to find a way to fix the return types here
 	LazyComponent: React.JSXElementConstructor<P> | React.LazyExoticComponent<P> | P,
 	FallbackComponent?: React.FC<Q> | null

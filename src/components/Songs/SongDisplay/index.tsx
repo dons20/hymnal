@@ -83,7 +83,7 @@ function SongDisplay() {
 			<Helmet>
 				<title>{`Hymns for All Times | ${songToRender!.title}`}</title>
 			</Helmet>
-			<Button onClick={backToIndex} pos="fixed" left={-5} top="14%" zIndex={100}>
+			<Button onClick={backToIndex} pos="absolute" left={-5} top="10%" zIndex={100} pr={1}>
 				Index
 			</Button>
 			<Box className="header" pos="relative" pr="5">

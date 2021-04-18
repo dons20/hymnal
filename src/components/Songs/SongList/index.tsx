@@ -44,18 +44,18 @@ const FixedSizeGridImport = lazy(() => import("react-window").then(module => ({ 
 const AutoSizerImport = lazy(() => import("react-virtualized-auto-sizer"));
 
 /* With Suspense Wrapper */
-const Text = withSuspense<typeof TextType, undefined>(TextImport);
-const Icon = withSuspense<typeof IconType, undefined>(IconImport);
-const IconButton = withSuspense<typeof IconButtonType, undefined>(IconButtonImport);
-const Stack = withSuspense<typeof StackType, undefined>(StackImport);
-const Checkbox = withSuspense<typeof CheckboxType, undefined>(CheckboxImport);
-const Radio = withSuspense<typeof RadioType, undefined>(RadioImport);
-const Heading = withSuspense<typeof HeadingType, undefined>(HeadingImport);
+const Text = withSuspense<typeof TextType>(TextImport);
+const Icon = withSuspense<typeof IconType>(IconImport);
+const IconButton = withSuspense<typeof IconButtonType>(IconButtonImport);
+const Stack = withSuspense<typeof StackType>(StackImport);
+const Checkbox = withSuspense<typeof CheckboxType>(CheckboxImport);
+const Radio = withSuspense<typeof RadioType>(RadioImport);
+const Heading = withSuspense<typeof HeadingType>(HeadingImport);
 const Slide = withSuspense<typeof SlideType, null>(SlideImport, null);
 const Portal = withSuspense<typeof PortalType, null>(PortalImport, null);
 const VStack = withSuspense<typeof VStackType, null>(VStackImport, null);
-const Flex = withSuspense<typeof FlexType, undefined>(FlexImport);
-const CloseButton = withSuspense<typeof CloseButtonType, undefined>(CloseButtonImport);
+const Flex = withSuspense<typeof FlexType>(FlexImport);
+const CloseButton = withSuspense<typeof CloseButtonType>(CloseButtonImport);
 const Grid = withSuspense<typeof GridType, null>(GridImport, null);
 const AutoSizer = withSuspense<typeof AutoSizerImport, null>(AutoSizerImport, null);
 const FixedSizeGrid = withSuspense<typeof FixedSizeGridImport, null>(FixedSizeGridImport, null);
@@ -546,7 +546,7 @@ function SongList() {
 				<title>{`Hymns for All Times | ${meta.title}`}</title>
 			</Helmet>
 
-			<Button onClick={onOpen} pos="absolute" right={-5} top="12%" zIndex={95}>
+			<Button onClick={onOpen} pos="absolute" right={-5} top="12%" zIndex={95} pl={2}>
 				Filter
 			</Button>
 

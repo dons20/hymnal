@@ -1,36 +1,95 @@
-import React, { useState } from "react";
+import React, { lazy, Suspense, useState } from "react";
+import { useColorMode, useMediaQuery, useDisclosure, useColorModeValue, Box } from "@chakra-ui/react";
 import { FaSearch, FaSun, FaMoon, FaHome, FaBars } from "react-icons/fa";
 import { useDebouncedCallback } from "use-debounce";
 import { useHistory } from "react-router-dom";
-import { Button } from "components";
+import Loader from "components/Loader";
 import { useMainContext } from "App";
 import Fuse from "fuse.js";
-import {
-	Box,
-	InputGroup,
-	Input,
-	InputRightElement,
-	Heading,
-	Grid,
-	useColorMode,
-	IconButton,
-	Icon,
-	useMediaQuery,
-	Text,
-	Fade,
-	useDisclosure,
-	CloseButton,
-	Portal,
-	useColorModeValue,
-	Modal,
-	ModalOverlay,
-	ModalContent,
-	ModalHeader,
-	ModalCloseButton,
-	ModalBody,
-	VStack,
-} from "@chakra-ui/react";
 import "./Header.scss";
+
+import type {
+	Icon as IconType,
+	Grid as GridType,
+	Text as TextType,
+	Fade as FadeType,
+	Input as InputType,
+	Modal as ModalType,
+	Portal as PortalType,
+	VStack as VStackType,
+	Heading as HeadingType,
+	ModalBody as ModalBodyType,
+	IconButton as IconButtonType,
+	InputGroup as InputGroupType,
+	ModalHeader as ModalHeaderType,
+	CloseButton as CloseButtonType,
+	ModalOverlay as ModalOverlayType,
+	ModalContent as ModalContentType,
+	ModalCloseButton as ModalCloseButtonType,
+	InputRightElement as InputRightElementType,
+} from "@chakra-ui/react/dist/types";
+
+const withSuspense = <P extends React.FC | Function, Q = void>(
+	// @ts-ignore Need to find a way to fix the return types here
+	LazyComponent: React.JSXElementConstructor<P> | React.LazyExoticComponent<P> | P,
+	FallbackComponent?: React.FC<Q> | null
+): P => {
+	// @ts-ignore Need to find a way to fix the return types here
+	return (props: P, props2: Q) => {
+		let fallbackLoader = <></>;
+		if (FallbackComponent === undefined) fallbackLoader = <Loader />;
+		if (FallbackComponent) fallbackLoader = <FallbackComponent {...props2} />;
+
+		return (
+			<Suspense fallback={fallbackLoader}>
+				{/** @ts-ignore Need to find a way to fix the return types here */}
+				<LazyComponent {...props} />
+			</Suspense>
+		);
+	};
+};
+
+/* Lazy Base Imports */
+const CloseButtonImport = lazy(() => import("@chakra-ui/react").then(m => ({ default: m.CloseButton })));
+const FadeImport = lazy(() => import("@chakra-ui/react").then(m => ({ default: m.Fade })));
+const GridImport = lazy(() => import("@chakra-ui/react").then(m => ({ default: m.Grid })));
+const HeadingImport = lazy(() => import("@chakra-ui/react").then(m => ({ default: m.Heading })));
+const InputImport = lazy(() => import("@chakra-ui/react").then(m => ({ default: m.Input })));
+const IconImport = lazy(() => import("@chakra-ui/react").then(m => ({ default: m.Icon })));
+const IconButtonImport = lazy(() => import("@chakra-ui/react").then(m => ({ default: m.IconButton })));
+const InputGroupImport = lazy(() => import("@chakra-ui/react").then(m => ({ default: m.InputGroup })));
+const InputRightElementImport = lazy(() => import("@chakra-ui/react").then(m => ({ default: m.InputRightElement })));
+const ModalImport = lazy(() => import("@chakra-ui/react").then(m => ({ default: m.Modal })));
+const ModalOverlayImport = lazy(() => import("@chakra-ui/react").then(m => ({ default: m.ModalOverlay })));
+const ModalContentImport = lazy(() => import("@chakra-ui/react").then(m => ({ default: m.ModalContent })));
+const ModalHeaderImport = lazy(() => import("@chakra-ui/react").then(m => ({ default: m.ModalHeader })));
+const ModalCloseButtonImport = lazy(() => import("@chakra-ui/react").then(m => ({ default: m.ModalCloseButton })));
+const ModalBodyImport = lazy(() => import("@chakra-ui/react").then(m => ({ default: m.ModalBody })));
+const PortalImport = lazy(() => import("@chakra-ui/react").then(m => ({ default: m.Portal })));
+const TextImport = lazy(() => import("@chakra-ui/react").then(m => ({ default: m.Text })));
+const VStackImport = lazy(() => import("@chakra-ui/react").then(m => ({ default: m.VStack })));
+const ButtonImport = lazy(() => import("components/Button"));
+
+/* With Suspense Wrapper */
+const Fade = withSuspense<typeof FadeType>(FadeImport);
+const Grid = withSuspense<typeof GridType, null>(GridImport, null);
+const Heading = withSuspense<typeof HeadingType, null>(HeadingImport, null);
+const Input = withSuspense<typeof InputType, null>(InputImport, null);
+const Icon = withSuspense<typeof IconType>(IconImport);
+const CloseButton = withSuspense<typeof CloseButtonType>(CloseButtonImport);
+const IconButton = withSuspense<typeof IconButtonType>(IconButtonImport);
+const InputGroup = withSuspense<typeof InputGroupType, null>(InputGroupImport, null);
+const InputRightElement = withSuspense<typeof InputRightElementType, null>(InputRightElementImport, null);
+const Modal = withSuspense<typeof ModalType, null>(ModalImport, null);
+const ModalOverlay = withSuspense<typeof ModalOverlayType, null>(ModalOverlayImport, null);
+const ModalContent = withSuspense<typeof ModalContentType, null>(ModalContentImport, null);
+const ModalHeader = withSuspense<typeof ModalHeaderType, null>(ModalHeaderImport, null);
+const ModalCloseButton = withSuspense<typeof ModalCloseButtonType, null>(ModalCloseButtonImport, null);
+const ModalBody = withSuspense<typeof ModalBodyType, null>(ModalBodyImport, null);
+const Portal = withSuspense<typeof PortalType, null>(PortalImport, null);
+const Text = withSuspense<typeof TextType>(TextImport);
+const VStack = withSuspense<typeof VStackType, null>(VStackImport, null);
+const Button = withSuspense<typeof ButtonImport, null>(ButtonImport, null);
 
 function Header() {
 	const history = useHistory();

@@ -2,22 +2,24 @@ import React, { useReducer, useEffect, lazy } from "react";
 import { Route, Switch, Redirect, useLocation } from "react-router-dom";
 import { useSongLoader } from "components/CustomHooks";
 import { withSuspense, createCtx } from "helpers";
+import { isMobile } from "react-device-detect";
 import styles from "./App.module.scss";
 
-const Loader = withSuspense(lazy(() => import("components/Loader")));
-const Header = withSuspense(
-	lazy(() => import("components/Header")),
-	null
-);
-const BottomNav = withSuspense(lazy(() => import("components/BottomNav")));
-const PictureHeader = withSuspense(
-	lazy(() => import("components/PictureHeader")),
-	null
-);
+const HomeImport = lazy(() => import("pages/Home"));
+const SongsImport = lazy(() => import("pages/Songs"));
+const SearchImport = lazy(() => import("pages/Search"));
+const LoaderImport = lazy(() => import("components/Loader"));
+const HeaderImport = lazy(() => import("components/Header"));
+const BottomNavImport = lazy(() => import("components/BottomNav"));
+const PictureHeaderImport = lazy(() => import("components/PictureHeader"));
 
-const Home = withSuspense(lazy(() => import("pages/Home")));
-const Songs = withSuspense(lazy(() => import("pages/Songs")));
-const Search = withSuspense(lazy(() => import("pages/Search")));
+const Home = withSuspense<typeof HomeImport>(HomeImport);
+const Songs = withSuspense<typeof SongsImport>(SongsImport);
+const Search = withSuspense<typeof SearchImport>(SearchImport);
+const Loader = withSuspense<typeof LoaderImport, null>(LoaderImport, null);
+const Header = withSuspense<typeof HeaderImport, null>(HeaderImport, null);
+const BottomNav = withSuspense<typeof BottomNavImport, null>(BottomNavImport, null);
+const PictureHeader = withSuspense<typeof PictureHeaderImport, null>(PictureHeaderImport, null);
 
 const pages = {
 	HOME: "/home",
@@ -99,7 +101,7 @@ function App() {
 				<section className={styles.app_body}>
 					<Header />
 					<ScrollRestoration />
-					<main className={styles.app_inner}>
+					<main className={`${styles.app_inner} ${isMobile ? styles.app_inner_mobile : ""}`}>
 						<PictureHeader />
 
 						<div className={styles.wrapper}>
