@@ -15,7 +15,7 @@ const meta = {
 
 function HomeScreen() {
 	const { pages, dispatch } = useMainContext();
-	const pageBG = useColorModeValue("#f5f5f5", "gray.800");
+	const pageBG = useColorModeValue("gray.200", "gray.800");
 
 	useEffect(() => {
 		dispatch!({ type: "setTitle", payload: meta.title });

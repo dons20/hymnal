@@ -13,39 +13,7 @@ exports[`renders without crashing 1`] = `
       >
         <div
           class="wrapper"
-        >
-          <div
-            class="css-1bsbzi3"
-          >
-            <div
-              aria-valuemax="100"
-              aria-valuemin="0"
-              class="chakra-progress css-120wkjd"
-              data-indeterminate=""
-              role="progressbar"
-            >
-              <svg
-                class="css-jf70f3"
-                viewBox="0 0 100 100"
-              >
-                <circle
-                  class="chakra-progress__track css-1bhxzgy"
-                  cx="50"
-                  cy="50"
-                  r="42"
-                  stroke-width="10px"
-                />
-                <circle
-                  class="chakra-progress__indicator css-p6i8i8"
-                  cx="50"
-                  cy="50"
-                  r="42"
-                  stroke-width="10px"
-                />
-              </svg>
-            </div>
-          </div>
-        </div>
+        />
       </main>
     </section>
   </div>

@@ -2,6 +2,7 @@ import React, { lazy, Suspense, useState } from "react";
 import { useColorMode, useMediaQuery, useDisclosure, useColorModeValue, Box } from "@chakra-ui/react";
 import { FaSearch, FaSun, FaMoon, FaHome, FaBars } from "react-icons/fa";
 import { useDebouncedCallback } from "use-debounce";
+import withSuspense from "helpers/withSuspense";
 import { useHistory } from "react-router-dom";
 import Loader from "components/Loader";
 import { useMainContext } from "App";
@@ -28,26 +29,6 @@ import type {
 	ModalCloseButton as ModalCloseButtonType,
 	InputRightElement as InputRightElementType,
 } from "@chakra-ui/react/dist/types";
-
-const withSuspense = <P extends React.FC | Function, Q = void>(
-	// @ts-ignore Need to find a way to fix the return types here
-	LazyComponent: React.JSXElementConstructor<P> | React.LazyExoticComponent<P> | P,
-	FallbackComponent?: React.FC<Q> | null
-): P => {
-	// @ts-ignore Need to find a way to fix the return types here
-	return (props: P, props2: Q) => {
-		let fallbackLoader = <></>;
-		if (FallbackComponent === undefined) fallbackLoader = <Loader />;
-		if (FallbackComponent) fallbackLoader = <FallbackComponent {...props2} />;
-
-		return (
-			<Suspense fallback={fallbackLoader}>
-				{/** @ts-ignore Need to find a way to fix the return types here */}
-				<LazyComponent {...props} />
-			</Suspense>
-		);
-	};
-};
 
 /* Lazy Base Imports */
 const CloseButtonImport = lazy(() => import("@chakra-ui/react").then(m => ({ default: m.CloseButton })));
@@ -172,7 +153,7 @@ function Header() {
 					/>
 				) : (
 					<Grid templateColumns="minmax(auto, 300px) auto" gap={2} justifyContent="flex-end">
-						<InputGroup size="md" as="form" onSubmit={submitQuery}>
+						<InputGroup size="md" as="form" onSubmit={submitQuery} role="search">
 							<Input
 								value={query}
 								onChange={searchQueryChange}

@@ -1,8 +1,9 @@
 import React, { useReducer, useEffect, lazy } from "react";
 import { Route, Switch, Redirect, useLocation } from "react-router-dom";
 import { useSongLoader } from "components/CustomHooks";
-import { withSuspense, createCtx } from "helpers";
+import withSuspense from "helpers/withSuspense";
 import { isMobile } from "react-device-detect";
+import { createCtx } from "helpers";
 import styles from "./App.module.scss";
 
 const HomeImport = lazy(() => import("pages/Home"));

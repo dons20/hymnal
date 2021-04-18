@@ -1,26 +1,5 @@
-import React, { Suspense } from "react";
+import React from "react";
 import { SongsDB, version } from "data/songs";
-import { Loader } from "components";
-
-export const withSuspense = <P extends React.FC | Function, Q = void>(
-	// @ts-ignore Need to find a way to fix the return types here
-	LazyComponent: React.JSXElementConstructor<P> | React.LazyExoticComponent<P> | P,
-	FallbackComponent?: React.FC<Q> | null
-): P => {
-	// @ts-ignore Need to find a way to fix the return types here
-	return (props: P, props2: Q) => {
-		let fallbackLoader = <></>;
-		if (FallbackComponent === undefined) fallbackLoader = <Loader />;
-		if (FallbackComponent) fallbackLoader = <FallbackComponent {...props2} />;
-
-		return (
-			<Suspense fallback={fallbackLoader}>
-				{/** @ts-ignore Need to find a way to fix the return types here */}
-				<LazyComponent {...props} />
-			</Suspense>
-		);
-	};
-};
 
 /**
  * Loads songs from JSON and stores them locally

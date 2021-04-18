@@ -3,8 +3,9 @@ import { FaHeart, FaSortAlphaDown, FaSortAlphaDownAlt, FaSortNumericDown, FaSort
 import { DEFAULT_ALPHA_PROPS, DEFAULT_FILTER_PROPS, DEFAULT_NUM_PROPS } from "./defaults";
 import { useDisclosure, RadioGroup, useColorModeValue, Box } from "@chakra-ui/react";
 import type { GridChildComponentProps } from "react-window";
-import { updateFavesDB, withSuspense } from "helpers";
+import withSuspense from "helpers/withSuspense";
 import { useHistory } from "react-router-dom";
+import { updateFavesDB } from "helpers";
 import { Helmet } from "react-helmet";
 import { useMainContext } from "App";
 import "./SongList.scss";

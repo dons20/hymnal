@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { BrowserRouter } from "react-router-dom";
+import { MemoryRouter } from "react-router-dom";
 import { render } from "@testing-library/react";
 import App from "./App";
 
@@ -9,11 +9,11 @@ it("renders without crashing", () => {
 	jest.spyOn(console, "warn").mockImplementation(() => {});
 	window.scrollTo = jest.fn();
 	const { asFragment } = render(
-		<BrowserRouter>
-			<Suspense fallback={<></>}>
+		<MemoryRouter>
+			<Suspense fallback="">
 				<App />
 			</Suspense>
-		</BrowserRouter>
+		</MemoryRouter>
 	);
 	expect(asFragment()).toMatchSnapshot();
 });
