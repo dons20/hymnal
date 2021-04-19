@@ -3,6 +3,7 @@ import { Box, Container, Text, IconButton } from "@chakra-ui/react";
 import { Redirect, useHistory, useParams } from "react-router-dom";
 import { useColorModeValue } from "@chakra-ui/color-mode";
 import { FaHeart } from "react-icons/fa";
+import { updateFavesDB } from "helpers";
 import { Helmet } from "react-helmet";
 import { useMainContext } from "App";
 import { Button } from "components";
@@ -11,22 +12,6 @@ import "./SongDisplay.scss";
 type ParamTypes = {
 	songID?: string;
 };
-
-async function updateFavesDB(indexes: number[]) {
-	const name = "Songs";
-	const storeName = "Favourites";
-	const localForage = await import("localforage");
-
-	localForage.config({
-		name,
-		storeName,
-		description: "Your favourite songs",
-	});
-
-	for (let i = 0; i < indexes.length; i++) {
-		await localForage.setItem(`${indexes[i]}`, indexes[i]);
-	}
-}
 
 function SongDisplay() {
 	const history = useHistory();

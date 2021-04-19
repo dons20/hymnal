@@ -46,17 +46,17 @@ function MobileNavBar() {
 			scrollPos.current = document.body.getBoundingClientRect().top;
 		};
 
+		scrollPos.current = document.body.getBoundingClientRect().top;
+		prevPath.current = pathname;
+		setScrollingDown(true);
+
 		// adding scroll event
 		window.addEventListener("scroll", scrollEventHandler);
 
 		return () => {
 			window.removeEventListener("scroll", scrollEventHandler);
 		};
-	}, [setScrollingDown]);
-
-	useEffect(() => {
-		prevPath.current = pathname;
-	}, [pathname]);
+	}, [setScrollingDown, pathname]);
 
 	function handleTabBarPress(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
 		const url = e.currentTarget.getAttribute("data-url") || "/";

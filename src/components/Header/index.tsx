@@ -1,10 +1,9 @@
-import React, { lazy, Suspense, useState } from "react";
+import React, { lazy, useState } from "react";
 import { useColorMode, useMediaQuery, useDisclosure, useColorModeValue, Box } from "@chakra-ui/react";
 import { FaSearch, FaSun, FaMoon, FaHome, FaBars } from "react-icons/fa";
 import { useDebouncedCallback } from "use-debounce";
 import withSuspense from "helpers/withSuspense";
 import { useHistory } from "react-router-dom";
-import Loader from "components/Loader";
 import { useMainContext } from "App";
 import Fuse from "fuse.js";
 import "./Header.scss";

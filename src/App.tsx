@@ -1,10 +1,12 @@
 import React, { useReducer, useEffect, lazy } from "react";
 import { Route, Switch, Redirect, useLocation } from "react-router-dom";
+import { useColorModeValue } from "@chakra-ui/color-mode";
 import { useSongLoader } from "components/CustomHooks";
 import withSuspense from "helpers/withSuspense";
 import { isMobile } from "react-device-detect";
 import { createCtx } from "helpers";
 import styles from "./App.module.scss";
+import { Box } from "@chakra-ui/layout";
 
 const HomeImport = lazy(() => import("pages/Home"));
 const SongsImport = lazy(() => import("pages/Songs"));
@@ -81,6 +83,7 @@ export const [useMainContext, MainContextProvider] = createCtx<CTX>();
 function App() {
 	const [state, dispatch] = useReducer(reducer, initialAppState);
 	const { songs, favourites, setFavourites } = useSongLoader();
+	const pageBG = useColorModeValue("gray.200", "gray.800");
 
 	function handleOrientationChange() {
 		dispatch({ type: "setWidth", payload: document.body.getBoundingClientRect().width });
@@ -98,11 +101,15 @@ function App() {
 
 	return (
 		<MainContextProvider value={{ meta: state, dispatch, songs, pages, favourites, setFavourites }}>
-			<div className={styles.root}>
-				<section className={styles.app_body}>
+			<Box className={styles.root}>
+				<Box as="section" className={styles.app_body}>
 					<Header />
 					<ScrollRestoration />
-					<main className={`${styles.app_inner} ${isMobile ? styles.app_inner_mobile : ""}`}>
+					<Box
+						as="main"
+						className={`${styles.app_inner} ${isMobile ? styles.app_inner_mobile : ""}`}
+						bg={pageBG}
+					>
 						<PictureHeader />
 
 						<div className={styles.wrapper}>
@@ -118,11 +125,11 @@ function App() {
 								</Route>
 							</Switch>
 						</div>
-					</main>
+					</Box>
 
 					<BottomNav />
-				</section>
-			</div>
+				</Box>
+			</Box>
 		</MainContextProvider>
 	);
 }

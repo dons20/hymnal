@@ -4,6 +4,7 @@ import { DEFAULT_ALPHA_PROPS, DEFAULT_FILTER_PROPS, DEFAULT_NUM_PROPS } from "./
 import { useDisclosure, RadioGroup, useColorModeValue, Box } from "@chakra-ui/react";
 import type { GridChildComponentProps } from "react-window";
 import withSuspense from "helpers/withSuspense";
+import { isMobile } from "react-device-detect";
 import { useHistory } from "react-router-dom";
 import { updateFavesDB } from "helpers";
 import { Helmet } from "react-helmet";
@@ -571,12 +572,13 @@ function SongList() {
 					color={modalColors}
 					bg={modalBG}
 					rounded="md"
-					h="100vh"
+					h={isMobile ? "94vh" : "100vh"}
 					w="300px"
 					right={0}
 					pos="absolute"
 					overflowY="auto"
 					zIndex={100}
+					pb={isMobile ? "1rem" : undefined}
 				>
 					<Box p={5} shadow="md" borderWidth="1px" bg="blue.500" w="100%" color="white">
 						<Flex justifyContent="space-between">
