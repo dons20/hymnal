@@ -1,13 +1,13 @@
 import { useEffect, Fragment, useMemo } from "react";
 import { Box, Container, Text, IconButton } from "@chakra-ui/react";
-import { useColorModeValue } from "@chakra-ui/color-mode";
 import { Redirect, useHistory, useParams } from "react-router-dom";
+import { useColorModeValue } from "@chakra-ui/color-mode";
+import { FaHeart } from "react-icons/fa";
 import { updateFavesDB } from "helpers";
 import { Helmet } from "react-helmet";
 import { useMainContext } from "App";
 import { Button } from "components";
 import "./SongDisplay.scss";
-import { FaHeart } from "react-icons/fa";
 
 type ParamTypes = {
 	songID?: string;
@@ -83,7 +83,7 @@ function SongDisplay() {
 			<Helmet>
 				<title>{`Hymns for All Times | ${songToRender!.title}`}</title>
 			</Helmet>
-			<Button onClick={backToIndex} pos="fixed" left={-5} top="14%" zIndex={100}>
+			<Button onClick={backToIndex} pos="absolute" left={-5} top="10%" zIndex={100} pr={1}>
 				Index
 			</Button>
 			<Box className="header" pos="relative" pr="5">

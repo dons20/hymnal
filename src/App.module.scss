@@ -14,8 +14,10 @@
 	&_inner {
 		display: grid;
 		grid-template-rows: minmax(150px, auto) 1fr;
-		//grid-template-rows: minmax(150px, 250px) auto;
 		align-items: center;
+		&_mobile {
+			padding-bottom: 3rem;
+		}
 	}
 
 	&_link {

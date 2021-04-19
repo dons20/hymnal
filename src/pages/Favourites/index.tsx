@@ -46,13 +46,14 @@ function Favourites() {
 				key={data[itemIndex].number}
 				className="gridItemWrapper"
 				style={style}
-				py={5}
 				pl={window.innerWidth * 0.07}
 				cursor="default"
 			>
 				<Grid
 					data-song-id={data[itemIndex].number}
-					p={5}
+					h={100}
+					px={3}
+					py={3}
 					alignItems="center"
 					maxW="800px"
 					margin="auto"
@@ -91,7 +92,7 @@ function Favourites() {
 			<Helmet>
 				<title>{`Hymns for All Times | ${meta.page}`}</title>
 			</Helmet>
-			<Grid pt="10" templateRows="1fr" h="100%" bg={pageBG}>
+			<Grid pt={5} templateRows="1fr" h="100%" bg={pageBG}>
 				{finalList.length === 0 && <EmptyListRender />}
 				<Box ref={wrapperRef} pos="relative" overflow="hidden" h="100%">
 					<AutoSizer>
@@ -99,7 +100,7 @@ function Favourites() {
 							<FixedSizeGrid
 								height={height}
 								width={width}
-								rowHeight={100}
+								rowHeight={120}
 								columnWidth={width - window.innerWidth * 0.07}
 								columnCount={numColumns.current}
 								rowCount={numRows}

@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders without crashing 1`] = `
+<DocumentFragment>
+  <div
+    class="root css-0"
+  >
+    <section
+      class="app_body css-0"
+    >
+      <main
+        class="app_inner  css-1157erc"
+      >
+        <div
+          class="wrapper"
+        />
+      </main>
+    </section>
+  </div>
+</DocumentFragment>
+`;

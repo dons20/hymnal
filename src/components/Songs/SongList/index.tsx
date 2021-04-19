@@ -3,8 +3,10 @@ import { FaHeart, FaSortAlphaDown, FaSortAlphaDownAlt, FaSortNumericDown, FaSort
 import { DEFAULT_ALPHA_PROPS, DEFAULT_FILTER_PROPS, DEFAULT_NUM_PROPS } from "./defaults";
 import { useDisclosure, RadioGroup, useColorModeValue, Box } from "@chakra-ui/react";
 import type { GridChildComponentProps } from "react-window";
-import { updateFavesDB, withSuspense } from "helpers";
+import withSuspense from "helpers/withSuspense";
+import { isMobile } from "react-device-detect";
 import { useHistory } from "react-router-dom";
+import { updateFavesDB } from "helpers";
 import { Helmet } from "react-helmet";
 import { useMainContext } from "App";
 import "./SongList.scss";
@@ -44,18 +46,18 @@ const FixedSizeGridImport = lazy(() => import("react-window").then(module => ({ 
 const AutoSizerImport = lazy(() => import("react-virtualized-auto-sizer"));
 
 /* With Suspense Wrapper */
-const Text = withSuspense<typeof TextType, undefined>(TextImport);
-const Icon = withSuspense<typeof IconType, undefined>(IconImport);
-const IconButton = withSuspense<typeof IconButtonType, undefined>(IconButtonImport);
-const Stack = withSuspense<typeof StackType, undefined>(StackImport);
-const Checkbox = withSuspense<typeof CheckboxType, undefined>(CheckboxImport);
-const Radio = withSuspense<typeof RadioType, undefined>(RadioImport);
-const Heading = withSuspense<typeof HeadingType, undefined>(HeadingImport);
+const Text = withSuspense<typeof TextType>(TextImport);
+const Icon = withSuspense<typeof IconType>(IconImport);
+const IconButton = withSuspense<typeof IconButtonType>(IconButtonImport);
+const Stack = withSuspense<typeof StackType>(StackImport);
+const Checkbox = withSuspense<typeof CheckboxType>(CheckboxImport);
+const Radio = withSuspense<typeof RadioType>(RadioImport);
+const Heading = withSuspense<typeof HeadingType>(HeadingImport);
 const Slide = withSuspense<typeof SlideType, null>(SlideImport, null);
 const Portal = withSuspense<typeof PortalType, null>(PortalImport, null);
 const VStack = withSuspense<typeof VStackType, null>(VStackImport, null);
-const Flex = withSuspense<typeof FlexType, undefined>(FlexImport);
-const CloseButton = withSuspense<typeof CloseButtonType, undefined>(CloseButtonImport);
+const Flex = withSuspense<typeof FlexType>(FlexImport);
+const CloseButton = withSuspense<typeof CloseButtonType>(CloseButtonImport);
 const Grid = withSuspense<typeof GridType, null>(GridImport, null);
 const AutoSizer = withSuspense<typeof AutoSizerImport, null>(AutoSizerImport, null);
 const FixedSizeGrid = withSuspense<typeof FixedSizeGridImport, null>(FixedSizeGridImport, null);
@@ -546,7 +548,7 @@ function SongList() {
 				<title>{`Hymns for All Times | ${meta.title}`}</title>
 			</Helmet>
 
-			<Button onClick={onOpen} pos="absolute" right={-5} top="12%" zIndex={95}>
+			<Button onClick={onOpen} pos="absolute" right={-5} top="12%" zIndex={95} pl={2}>
 				Filter
 			</Button>
 
@@ -570,12 +572,13 @@ function SongList() {
 					color={modalColors}
 					bg={modalBG}
 					rounded="md"
-					h="100vh"
+					h={isMobile ? "94vh" : "100vh"}
 					w="300px"
 					right={0}
 					pos="absolute"
 					overflowY="auto"
 					zIndex={100}
+					pb={isMobile ? "1rem" : undefined}
 				>
 					<Box p={5} shadow="md" borderWidth="1px" bg="blue.500" w="100%" color="white">
 						<Flex justifyContent="space-between">

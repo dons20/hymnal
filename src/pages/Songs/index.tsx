@@ -1,7 +1,7 @@
 import { lazy } from "react";
 import { Switch, Route, useRouteMatch, Redirect } from "react-router-dom";
 import { Box, useColorModeValue } from "@chakra-ui/react";
-import { withSuspense } from "helpers";
+import withSuspense from "helpers/withSuspense";
 
 import "./Songs.scss";
 

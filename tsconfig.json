@@ -19,5 +19,5 @@
 		"exclude": ["dotenv"]
 	},
 	"include": ["src/**/*"],
-	"exclude": ["**/*.test.ts", "**/node_modules/**/*", "**/chrome_local/**/*"]
+	"exclude": ["**/node_modules/**/*", "**/chrome_local/**/*"]
 }

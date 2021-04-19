@@ -37,17 +37,15 @@ function Search() {
 	const numRows = searchResults.length;
 	const numColumns = useRef(1);
 
-	console.log(extractedQuery, location, fuse.search(extractedQuery || searchQuery));
-
 	const submitQuery = (e: React.FormEvent<HTMLDivElement>) => {
 		e.preventDefault();
 		if (searchQuery.length > 0) handleSearch(searchQuery);
 	};
 
 	const searchQueryChange = (e: React.ChangeEvent<any>) => {
-		const searchValue = e.target.value;
+		const searchValue = e.target.value || extractedQuery;
 		setSearchQuery(searchValue);
-		if (searchValue.length > 0) handleSearch(searchValue);
+		if (searchValue?.length > 0) handleSearch(searchValue);
 	};
 
 	const handleSearch = useDebouncedCallback((value: string) => {
@@ -62,7 +60,6 @@ function Search() {
 				const songID = e.currentTarget.getAttribute("data-song-id");
 				history.push(`${process.env.PUBLIC_URL}/songs/${songID}`);
 			}
-
 			displaySong(e);
 		},
 		[history]
@@ -77,17 +74,18 @@ function Search() {
 				key={data[itemIndex].item.number}
 				className="gridItemWrapper"
 				style={style}
-				py={5}
 				pl={window.innerWidth * 0.07}
 				cursor="default"
 			>
 				<Grid
-					p={5}
+					h={100}
+					px={3}
+					py={3}
 					maxW="800px"
-					margin="auto"
+					mx="auto"
 					bg={cellBG}
 					onClick={memoDisplaySong}
-					templateColumns="80px 1fr"
+					templateColumns="40px 1fr"
 					shadow="md"
 					borderRadius="md"
 					className="gridItem"
@@ -104,16 +102,20 @@ function Search() {
 		dispatch!({ type: "setTitle", payload: meta.title });
 	}, [dispatch]);
 
+	useEffect(() => {
+		if (extractedQuery) handleSearch(extractedQuery);
+	}, [extractedQuery, handleSearch]);
+
 	return (
 		<>
 			<Helmet>
 				<title>{`Hymns for All Times | ${meta.page}`}</title>
 			</Helmet>
-			<Grid pt="10" templateRows="auto 1fr" h="100%" bg={pageBG}>
+			<Grid pt={7} templateRows="auto 1fr" h="100%" bg={pageBG}>
 				<Container centerContent>
-					<InputGroup size="lg" as="form" onSubmit={submitQuery} w="90%" mb="5">
+					<InputGroup size="lg" as="form" onSubmit={submitQuery} role="search" w="90%" mb="5">
 						<Input
-							defaultValue={extractedQuery || searchQuery}
+							value={extractedQuery || searchQuery}
 							onChange={searchQueryChange}
 							type="search"
 							placeholder="Search songs..."
@@ -138,7 +140,7 @@ function Search() {
 							<FixedSizeGrid
 								height={height}
 								width={width}
-								rowHeight={100}
+								rowHeight={120}
 								columnWidth={width - window.innerWidth * 0.07}
 								columnCount={numColumns.current}
 								rowCount={numRows}
