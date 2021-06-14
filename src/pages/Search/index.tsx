@@ -76,6 +76,7 @@ function Search() {
 				style={style}
 				pl={window.innerWidth * 0.07}
 				cursor="default"
+				mt={2}
 			>
 				<Grid
 					h={100}
@@ -115,7 +116,8 @@ function Search() {
 				<Container centerContent>
 					<InputGroup size="lg" as="form" onSubmit={submitQuery} role="search" w="90%" mb="5">
 						<Input
-							value={extractedQuery || searchQuery}
+							defaultValue={extractedQuery || undefined}
+							value={searchQuery}
 							onChange={searchQueryChange}
 							type="search"
 							placeholder="Search songs..."
