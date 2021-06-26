@@ -53,7 +53,7 @@ exports[`#Header should render correctly 1`] = `
         />
         <button
           aria-label="Toggle Color Mode"
-          class="chakra-button css-6jrz0n"
+          class="chakra-button css-1u13fi4"
           type="button"
         >
           <svg

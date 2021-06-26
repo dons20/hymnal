@@ -68,6 +68,7 @@ function MobileNavBar() {
 			className={`bottom-nav${isMobile ? "" : " --disabled"}${scrollingDown ? "" : " --hidden"}`}
 			color={footerColors}
 			bg={footerBg}
+			data-testid="bottomNavWrapper"
 		>
 			{tabValues.map(tab => (
 				<Button
@@ -79,6 +80,7 @@ function MobileNavBar() {
 					color={footerColors}
 					bg="transparent"
 					px={10}
+					data-testid={tab.title}
 				>
 					{iconsOnly && <>{tab.icon}</>}
 					{!iconsOnly && <Text>{tab.title}</Text>}
