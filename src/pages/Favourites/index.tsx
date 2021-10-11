@@ -1,13 +1,12 @@
 import { useCallback, useEffect, useRef } from "react";
-import { useColorModeValue } from "@chakra-ui/color-mode";
-import { GridChildComponentProps } from "react-window";
-import AutoSizer from "react-virtualized-auto-sizer";
 import { Box, Container, Grid, Link as ChakraLink, Text } from "@chakra-ui/layout";
-import { FixedSizeGrid } from "react-window";
+import { GridChildComponentProps, FixedSizeGrid } from "react-window";
+import { useColorModeValue } from "@chakra-ui/color-mode";
+import AutoSizer from "react-virtualized-auto-sizer";
+import { useMainContext } from "utils/context";
 import { useHistory } from "react-router";
-import { Helmet } from "react-helmet";
-import { useMainContext } from "App";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet";
 
 const meta = {
 	title: "Favourites",
@@ -27,8 +26,8 @@ function Favourites() {
 	/** Triggers navigation to a song at a specified index */
 	const memoDisplaySong = useCallback(
 		e => {
-			function displaySong(e: React.MouseEvent<HTMLDivElement>) {
-				const songID = e.currentTarget.getAttribute("data-song-id");
+			function displaySong(ev: React.MouseEvent<HTMLDivElement>) {
+				const songID = ev.currentTarget.getAttribute("data-song-id");
 				history.push(`${process.env.PUBLIC_URL}/songs/${songID}`);
 			}
 
@@ -76,7 +75,7 @@ function Favourites() {
 
 	const EmptyListRender = () => (
 		<Container centerContent>
-			<Text>Sorry, it seems you haven't added any favourites yet!</Text>
+			<Text>Sorry, it seems you haven&apos;t added any favourites yet!</Text>
 			<ChakraLink as={Link} to="/songs/index" color="blue.500">
 				Browse Songs Index
 			</ChakraLink>

@@ -1,11 +1,11 @@
-import { useEffect, Fragment, useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Box, Container, Text, IconButton } from "@chakra-ui/react";
 import { Redirect, useHistory, useParams } from "react-router-dom";
 import { useColorModeValue } from "@chakra-ui/color-mode";
+import { useMainContext } from "utils/context";
 import { FaHeart } from "react-icons/fa";
 import { updateFavesDB } from "helpers";
 import { Helmet } from "react-helmet";
-import { useMainContext } from "App";
 import { Button } from "components";
 import "./SongDisplay.scss";
 
@@ -24,41 +24,43 @@ function SongDisplay() {
 	const favActiveIconColor = useColorModeValue("var(--chakra-colors-red-500)", "var(--chakra-colors-red-300)");
 	const favIconColor = useColorModeValue("var(--chakra-colors-gray-600)", "var(--chakra-colors-gray-500)");
 	const favActiveIconBG = useColorModeValue("var(--chakra-colors-red-50)", "");
-	const songIndex = parseInt(songID || "1") - 1;
+	const songIndex = parseInt(songID || "1", 10) - 1;
 	const songToRender = songs.find(song => song.number === songIndex + 1) || null;
 
 	useEffect(() => {
 		if (songs.length > 1) dispatch!({ type: "setTitle", payload: songToRender?.title || "" });
 	}, [dispatch, songs, songToRender]);
 
-	const songBody = useMemo(() => {
-		return (
+	const songBody = useMemo(
+		() =>
 			songs.length > 1 &&
-			songToRender?.verse.map((verse, i) => {
-				if (i === 1 && songToRender.chorus) {
-					return (
-						<Fragment key={i}>
-							<Box className="chorus">
-								<span className="label">Chorus</span>
-								{songToRender.chorus}
-							</Box>
-							<Box className="verse">
-								<span className="label">Verse {i + 1}</span>
-								{verse}
-							</Box>
-						</Fragment>
-					);
-				}
+			React.Children.toArray(
+				songToRender?.verse.map((verse, i) => {
+					if (i === 1 && songToRender.chorus) {
+						return (
+							<>
+								<Box className="chorus">
+									<span className="label">Chorus</span>
+									{songToRender.chorus}
+								</Box>
+								<Box className="verse">
+									<span className="label">Verse {i + 1}</span>
+									{verse}
+								</Box>
+							</>
+						);
+					}
 
-				return (
-					<Box className="verse" key={i}>
-						<span className="label">Verse {i + 1}</span>
-						{verse}
-					</Box>
-				);
-			})
-		);
-	}, [songs, songToRender]);
+					return (
+						<Box className="verse">
+							<span className="label">Verse {i + 1}</span>
+							{verse}
+						</Box>
+					);
+				})
+			),
+		[songs, songToRender]
+	);
 
 	if (songToRender === null) return <Redirect to="songs/index" />;
 

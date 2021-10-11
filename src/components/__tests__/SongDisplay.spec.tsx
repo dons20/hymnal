@@ -1,8 +1,8 @@
 import { Suspense } from "react";
 import { render, screen } from "@testing-library/react";
 import SongDisplay from "components/Songs/SongDisplay";
+import { MainContextProvider } from "utils/context";
 import { MemoryRouter } from "react-router-dom";
-import { MainContextProvider } from "App";
 import { SongsDB } from "data/songs";
 
 type ProviderT = {
@@ -10,9 +10,9 @@ type ProviderT = {
 	value: any;
 };
 
-const Providers = ({ children, value }: ProviderT) => {
-	return <MainContextProvider value={value}>{children}</MainContextProvider>;
-};
+const Providers = ({ children, value }: ProviderT) => (
+	<MainContextProvider value={value}>{children}</MainContextProvider>
+);
 
 describe("#SongDisplay", () => {
 	it("renders the matching song based on the route", () => {

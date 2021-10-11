@@ -1,7 +1,7 @@
 import { useColorModeValue } from "@chakra-ui/color-mode";
 import { Box, Image } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
-import { Button } from "components";
+import Button from "components/Button";
 import Loader from "components/Loader";
 
 interface CardBase {

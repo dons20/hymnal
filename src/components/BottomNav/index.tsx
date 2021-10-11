@@ -6,6 +6,7 @@ import { useMediaQuery } from "@chakra-ui/media-query";
 import { isMobile } from "react-device-detect";
 import { Box, Text } from "@chakra-ui/layout";
 import Button from "components/Button";
+import cx from "classnames";
 import "./BottomNav.scss";
 
 function MobileNavBar() {
@@ -59,13 +60,13 @@ function MobileNavBar() {
 	}, [setScrollingDown, pathname]);
 
 	function handleTabBarPress(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-		const url = e.currentTarget.getAttribute("data-url") || "/";
+		const url = e.currentTarget.getAttribute("data-url") as string;
 		history.push(url);
 	}
 
 	return (
 		<Box
-			className={`bottom-nav${isMobile ? "" : " --disabled"}${scrollingDown ? "" : " --hidden"}`}
+			className={cx("bottom-nav", { "--disabled": isMobile, "--hidden": scrollingDown })}
 			color={footerColors}
 			bg={footerBg}
 			data-testid="bottomNavWrapper"

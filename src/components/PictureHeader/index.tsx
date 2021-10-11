@@ -1,5 +1,5 @@
 import { Heading, Box, useColorModeValue } from "@chakra-ui/react";
-import { useMainContext } from "App";
+import { useMainContext } from "utils/context";
 import "./PictureHeader.scss";
 
 function PictureHeader() {

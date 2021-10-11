@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { Box, SimpleGrid, useColorModeValue } from "@chakra-ui/react";
+import { useMainContext } from "utils/context";
 import { Helmet } from "react-helmet";
 import { Card } from "components";
-import { useMainContext } from "App";
 
 import favourites from "img/favourites.svg";
 import songs from "img/songs.svg";
@@ -26,7 +26,7 @@ function HomeScreen() {
 			<Helmet>
 				<title>{`Hymns for All Times | ${meta.page}`}</title>
 			</Helmet>
-			<Box bg={pageBG} h="100%">
+			<Box bg={pageBG} h="100%" data-testid="homeWrapper">
 				<SimpleGrid
 					minChildWidth={{ base: "260px", sm: "380px" }}
 					spacingX="30px"

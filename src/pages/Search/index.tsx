@@ -1,16 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Input, InputGroup, InputRightElement } from "@chakra-ui/input";
+import { GridChildComponentProps, FixedSizeGrid } from "react-window";
 import { Box, Container, Grid, Text } from "@chakra-ui/layout";
 import { useColorModeValue } from "@chakra-ui/color-mode";
-import { GridChildComponentProps } from "react-window";
 import { useHistory, useLocation } from "react-router";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { useDebouncedCallback } from "use-debounce";
 import { IconButton } from "@chakra-ui/button";
-import { FixedSizeGrid } from "react-window";
+import { useMainContext } from "utils/context";
 import { FaSearch } from "react-icons/fa";
 import { Helmet } from "react-helmet";
-import { useMainContext } from "App";
 import { useQuery } from "helpers";
 import Fuse from "fuse.js";
 import "./Search.scss";
@@ -37,6 +36,11 @@ function Search() {
 	const numRows = searchResults.length;
 	const numColumns = useRef(1);
 
+	const handleSearch = useDebouncedCallback((value: string) => {
+		const result = fuse.search(value);
+		setSearchResults(result);
+	}, 300);
+
 	const submitQuery = (e: React.FormEvent<HTMLDivElement>) => {
 		e.preventDefault();
 		if (searchQuery.length > 0) handleSearch(searchQuery);
@@ -48,16 +52,11 @@ function Search() {
 		if (searchValue?.length > 0) handleSearch(searchValue);
 	};
 
-	const handleSearch = useDebouncedCallback((value: string) => {
-		const result = fuse.search(value);
-		setSearchResults(result);
-	}, 300);
-
 	/** Triggers navigation to a song at a specified index */
 	const memoDisplaySong = useCallback(
 		e => {
-			function displaySong(e: React.MouseEvent<HTMLDivElement>) {
-				const songID = e.currentTarget.getAttribute("data-song-id");
+			function displaySong(ev: React.MouseEvent<HTMLDivElement>) {
+				const songID = ev.currentTarget.getAttribute("data-song-id");
 				history.push(`${process.env.PUBLIC_URL}/songs/${songID}`);
 			}
 			displaySong(e);
@@ -73,6 +72,7 @@ function Search() {
 			<Box
 				key={data[itemIndex].item.number}
 				className="gridItemWrapper"
+				// @ts-ignore
 				style={style}
 				pl={window.innerWidth * 0.07}
 				cursor="default"

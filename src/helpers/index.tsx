@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React from "react";
 import { SongsDB, version } from "data/songs";
 
@@ -6,18 +7,18 @@ import { SongsDB, version } from "data/songs";
  */
 export async function loadNewSongs() {
 	const localForage = await import("localforage");
-	const _songs = localForage.createInstance({ storeName: "items" });
-	const _version = localForage.createInstance({ storeName: "version" });
+	const songs = localForage.createInstance({ storeName: "items" });
+	const localVersion = localForage.createInstance({ storeName: "version" });
 	const favourites = localForage.createInstance({ storeName: "favourites" });
 
 	try {
 		await Promise.all([
-			SongsDB.forEach((song, i) => _songs.setItem(`${i}`, { ...song }).catch(e => console.info(e))),
-			_version.setItem("value", version).catch(e => console.info(e)),
+			SongsDB.forEach((song, i) => songs.setItem(`${i}`, { ...song }).catch(e => console.info(e))),
+			localVersion.setItem("value", localVersion).catch(e => console.info(e)),
 			favourites.clear(),
 		]);
 	} catch (err) {
-		console.info(err.message);
+		if (err instanceof Error) console.info(err.message);
 	}
 }
 
@@ -34,20 +35,20 @@ export async function checkDB() {
 
 	try {
 		console.log(`%cChecking if songs exist already`, "color: #3182ce; font-size: medium;");
-		const _songs = localForage.createInstance({ storeName: "items" });
-		const songsLength = await _songs.length();
+		const songs = localForage.createInstance({ storeName: "items" });
+		const songsLength = await songs.length();
 		if (songsLength < SongsDB.length) throw new Error("Items out of sync with latest items");
 
 		console.log(`%cChecking for updates`, "color: #3182ce; font-size: medium;");
-		const _version = localForage.createInstance({ storeName: "version" });
-		if (!_version) throw new Error("No version stored");
-		const versionNumber = (await _version.getItem("value")) as string;
+		const localVersion = localForage.createInstance({ storeName: "version" });
+		if (!localVersion) throw new Error("No version stored");
+		const versionNumber = (await localVersion.getItem("value")) as string;
 		if (version !== versionNumber) throw new Error("Version mismatch, sync necessary");
 
 		console.log(`%cSongs found! Attempting to load...`, "color: #3182ce; font-size: medium;");
 	} catch (e) {
 		console.log(`%cLocal entries outdated or undefined, parsing songs DB...`, "color: #3182ce; font-size: medium;");
-		console.info(e.message);
+		if (e instanceof Error) console.info(e.message);
 		loadNewSongs();
 	}
 }
@@ -67,7 +68,7 @@ export function createCtx<A extends {} | null>() {
 		if (c === undefined) throw new Error("useCtx must be inside a Provider with a value");
 		return c;
 	}
-	return [useCtx, ctx.Provider] as const; // 'as const' makes TypeScript infer a tuple
+	return [useCtx, ctx.Provider, ctx.Consumer] as const; // 'as const' makes TypeScript infer a tuple
 }
 
 export async function updateFavesDB(indexes: number[]) {
@@ -81,7 +82,7 @@ export async function updateFavesDB(indexes: number[]) {
 		description: "Your favourite songs",
 	});
 
-	for (let i = 0; i < indexes.length; i++) {
-		await localForage.setItem(`${indexes[i]}`, indexes[i]);
-	}
+	indexes.forEach(async item => {
+		await localForage.setItem(`${item}`, item);
+	});
 }

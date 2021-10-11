@@ -1,7 +1,12 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { BrowserRouter } from "react-router-dom";
 import { resizeWindow } from "helpers/tests";
+import * as rdd from "react-device-detect";
 import { BottomNav } from "components";
+
+// @ts-expect-error
+rdd.isMobile = true;
 
 describe("#BottomNav", () => {
 	it("should render correctly", () => {
@@ -51,28 +56,27 @@ describe("#BottomNav", () => {
 		const SongsButton = screen.getByTestId("Songs");
 		const FavouritesButton = screen.getByTestId("Favourites");
 
-		fireEvent.click(FavouritesButton);
+		userEvent.click(FavouritesButton);
 		expect(window.location.href).toContain("/songs/favourites");
 
-		fireEvent.click(SongsButton);
+		userEvent.click(SongsButton);
 		expect(window.location.href).toContain("/songs/index");
 
-		fireEvent.click(HomeButton);
+		userEvent.click(HomeButton);
 		expect(window.location.href).toContain("/home");
 	});
-	it("hides when scrolling up and is shown when scrolling down", async () => {
+	it("hides when scrolling up and shows when scrolling down", async () => {
 		render(
 			<BrowserRouter>
-				<div style={{ height: 1400 }}></div>
+				<div style={{ height: 1400 }} />
 				<BottomNav />
 			</BrowserRouter>
 		);
-		resizeWindow(500, 1600);
 		fireEvent.scroll(window, { target: { scrollY: 500 } });
-		const navbar = screen.getByTestId("bottomNavWrapper");
-		expect(navbar).toHaveClass("--disabled");
+		const navbar = await screen.findByTestId("bottomNavWrapper");
+		await waitFor(() => expect(navbar).toHaveClass("--disabled"));
 
 		fireEvent.scroll(window, { target: { scrollY: 300 } });
-		waitFor(() => expect(navbar).toHaveClass("--disabled", "--hidden"));
+		await waitFor(() => expect(navbar).toHaveClass("--disabled", "--hidden"));
 	});
 });

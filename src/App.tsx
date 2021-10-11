@@ -1,12 +1,13 @@
-import React, { useReducer, useEffect, lazy } from "react";
+import { useReducer, useEffect, lazy } from "react";
 import { Route, Switch, Redirect, useLocation } from "react-router-dom";
 import { useColorModeValue } from "@chakra-ui/color-mode";
 import { useSongLoader } from "components/CustomHooks";
 import withSuspense from "helpers/withSuspense";
 import { isMobile } from "react-device-detect";
-import { createCtx } from "helpers";
-import styles from "./App.module.scss";
 import { Box } from "@chakra-ui/layout";
+
+import { State, ACTIONTYPE, MainContextProvider, pages } from "utils/context";
+import styles from "./App.module.scss";
 
 const HomeImport = lazy(() => import("pages/Home"));
 const SongsImport = lazy(() => import("pages/Songs"));
@@ -23,33 +24,6 @@ const Loader = withSuspense<typeof LoaderImport, null>(LoaderImport, null);
 const Header = withSuspense<typeof HeaderImport, null>(HeaderImport, null);
 const BottomNav = withSuspense<typeof BottomNavImport, null>(BottomNavImport, null);
 const PictureHeader = withSuspense<typeof PictureHeaderImport, null>(PictureHeaderImport, null);
-
-const pages = {
-	HOME: "/home",
-	INDEX: "/songs",
-	FAVOURITES: "/favourites",
-	SETTINGS: "/settings",
-};
-
-type ACTIONTYPE =
-	| { type: "setTitle"; payload: string }
-	| { type: "setSubtitle"; payload: string }
-	| { type: "setWidth"; payload: number };
-
-type State = {
-	title: string;
-	subtitle: string;
-	width: number;
-};
-
-type CTX = {
-	dispatch: React.Dispatch<ACTIONTYPE>;
-	songs: Song[];
-	favourites: number[];
-	setFavourites: React.Dispatch<React.SetStateAction<number[]>>;
-	pages: typeof pages;
-	meta: State;
-};
 
 const initialAppState = {
 	title: "",
@@ -78,24 +52,22 @@ const ScrollRestoration = () => {
 	return null;
 };
 
-export const [useMainContext, MainContextProvider] = createCtx<CTX>();
-
 function App() {
 	const [state, dispatch] = useReducer(reducer, initialAppState);
 	const { songs, favourites, setFavourites } = useSongLoader();
 	const pageBG = useColorModeValue("gray.200", "gray.800");
 
-	function handleOrientationChange() {
+	const handleOrientationChange = () => {
 		dispatch({ type: "setWidth", payload: document.body.getBoundingClientRect().width });
-	}
+	};
 
 	useEffect(() => {
-		window.addEventListener("orientationchange", handleOrientationChange, {
+		window.screen.orientation.addEventListener("change", handleOrientationChange, {
 			capture: false,
 			passive: true,
 		});
 		return function cleanup() {
-			window.addEventListener("orientationchange", handleOrientationChange);
+			window.screen.orientation.removeEventListener("change", handleOrientationChange);
 		};
 	}, []);
 
