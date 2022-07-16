@@ -5,17 +5,17 @@ import { Router, BrowserRouter } from "react-router-dom";
 import { ColorModeScript } from "@chakra-ui/system";
 import { MainContextProvider } from "utils/context";
 import { ChakraProvider } from "@chakra-ui/react";
+import MainContext from "components/Providers";
 import { createMemoryHistory } from "history";
 import { resizeWindow } from "helpers/tests";
 import Header from "components/Header";
-import { SongsDB } from "data/songs";
 
 type ProviderT = {
 	children: React.ReactNode;
 	value: any;
 };
 
-const Providers = ({ children, value }: ProviderT) => (
+const TestProvider = ({ children, value }: ProviderT) => (
 	<MainContextProvider value={value}>{children}</MainContextProvider>
 );
 
@@ -29,9 +29,9 @@ describe("#Header", () => {
 	it("should render correctly", async () => {
 		const { asFragment } = render(
 			<BrowserRouter>
-				<Providers value="">
+				<TestProvider value="">
 					<Header />
-				</Providers>
+				</TestProvider>
 			</BrowserRouter>
 		);
 		expect(await screen.findByText(/Hymns for All Times/)).toBeInTheDocument();
@@ -40,9 +40,9 @@ describe("#Header", () => {
 	it("should show the search results when typing and hide them when query is erased", async () => {
 		render(
 			<BrowserRouter>
-				<Providers value={{ songs: SongsDB }}>
+				<MainContext>
 					<Header />
-				</Providers>
+				</MainContext>
 			</BrowserRouter>
 		);
 
@@ -57,7 +57,6 @@ describe("#Header", () => {
 		expect(searchField.value).toBe("test");
 		await waitFor(() => expect(resultsList).not.toBeEmptyDOMElement());
 
-		// userEvent.clear(searchField);
 		searchField.setSelectionRange(0, 4);
 		userEvent.type(searchField, "{backspace}");
 
@@ -67,9 +66,9 @@ describe("#Header", () => {
 	it("should send the user to a song's page directly when they click a result", async () => {
 		render(
 			<BrowserRouter>
-				<Providers value={{ songs: SongsDB }}>
+				<MainContext>
 					<Header />
-				</Providers>
+				</MainContext>
 			</BrowserRouter>
 		);
 
@@ -90,9 +89,9 @@ describe("#Header", () => {
 	it("should navigate to the search results page when a search is submitted", () => {
 		render(
 			<BrowserRouter>
-				<Providers value={useCtx}>
+				<TestProvider value={useCtx}>
 					<Header />
-				</Providers>
+				</TestProvider>
 			</BrowserRouter>
 		);
 
@@ -107,9 +106,9 @@ describe("#Header", () => {
 			<ChakraProvider>
 				<ColorModeScript initialColorMode="light" />
 				<BrowserRouter basename="/home">
-					<Providers value={useCtx}>
+					<TestProvider value={useCtx}>
 						<Header />
-					</Providers>
+					</TestProvider>
 				</BrowserRouter>
 			</ChakraProvider>
 		);
@@ -124,9 +123,9 @@ describe("#Header", () => {
 		const history = createMemoryHistory();
 		render(
 			<Router history={history}>
-				<Providers value={useCtx}>
+				<TestProvider value={useCtx}>
 					<Header />
-				</Providers>
+				</TestProvider>
 			</Router>
 		);
 
@@ -146,9 +145,9 @@ describe("#Header", () => {
 
 		render(
 			<BrowserRouter>
-				<Providers value={useCtx}>
+				<TestProvider value={useCtx}>
 					<Header />
-				</Providers>
+				</TestProvider>
 			</BrowserRouter>
 		);
 
