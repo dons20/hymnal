@@ -17,7 +17,7 @@ function Listing() {
 			<Routes>
 				<Route path="index" element={<SongList />} />
 				<Route path="favourites" element={<Favourites />} />
-				<Route path=":songID(\\d+)" element={<SongDisplay />} />
+				<Route path=":songID" element={<SongDisplay />} />
 				<Route path="/" element={<Navigate to="/songs/index" replace />} />
 			</Routes>
 		</Box>

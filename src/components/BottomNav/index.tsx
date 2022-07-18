@@ -66,7 +66,7 @@ function MobileNavBar() {
 
 	return (
 		<Box
-			className={cx("bottom-nav", { "--disabled": isMobile, "--hidden": scrollingDown })}
+			className={cx("bottom-nav", { "--disabled": !isMobile, "--hidden": scrollingDown })}
 			color={footerColors}
 			bg={footerBg}
 			data-testid="bottomNavWrapper"

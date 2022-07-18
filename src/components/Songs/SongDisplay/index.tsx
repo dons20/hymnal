@@ -27,6 +27,11 @@ function SongDisplay() {
 	const songIndex = parseInt(songID || "1", 10) - 1;
 	const songToRender = songs.find(song => song.number === songIndex + 1) || null;
 
+	// Ensure the route parameter is a number before rendering anything
+	useEffect(() => {
+		if (!/\d+/.test(songID!)) navigate(-1);
+	  }, [songID, navigate]);
+
 	useEffect(() => {
 		if (songs.length > 1) dispatch!({ type: "setTitle", payload: songToRender?.title || "" });
 	}, [dispatch, songs, songToRender]);

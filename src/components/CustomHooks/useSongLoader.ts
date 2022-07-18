@@ -1,7 +1,7 @@
-/* eslint-disable no-console */
 import { useEffect, useState } from "react";
 import { SongsDB } from "helpers";
 import axios from "axios";
+import { log, info } from "utils/logger";
 
 const dbName = "Songs";
 
@@ -12,7 +12,7 @@ const dbName = "Songs";
 function useSongLoader() {
 	const [songs, setSongs] = useState<Song[]>([]);
 	const [favourites, setFavourites] = useState<number[]>([]);
-	console.log(songs);
+	log(songs);
 
 	/**
 	 * Initiates the process of loading songs from the db
@@ -29,12 +29,12 @@ function useSongLoader() {
 			try {
 				await Promise.all([
 					fetchedSongs.forEach(async (song, i) => localSongs.setItem(`${i}`, song)),
-					localVersion.setItem("value", version).catch(e => console.info(e)),
+					localVersion.setItem("value", version).catch(e => info(e)),
 				]);
 
 				setSongs(fetchedSongs);
 			} catch (err) {
-				if (err instanceof Error) console.info(err.message);
+				if (err instanceof Error) info(err.message);
 			}
 		}
 
@@ -63,30 +63,30 @@ function useSongLoader() {
 				 * Delete old DB
 				 */
 				const oldDB = localForage.createInstance({ name: "keyval-store" });
-				oldDB.dropInstance().catch(() => console.info("Problem dropping old DB"));
+				oldDB.dropInstance().catch(() => info("Problem dropping old DB"));
 				const query = await axios.get<SongsDB>("https://f002.backblazeb2.com/file/hymnal/hymns.json");
 				if (!query.data) return;
-				console.log(query);
+				log(query);
 				const songsDB: SongsDB = query.data;
-				console.log(`%cChecking if songs exist already`, "color: #3182ce; font-size: medium;");
+				log(`%cChecking if songs exist already`, "color: #3182ce; font-size: medium;");
 				const localSongs = localForage.createInstance({ name: dbName, storeName: "items" });
 				const songsLength = await localSongs.length();
 
 				if (songsLength < songsDB.songs.length) {
-					console.info("Items out of sync with latest items");
+					info("Items out of sync with latest items");
 					loadNewSongs(songsDB);
 				}
 
-				console.log(`%cChecking for updates`, "color: #3182ce; font-size: medium;");
+				log(`%cChecking for updates`, "color: #3182ce; font-size: medium;");
 				const version = localForage.createInstance({ name: dbName, storeName: "version" });
 				if (!version) throw new Error("No version stored");
 				const versionNumber = (await version.getItem("value")) as string;
 				if (songsDB.version !== versionNumber) {
-					console.info("Version mismatch, sync necessary");
+					info("Version mismatch, sync necessary");
 					loadNewSongs(songsDB);
 				}
 
-				console.log(`%cSongs found! Attempting to load...`, "color: #3182ce; font-size: medium;");
+				log(`%cSongs found! Attempting to load...`, "color: #3182ce; font-size: medium;");
 				const songStorage: Song[] = [];
 				await localSongs.iterate((value: Song) => {
 					songStorage.push(value);
@@ -94,11 +94,11 @@ function useSongLoader() {
 
 				setSongs(songStorage);
 			} catch (e) {
-				console.log(
+				log(
 					`%cLocal entries outdated or undefined, parsing songs DB...`,
 					"color: #3182ce; font-size: medium;"
 				);
-				if (e instanceof Error) console.info(e.message);
+				if (e instanceof Error) info(e.message);
 			}
 		}
 
@@ -121,13 +121,13 @@ function useSongLoader() {
 				});
 				setFavourites(favourites);
 			} catch (e) {
-				console.log("Error obtaining favourites");
-				if (e instanceof Error) console.info(e.message);
+				log("Error obtaining favourites");
+				if (e instanceof Error) info(e.message);
 			}
 		}
 
 		if (songs.length <= 1) {
-			console.log("%cLoading Songs...", "color: #3182ce; font-size: large; font-weight: bold");
+			log("%cLoading Songs...", "color: #3182ce; font-size: large; font-weight: bold");
 			checkDB();
 			loadFavourites();
 		}
