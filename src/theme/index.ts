@@ -1,15 +1,15 @@
 import { extendTheme } from "@chakra-ui/react";
 import { mode } from "@chakra-ui/theme-tools";
+import type { Dict } from "@chakra-ui/utils";
 
 const config = {
-	initialColorMode: "light",
-	useSystemColorMode: true,
+	initialColorMode: "system",
 };
 
 export const customTheme = extendTheme({
 	config,
 	style: {
-		global: props => ({
+		global: (props: Dict<any>) => ({
 			body: {
 				color: mode("gray.800", "whiteAlpha.700")(props),
 				bg: mode("white", "gray.800")(props),

@@ -6,7 +6,7 @@ exports[`#SongDisplay renders the matching song based on the route 1`] = `
     class="chakra-container container css-hqc2zy"
   >
     <button
-      class="chakra-button css-f1xyqi"
+      class="chakra-button css-1f4vu1z"
       type="button"
     >
       Index
@@ -26,7 +26,7 @@ exports[`#SongDisplay renders the matching song based on the route 1`] = `
       </p>
       <button
         aria-label="Add to Favourites"
-        class="chakra-button faveIcon css-xmrubv"
+        class="chakra-button faveIcon css-11itnfl"
         type="button"
       >
         <svg

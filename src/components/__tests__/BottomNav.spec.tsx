@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { BrowserRouter } from "react-router-dom";
+import { MemoryRouter } from "react-router-dom";
 import { resizeWindow } from "helpers/tests";
 import * as rdd from "react-device-detect";
 import { BottomNav } from "components";
@@ -11,9 +11,9 @@ rdd.isMobile = true;
 describe("#BottomNav", () => {
 	it("should render correctly", () => {
 		const { asFragment } = render(
-			<BrowserRouter>
+			<MemoryRouter>
 				<BottomNav />
-			</BrowserRouter>
+			</MemoryRouter>
 		);
 		const Navbar = screen.getByTestId("bottomNavWrapper");
 		const HomeButton = screen.getByTestId("Home");
@@ -28,9 +28,9 @@ describe("#BottomNav", () => {
 	});
 	it("shows only icons on smaller screens", () => {
 		render(
-			<BrowserRouter>
+			<MemoryRouter>
 				<BottomNav />
-			</BrowserRouter>
+			</MemoryRouter>
 		);
 		resizeWindow(450, 500);
 		const HomeButton = screen.getByTestId("Home");
@@ -48,9 +48,9 @@ describe("#BottomNav", () => {
 	});
 	it("navigates to the correct route when each button is clicked", () => {
 		render(
-			<BrowserRouter>
+			<MemoryRouter>
 				<BottomNav />
-			</BrowserRouter>
+			</MemoryRouter>
 		);
 		const HomeButton = screen.getByTestId("Home");
 		const SongsButton = screen.getByTestId("Songs");
@@ -67,10 +67,10 @@ describe("#BottomNav", () => {
 	});
 	it("hides when scrolling up and shows when scrolling down", async () => {
 		render(
-			<BrowserRouter>
+			<MemoryRouter>
 				<div style={{ height: 1400 }} />
 				<BottomNav />
-			</BrowserRouter>
+			</MemoryRouter>
 		);
 		fireEvent.scroll(window, { target: { scrollY: 500 } });
 		const navbar = await screen.findByTestId("bottomNavWrapper");

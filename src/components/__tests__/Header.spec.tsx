@@ -1,7 +1,6 @@
-import React from "react";
-import userEvent, { specialChars } from "@testing-library/user-event";
+import userEvent from "@testing-library/user-event";
 import { render, screen, waitFor } from "@testing-library/react";
-import { Router, BrowserRouter } from "react-router-dom";
+import { MemoryRouter, BrowserRouter } from "react-router-dom";
 import { ColorModeScript } from "@chakra-ui/system";
 import { MainContextProvider } from "utils/context";
 import { ChakraProvider } from "@chakra-ui/react";
@@ -9,9 +8,10 @@ import MainContext from "components/Providers";
 import { createMemoryHistory } from "history";
 import { resizeWindow } from "helpers/tests";
 import Header from "components/Header";
+import type { ReactNode } from "react";
 
 type ProviderT = {
-	children: React.ReactNode;
+	children: ReactNode;
 	value: any;
 };
 
@@ -28,13 +28,14 @@ describe("#Header", () => {
 
 	it("should render correctly", async () => {
 		const { asFragment } = render(
-			<BrowserRouter>
-				<TestProvider value="">
+			<MemoryRouter>
+				<MainContext>
 					<Header />
-				</TestProvider>
-			</BrowserRouter>
+				</MainContext>
+			</MemoryRouter>
 		);
-		expect(await screen.findByText(/Hymns for All Times/)).toBeInTheDocument();
+		const title = await screen.findByText(/Hymns for All Times/);
+		expect(title).toBeInTheDocument();
 		expect(asFragment()).toMatchSnapshot();
 	});
 	it("should show the search results when typing and hide them when query is erased", async () => {
@@ -87,29 +88,30 @@ describe("#Header", () => {
 		expect(window.location.href).toContain("/songs/399");
 	});
 	it("should navigate to the search results page when a search is submitted", () => {
+		const user = userEvent.setup();
 		render(
-			<BrowserRouter>
+			<MemoryRouter>
 				<TestProvider value={useCtx}>
 					<Header />
 				</TestProvider>
-			</BrowserRouter>
+			</MemoryRouter>
 		);
 
 		const searchField = screen.getByTestId("desktopSearch");
-		userEvent.type(searchField, "test");
+		user.type(searchField, "test");
 
-		userEvent.type(searchField, specialChars.enter);
+		user.type(searchField, "[Enter]");
 		expect(window.location.href).toContain("/search?query=test");
 	});
 	it("should toggle night mode when the user clicks the night mode toggle button", async () => {
 		render(
 			<ChakraProvider>
 				<ColorModeScript initialColorMode="light" />
-				<BrowserRouter basename="/home">
+				<MemoryRouter basename="/home">
 					<TestProvider value={useCtx}>
 						<Header />
 					</TestProvider>
-				</BrowserRouter>
+				</MemoryRouter>
 			</ChakraProvider>
 		);
 		const colorModeToggle = await screen.findByLabelText("Toggle Color Mode");
@@ -122,11 +124,11 @@ describe("#Header", () => {
 	it("should navigate the user home when they click the main logo", async () => {
 		const history = createMemoryHistory();
 		render(
-			<Router history={history}>
+			<MemoryRouter>
 				<TestProvider value={useCtx}>
 					<Header />
 				</TestProvider>
-			</Router>
+			</MemoryRouter>
 		);
 
 		const logo = await screen.findByRole("heading", { name: /Hymns For All Times/i });

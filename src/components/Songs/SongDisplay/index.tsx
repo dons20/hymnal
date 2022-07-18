@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from "react";
 import { Box, Container, Text, IconButton } from "@chakra-ui/react";
-import { Redirect, useHistory, useParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { useColorModeValue } from "@chakra-ui/color-mode";
 import { useMainContext } from "utils/context";
 import { FaHeart } from "react-icons/fa";
@@ -14,7 +14,7 @@ type ParamTypes = {
 };
 
 function SongDisplay() {
-	const history = useHistory();
+	const navigate = useNavigate();
 	const { songID } = useParams<ParamTypes>();
 	const { songs, favourites, setFavourites, dispatch } = useMainContext();
 	const authorColor = useColorModeValue("#555555", "gray.300");
@@ -62,7 +62,7 @@ function SongDisplay() {
 		[songs, songToRender]
 	);
 
-	if (songToRender === null) return <Redirect to="songs/index" />;
+	if (songToRender === null) return <Navigate to="songs/index" replace />;
 
 	const isFavourite = favourites.includes(songToRender.number - 1);
 
@@ -78,7 +78,7 @@ function SongDisplay() {
 		updateFavesDB(faves);
 	};
 
-	const backToIndex = () => history.push(`${process.env.PUBLIC_URL}/songs/index`);
+	const backToIndex = () => navigate(`${process.env.PUBLIC_URL}/songs/index`);
 
 	return (
 		<Container className="container" bg={songBG} shadow={songShadow} my={4} py="1rem" px="1.5rem">

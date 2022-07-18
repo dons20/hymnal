@@ -5,7 +5,7 @@ import type { GridChildComponentProps } from "react-window";
 import withSuspense from "helpers/withSuspense";
 import { isMobile } from "react-device-detect";
 import { useMainContext } from "utils/context";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { updateFavesDB } from "helpers";
 import { Helmet } from "react-helmet";
 
@@ -24,7 +24,7 @@ import type {
 	Checkbox as CheckboxType,
 	IconButton as IconButtonType,
 	CloseButton as CloseButtonType,
-} from "@chakra-ui/react/dist/types/index";
+} from "@chakra-ui/react/dist/declarations/src";
 
 import { DEFAULT_ALPHA_PROPS, DEFAULT_FILTER_PROPS, DEFAULT_NUM_PROPS } from "./defaults";
 import "./SongList.scss";
@@ -43,7 +43,9 @@ const VStackImport = lazy(() => import("@chakra-ui/react").then(module => ({ def
 const FlexImport = lazy(() => import("@chakra-ui/react").then(module => ({ default: module.Flex })));
 const CloseButtonImport = lazy(() => import("@chakra-ui/react").then(module => ({ default: module.CloseButton })));
 const GridImport = lazy(() => import("@chakra-ui/react").then(module => ({ default: module.Grid })));
+// @ts-ignore
 const FixedSizeGridImport = lazy(() => import("react-window").then(module => ({ default: module.FixedSizeGrid })));
+// @ts-ignore
 const AutoSizerImport = lazy(() => import("react-virtualized-auto-sizer"));
 
 /* With Suspense Wrapper */
@@ -140,7 +142,7 @@ function sortList({ sortAlphabetically, sortDescending, sourceList }: SortListPr
 
 function SongList() {
 	/** Core, Context, Routing */
-	const history = useHistory();
+	const navigate = useNavigate();
 	const { songs, favourites, setFavourites, dispatch } = useMainContext();
 
 	// TODO: Sync all filter options with local storage as preferences
@@ -172,7 +174,7 @@ function SongList() {
 	const favIconColor = useColorModeValue("var(--chakra-colors-gray-600)", "var(--chakra-colors-gray-500)");
 	const favActiveIconBG = useColorModeValue("var(--chakra-colors-red-50)", "");
 
-	const toggleFavourite = (number: number) => {
+	const toggleFavourite = useCallback((number: number) => {
 		let faves = [];
 		if (favourites.includes(number - 1)) {
 			faves = favourites.filter(fave => fave !== number - 1);
@@ -182,19 +184,19 @@ function SongList() {
 			setFavourites(faves);
 		}
 		updateFavesDB(faves);
-	};
+	}, [favourites, setFavourites]);
 
 	/** Triggers navigation to a song at a specified index */
 	const memoDisplaySong = useCallback(
-		e => {
+		(e: React.MouseEvent<HTMLDivElement>) => {
 			function displaySong(ev: React.MouseEvent<HTMLDivElement>) {
 				const songID = ev.currentTarget.getAttribute("data-song-id");
-				history.push(`${process.env.PUBLIC_URL}/songs/${songID}`);
+				navigate(`${process.env.PUBLIC_URL}/songs/${songID}`);
 			}
 
 			displaySong(e);
 		},
-		[history]
+		[navigate]
 	);
 
 	/** Generates category labels from all available letters and numbers */
@@ -245,7 +247,7 @@ function SongList() {
 	 * TODO: Write tests covering all use cases
 	 * Maybe improve readability
 	 */
-	function filterSongs(props: FilterSongT) {
+	const filterSongs = useCallback((props: FilterSongT) => {
 		let filteredList: Song[] = [...songs];
 		switch (props.type) {
 			case "numbers": {
@@ -311,23 +313,23 @@ function SongList() {
 		setFinalList(
 			sortList({ sortAlphabetically: sortAlphaProps.enabled, sortDescending, sourceList: filteredList })
 		);
-	}
+	}, [favourites, filterByFaves, filterLetterProps.currValue, filterLetterProps.enabled, filterRangeProps.currValue, filterRangeProps.enabled, songs, sortAlphaProps.enabled, sortAlphaProps.sortDescending, sortNumberProps.sortDescending]);
 
-	const createLetters = () =>
+	const createLetters = useCallback(() =>
 		letters.map(letter => ({
 			callback: () => filterSongs({ type: "letters", value: letter }),
 			value: letter,
-		}));
+		})), [filterSongs, letters]);
 
-	const createNumbers = () =>
+	const createNumbers = useCallback(() =>
 		numbers.map(num => ({
 			callback: () => filterSongs({ type: "range", value: [num[0], num[1]] }),
 			start: num[0],
 			end: num[1],
-		}));
+		})), [filterSongs, numbers]);
 
 	/** [Enable Options] Handles list filter features enable / disable */
-	function handleSortToggle(filterType: FilterT, sortDesc?: boolean) {
+	const handleSortToggle = useCallback((filterType: FilterT, sortDesc?: boolean) => {
 		if (filterType !== FilterTypes.FAVE) {
 			const sortAlphabetically = filterType === FilterTypes.ALPHA;
 			let sortDescending: boolean;
@@ -346,10 +348,10 @@ function SongList() {
 			if (!filterByFaves) targetList = targetList.filter(item => favourites.includes(item.number - 1));
 			sortList({ sortAlphabetically: sortAlphaProps.enabled, sortDescending, sourceList: targetList });
 		}
-	}
+	}, [favourites, filterByFaves, finalList, songs, sortAlphaProps.enabled, sortAlphaProps.sortDescending, sortNumberProps.sortDescending]);
 
 	/** [ASC/DESC] Handles list filter directional changes */
-	function handleSortChange(value: string | number, filterType: FilterT) {
+	const handleSortChange = useCallback((value: string | number, filterType: FilterT) => {
 		const sortDescending = value === "Descending";
 
 		if (filterType === FilterTypes.NUM) {
@@ -361,14 +363,14 @@ function SongList() {
 			setSortAlphaProps(props => ({ ...props, sortDescending }));
 			if (sortAlphaProps.enabled) handleSortToggle(filterType, sortDescending);
 		}
-	}
+	}, [handleSortToggle, sortAlphaProps.enabled, sortNumberProps.enabled]);
 
 	/** Sets the page title */
 	useEffect(() => {
 		dispatch!({ type: "setTitle", payload: meta.page });
 	}, [dispatch]);
 
-	const NumberItems = () => {
+	const NumberItems = useCallback(() => {
 		const values = createNumbers();
 		return (
 			<>
@@ -392,9 +394,9 @@ function SongList() {
 				})}
 			</>
 		);
-	};
+	}, [createNumbers, filterRangeProps.currValue, filterRangeProps.enabled]);
 
-	const LetterItems = () => {
+	const LetterItems = useCallback(() => {
 		const values = createLetters();
 		return (
 			<>
@@ -415,10 +417,10 @@ function SongList() {
 				))}
 			</>
 		);
-	};
+	}, [createLetters, filterLetterProps.currValue, filterLetterProps.enabled]);
 
 	/** Renders a single cell */
-	const Cell = ({ columnIndex, rowIndex, style, data }: GridChildComponentProps) => {
+	const Cell = useCallback(({ columnIndex, rowIndex, style, data }: GridChildComponentProps) => {
 		const maxColumns = 2;
 		const itemWidth = 800;
 		const columnCount = Math.min(Math.max(Math.ceil(window.innerWidth / itemWidth), 1), maxColumns);
@@ -465,9 +467,9 @@ function SongList() {
 				</Grid>
 			</Box>
 		);
-	};
+	}, [favActiveIconBG, favActiveIconColor, favIconColor, favourites, finalList.length, memoDisplaySong, modalBG, toggleFavourite]);
 
-	const FilterMenu = () => (
+	const FilterMenu = useCallback(() => (
 		<VStack pl={5} spacing={6}>
 			<RadioGroup
 				name="sorting-type"
@@ -567,7 +569,7 @@ function SongList() {
 				</Box>
 			</Box>
 		</VStack>
-	);
+	), [LetterItems, NumberItems, filterByFaves, filterLetterProps.enabled, filterRangeProps.enabled, filterSongs, handleSortChange, handleSortToggle, sortAlphaProps.enabled, sortAlphaProps.sortDescending, sortNumberProps.enabled, sortNumberProps.sortDescending]);
 
 	return (
 		<>

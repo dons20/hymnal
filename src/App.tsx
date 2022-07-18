@@ -1,10 +1,9 @@
 import { useEffect, lazy } from "react";
-import { Route, Switch, Redirect, useLocation } from "react-router-dom";
+import { Route, Routes, Navigate, useLocation } from "react-router-dom";
 import { useColorModeValue } from "@chakra-ui/color-mode";
 import withSuspense from "helpers/withSuspense";
 import { useMainContext } from "utils/context";
 import { isMobile } from "react-device-detect";
-import MainContext from "components/Providers";
 import { Box } from "@chakra-ui/layout";
 
 import styles from "./App.module.scss";
@@ -52,37 +51,27 @@ function App() {
 	}, [dispatch]);
 
 	return (
-		<MainContext>
-			<Box className={styles.root}>
-				<Box as="section" className={styles.app_body}>
-					<Header />
-					<ScrollRestoration />
-					<Box
-						as="main"
-						className={`${styles.app_inner} ${isMobile ? styles.app_inner_mobile : ""}`}
-						bg={pageBG}
-					>
-						<PictureHeader />
+		<Box className={styles.root}>
+			<Box as="section" className={styles.app_body}>
+				<Header />
+				<ScrollRestoration />
+				<Box as="main" className={`${styles.app_inner} ${isMobile ? styles.app_inner_mobile : ""}`} bg={pageBG}>
+					<PictureHeader />
 
-						<div className={styles.wrapper}>
-							<Switch>
-								<Route path="/home" component={Home} />
-								<Route path="/songs">{songs.length > 1 ? <Songs /> : <Loader />}</Route>
-								<Route path="/search" component={Search} />
-								<Route path="/favourites">
-									<Redirect to="/songs/favourites" />
-								</Route>
-								<Route>
-									<Redirect to="/home" />
-								</Route>
-							</Switch>
-						</div>
-					</Box>
-
-					<BottomNav />
+					<div className={styles.wrapper}>
+						<Routes>
+							<Route path="home" element={<Home />} />
+							<Route path="songs/*" element={songs.length > 1 ? <Songs /> : <Loader />} />
+							<Route path="search/*" element={<Search />} />
+							<Route path="favourites/*" element={<Navigate to="/songs/favourites" replace />} />
+							<Route path="/" element={<Navigate to="/home" replace />} />
+						</Routes>
+					</div>
 				</Box>
+
+				<BottomNav />
 			</Box>
-		</MainContext>
+		</Box>
 	);
 }
 

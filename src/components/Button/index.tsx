@@ -2,7 +2,7 @@ import { Button as CoreButton, ButtonProps } from "@chakra-ui/react";
 import { Link, LinkProps } from "react-router-dom";
 
 interface ButtonLink extends ButtonProps {
-	as: Link;
+	as: typeof Link;
 }
 
 type ButtonP = ButtonProps | (ButtonLink & LinkProps);

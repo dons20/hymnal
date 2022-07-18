@@ -1,3 +1,4 @@
+/* eslint-disable react/function-component-definition */
 import { lazy, Suspense } from "react";
 
 const Loader = lazy(() => import("components/Loader"));
@@ -10,6 +11,7 @@ const withSuspense =
 	): P =>
 	// @ts-ignore TODO: Possibly investigate fix for this error
 	(props: P, props2: Q) => {
+		// eslint-disable-next-line react/jsx-no-useless-fragment
 		let fallbackLoader = <></>;
 		if (FallbackComponent === undefined)
 			fallbackLoader = (

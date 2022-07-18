@@ -3,7 +3,7 @@ import { Input, InputGroup, InputRightElement } from "@chakra-ui/input";
 import { GridChildComponentProps, FixedSizeGrid } from "react-window";
 import { Box, Container, Grid, Text } from "@chakra-ui/layout";
 import { useColorModeValue } from "@chakra-ui/color-mode";
-import { useHistory, useLocation } from "react-router";
+import { useNavigate, useLocation } from "react-router";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { useDebouncedCallback } from "use-debounce";
 import { IconButton } from "@chakra-ui/button";
@@ -20,7 +20,7 @@ const meta = {
 };
 
 function Search() {
-	const history = useHistory();
+	const navigate = useNavigate();
 	const location = useLocation();
 	const { songs, dispatch } = useMainContext();
 	const routerQuery = useQuery(location.search);
@@ -54,18 +54,18 @@ function Search() {
 
 	/** Triggers navigation to a song at a specified index */
 	const memoDisplaySong = useCallback(
-		e => {
+		(e: React.MouseEvent<HTMLDivElement>) => {
 			function displaySong(ev: React.MouseEvent<HTMLDivElement>) {
 				const songID = ev.currentTarget.getAttribute("data-song-id");
-				history.push(`${process.env.PUBLIC_URL}/songs/${songID}`);
+				navigate(`${process.env.PUBLIC_URL}/songs/${songID}`);
 			}
 			displaySong(e);
 		},
-		[history]
+		[navigate]
 	);
 
 	/** Renders a single cell */
-	const Cell = ({ columnIndex, rowIndex, style, data }: GridChildComponentProps) => {
+	const Cell = useCallback(({ columnIndex, rowIndex, style, data }: GridChildComponentProps) => {
 		const itemIndex = rowIndex * numColumns.current + columnIndex;
 		if (itemIndex >= searchResults.length) return null;
 		return (
@@ -97,7 +97,7 @@ function Search() {
 				</Grid>
 			</Box>
 		);
-	};
+	}, [cellBG, memoDisplaySong, searchResults.length]);
 
 	useEffect(() => {
 		dispatch!({ type: "setTitle", payload: meta.title });

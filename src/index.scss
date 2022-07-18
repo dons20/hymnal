@@ -45,7 +45,7 @@ body,
 	background-color: var(--chakra-colors-whiteAlpha-600);
 }
 
-html[style="--chakra-ui-color-mode:light;"] {
+html[data-theme="light"] {
 	& ::-webkit-scrollbar-thumb {
 		background-color: var(--chakra-colors-blackAlpha-400);
 		&:hover {

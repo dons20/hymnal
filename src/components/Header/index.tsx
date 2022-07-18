@@ -4,7 +4,7 @@ import { FaSearch, FaSun, FaMoon, FaHome, FaBars } from "react-icons/fa";
 import { useDebouncedCallback } from "use-debounce";
 import withSuspense from "helpers/withSuspense";
 import { useMainContext } from "utils/context";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Fuse from "fuse.js";
 import "./Header.scss";
 
@@ -27,7 +27,7 @@ import type {
 	ModalContent as ModalContentType,
 	ModalCloseButton as ModalCloseButtonType,
 	InputRightElement as InputRightElementType,
-} from "@chakra-ui/react/dist/types";
+} from "@chakra-ui/react/dist/declarations/src";
 
 /* Lazy Base Imports */
 const CloseButtonImport = lazy(() => import("@chakra-ui/react").then(m => ({ default: m.CloseButton })));
@@ -72,7 +72,7 @@ const VStack = withSuspense<typeof VStackType, null>(VStackImport, null);
 const Button = withSuspense<typeof ButtonImport, null>(ButtonImport, null);
 
 function Header() {
-	const history = useHistory();
+	const navigate = useNavigate();
 	const { songs } = useMainContext();
 	const { colorMode, toggleColorMode } = useColorMode();
 	const { isOpen, onOpen, onClose } = useDisclosure();
@@ -87,7 +87,7 @@ function Header() {
 	const searchBG = useColorModeValue("gray.50", "gray.700");
 
 	/** Will navigate one level up in the application */
-	const GoHome = () => history.push("/");
+	const GoHome = () => navigate("/");
 
 	const searchSongs = (_?: React.ChangeEvent<any>, mobile?: boolean) => {
 		const shouldSearchMobile = mobile && mobileQuery.length > 0;
@@ -98,7 +98,7 @@ function Header() {
 			setQuery("");
 			setMobileQuery("");
 			setQueryResults([]);
-			history.push(`/search?query=${shouldSearchMobile ? mobileQuery : query}`);
+			navigate(`/search?query=${shouldSearchMobile ? mobileQuery : query}`);
 		}
 	};
 
@@ -134,7 +134,7 @@ function Header() {
 	const gotoSong = (index: number) => {
 		onClose();
 		setQuery("");
-		history.push(`/songs/${index}`);
+		navigate(`/songs/${index}`);
 	};
 
 	return (
@@ -158,7 +158,7 @@ function Header() {
 						<InputGroup size="md" as="form" onSubmit={submitQuery} role="search">
 							<Input
 								value={query}
-								onChange={e => searchQueryChange(e.target.value)}
+								onChange={(e: React.ChangeEvent<HTMLInputElement>) => searchQueryChange(e.target.value)}
 								type="search"
 								placeholder="Search songs..."
 								pr="4.5rem"
@@ -250,7 +250,7 @@ function Header() {
 										h="1.75rem"
 										icon={<FaSearch />}
 										aria-label="Search Song Database"
-										onClick={e => searchSongs(e, true)}
+										onClick={(e: React.MouseEvent<HTMLButtonElement>) => searchSongs(e, true)}
 									/>
 								</InputRightElement>
 							</InputGroup>

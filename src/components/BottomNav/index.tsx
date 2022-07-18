@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FaItunesNote, FaHome, FaStar } from "react-icons/fa";
-import { useLocation, useHistory } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useColorModeValue } from "@chakra-ui/color-mode";
 import { useMediaQuery } from "@chakra-ui/media-query";
 import { isMobile } from "react-device-detect";
@@ -11,7 +11,7 @@ import "./BottomNav.scss";
 
 function MobileNavBar() {
 	const { pathname } = useLocation();
-	const history = useHistory();
+	const navigate = useNavigate();
 	const [scrollingDown, setScrollingDown] = useState(true);
 	const prevPath = useRef<string | null>(null);
 	const scrollPos = useRef(document.body.getBoundingClientRect().top);
@@ -61,7 +61,7 @@ function MobileNavBar() {
 
 	function handleTabBarPress(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
 		const url = e.currentTarget.getAttribute("data-url") as string;
-		history.push(url);
+		navigate(url);
 	}
 
 	return (
@@ -83,7 +83,7 @@ function MobileNavBar() {
 					px={10}
 					data-testid={tab.title}
 				>
-					{iconsOnly && <>{tab.icon}</>}
+					{iconsOnly && tab.icon}
 					{!iconsOnly && <Text>{tab.title}</Text>}
 				</Button>
 			))}
