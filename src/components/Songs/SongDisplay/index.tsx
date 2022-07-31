@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo } from "react";
-import { Box, Container, Text, IconButton } from "@chakra-ui/react";
+import { FaHeart, FaArrowCircleRight, FaArrowCircleLeft, FaBook } from "react-icons/fa";
+import { Box, Container, Text, IconButton, SimpleGrid, Icon } from "@chakra-ui/react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { useColorModeValue } from "@chakra-ui/color-mode";
 import { useMainContext } from "utils/context";
-import { FaHeart } from "react-icons/fa";
 import { updateFavesDB } from "helpers";
 import { Helmet } from "react-helmet";
 import { Button } from "components";
@@ -30,7 +30,7 @@ function SongDisplay() {
 	// Ensure the route parameter is a number before rendering anything
 	useEffect(() => {
 		if (!/\d+/.test(songID!)) navigate(-1);
-	  }, [songID, navigate]);
+	}, [songID, navigate]);
 
 	useEffect(() => {
 		if (songs.length > 1) dispatch!({ type: "setTitle", payload: songToRender?.title || "" });
@@ -67,7 +67,7 @@ function SongDisplay() {
 		[songs, songToRender]
 	);
 
-	if (songToRender === null) return <Navigate to="songs/index" replace />;
+	if (songToRender === null) return <Navigate to="../index" replace />;
 
 	const isFavourite = favourites.includes(songToRender.number - 1);
 
@@ -83,31 +83,53 @@ function SongDisplay() {
 		updateFavesDB(faves);
 	};
 
-	const backToIndex = () => navigate(`${process.env.PUBLIC_URL}/songs/index`);
+	const backToIndex = () => navigate("../index");
+	const previousSong = () => navigate(`../${songToRender.number - 1}`);
+	const nextSong = () => navigate(`../${songToRender.number + 1}`);
 
 	return (
-		<Container className="container" bg={songBG} shadow={songShadow} my={4} py="1rem" px="1.5rem">
+		<Container
+			className="container"
+			maxW="container.lg"
+			bg={songBG}
+			shadow={songShadow}
+			my={4}
+			py="1rem"
+			px="1.5rem"
+		>
 			<Helmet>
 				<title>{`Hymns for All Times | ${songToRender!.title}`}</title>
 			</Helmet>
-			<Button onClick={backToIndex} pos="absolute" left={-5} top="10%" zIndex={100} pr={1}>
-				Index
-			</Button>
 			<Box className="header" pos="relative" pr="5">
 				<Text># {songToRender!.number}</Text>
 				<Text>{songToRender!.title}</Text>
-				<IconButton
-					colorScheme={isFavourite ? "red" : "gray"}
-					bgColor={isFavourite ? favActiveIconBG : modalBG}
-					_hover={{ shadow: "md" }}
-					icon={<FaHeart color={isFavourite ? favActiveIconColor : favIconColor} />}
-					aria-label="Add to Favourites"
-					size="lg"
-					variant="outline"
-					className="faveIcon"
-					onClick={() => toggleFavourite(songToRender.number)}
-					maxW="60px"
-				/>
+				<Box>
+					<IconButton
+						colorScheme="gray"
+						icon={<FaBook color={favIconColor} />}
+						onClick={backToIndex}
+						_hover={{ shadow: "md" }}
+						bgColor={modalBG}
+						aria-label="Back to songs index"
+						variant="outline"
+						size="lg"
+						maxW="60px"
+						pr={1}
+						mr={5}
+					/>
+					<IconButton
+						colorScheme={isFavourite ? "red" : "gray"}
+						bgColor={isFavourite ? favActiveIconBG : modalBG}
+						_hover={{ shadow: "md" }}
+						icon={<FaHeart color={isFavourite ? favActiveIconColor : favIconColor} />}
+						aria-label="Add to Favourites"
+						size="lg"
+						variant="outline"
+						className="faveIcon"
+						onClick={() => toggleFavourite(songToRender.number)}
+						maxW="60px"
+					/>
+				</Box>
 			</Box>
 			<Box className="body">{songBody}</Box>
 			{songToRender.author && (
@@ -115,6 +137,21 @@ function SongDisplay() {
 					{songToRender.author}
 				</Text>
 			)}
+			<SimpleGrid columns={{ sm: 2 }} justifyContent="space-around" mb={5} mt={5} spacing={5}>
+				{songToRender.number > 1 && (
+					<Button onClick={previousSong} flex="1">
+						<Icon as={FaArrowCircleLeft} size={20} mr={3} /> Previous Song
+					</Button>
+				)}
+				{songToRender.number < songs.length - 1 && (
+					<Button onClick={nextSong} flex="1">
+						Next Song <Icon as={FaArrowCircleRight} size={20} ml={3} />
+					</Button>
+				)}
+			</SimpleGrid>
+			<Button onClick={backToIndex} variant="outline">
+				Back to Index
+			</Button>
 		</Container>
 	);
 }

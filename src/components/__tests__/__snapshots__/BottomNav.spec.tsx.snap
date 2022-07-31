@@ -3,12 +3,12 @@
 exports[`#BottomNav should render correctly 1`] = `
 <DocumentFragment>
   <div
-    class="bottom-nav --disabled --hidden css-lvpuj"
+    class="bottom-nav --hidden css-lvpuj"
     data-testid="bottomNavWrapper"
   >
     <button
       aria-label="Home"
-      class="chakra-button css-gddl8k"
+      class="chakra-button css-lrkawa"
       data-testid="Home"
       data-url="/home"
       type="button"
@@ -40,7 +40,7 @@ exports[`#BottomNav should render correctly 1`] = `
     </button>
     <button
       aria-label="Songs"
-      class="chakra-button css-gddl8k"
+      class="chakra-button css-lrkawa"
       data-testid="Songs"
       data-url="/songs/index"
       type="button"
@@ -72,7 +72,7 @@ exports[`#BottomNav should render correctly 1`] = `
     </button>
     <button
       aria-label="Favourites"
-      class="chakra-button css-gddl8k"
+      class="chakra-button css-lrkawa"
       data-testid="Favourites"
       data-url="/songs/favourites"
       type="button"

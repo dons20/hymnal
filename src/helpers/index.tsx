@@ -1,14 +1,15 @@
 /* eslint-disable no-console */
 import React from "react";
 import axios from "axios";
-import { log, info, error } from "utils/logger";
+import hymns from "static/hymns.json";
+import setDebug from "utils/logger";
 
 interface SongPropsA {
 	number: number;
 	title: string;
 	verse: string[];
 	chorus: string;
-	author: string;
+	author?: string;
 }
 interface SongPropsB {
 	number: number;
@@ -22,6 +23,9 @@ export type SongProps = SongPropsA | SongPropsB;
 
 export type SongsDB = { songs: SongProps[]; version: string };
 
+setDebug();
+const { debug } = window;
+
 /**
  * Loads songs from JSON and stores them locally
  */
@@ -33,12 +37,12 @@ export async function loadNewSongs(fetchedSongs: SongProps[]) {
 
 	try {
 		await Promise.all([
-			fetchedSongs.forEach((song, i) => songs.setItem(`${i}`, { ...song }).catch(e => info(e))),
-			localVersion.setItem("value", localVersion).catch(e => info(e)),
+			fetchedSongs.forEach((song, i) => songs.setItem(`${i}`, { ...song }).catch(e => debug.info(e))),
+			localVersion.setItem("value", localVersion).catch(e => debug.info(e)),
 			favourites.clear(),
 		]);
 	} catch (err) {
-		if (err instanceof Error) info(err.message);
+		if (err instanceof Error) debug.info(err.message);
 	}
 }
 
@@ -55,30 +59,30 @@ export async function checkDB() {
 
 	let songsDB: SongsDB;
 	try {
-		const fetchedData = await axios.get<SongsDB>("https://f002.backblazeb2.com/file/hymnal/hymns.json");
+		const fetchedData = process.env.NODE_ENV === "production" ? await axios.get<SongsDB>(process.env.HYMNS_URL || "https://f002.backblazeb2.com/file/hymnal/hymns.json") : { data: hymns };
 		if (!fetchedData.data) return;
 		songsDB = fetchedData.data;
 
-		log(`%cChecking if songs exist already`, "color: #3182ce; font-size: medium;");
+		debug.log(`%cChecking if songs exist already`, "color: #3182ce; font-size: medium;");
 		const songs = localForage.createInstance({ storeName: "items" });
 		const songsLength = await songs.length();
 		if (songsLength < songsDB.songs.length) {
-			info("Items out of sync with latest items");
+			debug.info("Items out of sync with latest items");
 			loadNewSongs(songsDB.songs);
 		}
 
-		log(`%cChecking for updates`, "color: #3182ce; font-size: medium;");
+		debug.log(`%cChecking for updates`, "color: #3182ce; font-size: medium;");
 		const localVersion = localForage.createInstance({ storeName: "version" });
 		if (!localVersion) throw new Error("No version stored");
 		const versionNumber = (await localVersion.getItem("value")) as string;
 		if (songsDB.version !== versionNumber) {
-			info("Version mismatch, sync necessary");
+			debug.info("Version mismatch, sync necessary");
 			loadNewSongs(songsDB.songs);
 		}
 
-		log(`%cSongs found! Attempting to load...`, "color: #3182ce; font-size: medium;");
+		debug.log(`%cSongs found! Attempting to load...`, "color: #3182ce; font-size: medium;");
 	} catch (e) {
-		if (e instanceof Error) error(e.message);
+		if (e instanceof Error) debug.error(e.message);
 	}
 }
 

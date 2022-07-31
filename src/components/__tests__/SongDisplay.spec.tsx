@@ -1,18 +1,9 @@
 import { Suspense } from "react";
 import { render, screen } from "@testing-library/react";
 import SongDisplay from "components/Songs/SongDisplay";
-import { MainContextProvider } from "utils/context";
 import { MemoryRouter } from "react-router-dom";
+import { Providers } from "helpers/tests";
 import { SongsDB } from "data/songs";
-
-type ProviderT = {
-	children: React.ReactNode;
-	value: any;
-};
-
-const Providers = ({ children, value }: ProviderT) => (
-	<MainContextProvider value={value}>{children}</MainContextProvider>
-);
 
 describe("#SongDisplay", () => {
 	it("renders the matching song based on the route", () => {

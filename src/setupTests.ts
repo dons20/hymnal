@@ -5,14 +5,6 @@ import "@testing-library/jest-dom";
 // @ts-ignore
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
-window.matchMedia = jest.fn().mockImplementation(() => ({
-    matches: jest.fn(),
-    media: "",
-    onchange: null,
-    addListener: jest.fn(),
-    removeListener: jest.fn(),
-}));
-
 // Object.defineProperty(window, 'matchMedia', {
 //     writable: true,
 //     value: jest.fn().mockImplementation(query => ({

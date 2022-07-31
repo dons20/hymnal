@@ -3,15 +3,16 @@
 	grid-row: 1 / span 2;
 	grid-auto-rows: max-content;
 	justify-content: center;
+	grid-template-columns: minmax(auto, var(--chakra-sizes-container-md));
 
 	& > .body {
 		margin: 20px auto;
 		display: grid;
 		white-space: pre-line;
 		grid-row-gap: 2.5rem;
-		grid-template-rows: repeat(auto-fit, minmax(100px, 1fr));
-		width: 100%;
-		max-width: 1000px;
+		width: max-content;
+		// width: 100%;
+		// max-width: var(--chakra-sizes-container-sm);
 	}
 
 	& > .header {
@@ -38,7 +39,7 @@
 
 	@media only screen and (min-width: 550px) {
 		& > .header {
-			grid-template-columns: auto 1fr 50px;
+			grid-template-columns: auto 1fr auto 50px;
 		}
 	}
 }

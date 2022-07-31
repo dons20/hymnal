@@ -2,8 +2,9 @@
 import { Suspense } from "react";
 import { screen, waitFor } from "@testing-library/react";
 import { renderWithRouter } from "utils/tests";
-import { resizeWindow } from "helpers/tests";
+import { Providers, resizeWindow } from "helpers/tests";
 import localforage from "localforage";
+import { SongsDB } from "data/songs";
 import App from "./App";
 
 jest.mock("__mocks__/createMocks.ts");
@@ -24,22 +25,27 @@ afterEach(() => {
 
 describe("#App", () => {
 	it("renders without crashing", async () => {
+		const songs = SongsDB;
+		const favourites: Song[] = [];
 		const spyConfig = jest.spyOn(localforage, "config");
 		const spyCreateInstance = jest.spyOn(localforage, "createInstance");
 		await waitFor(() => {
 			expect(spyConfig).toBeTruthy();
+		});
+		await waitFor(() => {
 			expect(spyCreateInstance).toBeTruthy();
 		});
 		jest.spyOn(console, "warn").mockImplementation(() => {});
+
 		const { asFragment } = renderWithRouter(
 			<Suspense fallback="">
-				<App />
+				<Providers value={{ favourites, songs }}>
+					<App />
+				</Providers>
 			</Suspense>
 		);
 
-		await waitFor(() => {
-			expect(asFragment()).toMatchSnapshot();
-		});
+		expect(asFragment()).toMatchSnapshot();		
 	});
 });
 
@@ -49,8 +55,10 @@ describe("#AppTest", () => {
 		const spyCreateInstance = jest.spyOn(localforage, "createInstance");
 		// jest.spyOn(window, "addEventListener").mockImplementation(() => {});
 
-		await waitFor(async () => {
+		await waitFor(() => {
 			expect(spyConfig).toBeTruthy();
+		});
+		await waitFor(() => {
 			expect(spyCreateInstance).toBeTruthy();
 		});
 
