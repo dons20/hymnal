@@ -70,6 +70,8 @@ function SongDisplay() {
 	if (songToRender === null) return <Navigate to="../index" replace />;
 
 	const isFavourite = favourites.includes(songToRender.number - 1);
+	const isFirstSong = songToRender.number > 1;
+	const isLastSong = songToRender.number < songs.length - 1;
 
 	const toggleFavourite = (number: number) => {
 		let faves = [];
@@ -137,13 +139,13 @@ function SongDisplay() {
 					{songToRender.author}
 				</Text>
 			)}
-			<SimpleGrid columns={{ sm: 2 }} justifyContent="space-around" mb={5} mt={5} spacing={5}>
-				{songToRender.number > 1 && (
+			<SimpleGrid columns={{ sm: isFirstSong || isLastSong ? 1 : 2 }} justifyContent={{ md: "space-around" }} mb={5} mt={5} spacing={5}>
+				{isFirstSong && (
 					<Button onClick={previousSong} flex="1">
 						<Icon as={FaArrowCircleLeft} size={20} mr={3} /> Previous Song
 					</Button>
 				)}
-				{songToRender.number < songs.length - 1 && (
+				{isLastSong && (
 					<Button onClick={nextSong} flex="1">
 						Next Song <Icon as={FaArrowCircleRight} size={20} ml={3} />
 					</Button>
