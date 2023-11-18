@@ -23,6 +23,7 @@ function HomeScreen() {
 
 	return (
 		<>
+			{/* @ts-expect-error Helmet no longer updated */}
 			<Helmet>
 				<title>{`Hymns for All Times | ${meta.page}`}</title>
 			</Helmet>

@@ -99,6 +99,7 @@ function SongDisplay() {
 			py="1rem"
 			px="1.5rem"
 		>
+			{/* @ts-expect-error Helmet no longer updated */}
 			<Helmet>
 				<title>{`Hymns for All Times | ${songToRender!.title}`}</title>
 			</Helmet>

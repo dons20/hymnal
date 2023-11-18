@@ -24,7 +24,7 @@ import type {
 	Checkbox as CheckboxType,
 	IconButton as IconButtonType,
 	CloseButton as CloseButtonType,
-} from "@chakra-ui/react/dist/declarations/src";
+} from "@chakra-ui/react/dist";
 
 import { DEFAULT_ALPHA_PROPS, DEFAULT_FILTER_PROPS, DEFAULT_NUM_PROPS } from "./defaults";
 import "./SongList.scss";
@@ -573,6 +573,7 @@ function SongList() {
 
 	return (
 		<>
+			{/* @ts-expect-error Helmet no longer updated */}
 			<Helmet>
 				<title>{`Hymns for All Times | ${meta.title}`}</title>
 			</Helmet>

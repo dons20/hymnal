@@ -11,7 +11,7 @@ import { useMainContext } from "utils/context";
 import { FaSearch } from "react-icons/fa";
 import { Helmet } from "react-helmet";
 import { useQuery } from "helpers";
-import Fuse from "fuse.js";
+import Fuse, { FuseResult } from "fuse.js";
 import "./Search.scss";
 
 const meta = {
@@ -27,7 +27,7 @@ function Search() {
 	const extractedQuery = routerQuery.get("query");
 	const fuse = new Fuse(songs!, { keys: ["number", "title"], minMatchCharLength: 1, threshold: 0.4 });
 	const [searchQuery, setSearchQuery] = useState("");
-	const [searchResults, setSearchResults] = useState<Fuse.FuseResult<Song>[]>(
+	const [searchResults, setSearchResults] = useState<FuseResult<Song>[]>(
 		fuse.search(extractedQuery || searchQuery)
 	);
 	const pageBG = useColorModeValue("gray.200", "gray.800");
@@ -109,6 +109,7 @@ function Search() {
 
 	return (
 		<>
+			{/* @ts-expect-error Helmet no longer updated */}
 			<Helmet>
 				<title>{`Hymns for All Times | ${meta.page}`}</title>
 			</Helmet>
@@ -139,18 +140,21 @@ function Search() {
 				<Box ref={wrapperRef} pos="relative" overflow="hidden" h="100%">
 					<AutoSizer>
 						{({ height, width }) => (
-							<FixedSizeGrid
-								height={height}
-								width={width}
-								rowHeight={120}
-								columnWidth={width - window.innerWidth * 0.07}
-								columnCount={numColumns.current}
-								rowCount={numRows}
-								itemData={searchResults}
-								style={{ overflowX: "hidden" }}
-							>
-								{Cell}
-							</FixedSizeGrid>
+							<>
+								{/** @ts-expect-error Fixed size grid has TS issue */}
+								<FixedSizeGrid
+									height={height}
+									width={width}
+									rowHeight={120}
+									columnWidth={width - window.innerWidth * 0.07}
+									columnCount={numColumns.current}
+									rowCount={numRows}
+									itemData={searchResults}
+									style={{ overflowX: "hidden" }}
+								>
+									{Cell}
+								</FixedSizeGrid>
+							</>
 						)}
 					</AutoSizer>
 				</Box>

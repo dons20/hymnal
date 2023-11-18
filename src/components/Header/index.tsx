@@ -5,7 +5,7 @@ import { useDebouncedCallback } from "use-debounce";
 import withSuspense from "helpers/withSuspense";
 import { useMainContext } from "utils/context";
 import { useNavigate } from "react-router-dom";
-import Fuse from "fuse.js";
+import Fuse, { FuseResult } from "fuse.js";
 import "./Header.scss";
 
 import type {
@@ -27,7 +27,7 @@ import type {
 	ModalContent as ModalContentType,
 	ModalCloseButton as ModalCloseButtonType,
 	InputRightElement as InputRightElementType,
-} from "@chakra-ui/react/dist/declarations/src";
+} from "@chakra-ui/react/dist";
 
 /* Lazy Base Imports */
 const CloseButtonImport = lazy(() => import("@chakra-ui/react").then(m => ({ default: m.CloseButton })));
@@ -80,7 +80,7 @@ function Header() {
 	const fuse = new Fuse(songs!, { keys: ["number", "title"], minMatchCharLength: 2, threshold: 0.4 });
 	const [query, setQuery] = useState("");
 	const [mobileQuery, setMobileQuery] = useState("");
-	const [queryResults, setQueryResults] = useState<Fuse.FuseResult<Song>[]>([]);
+	const [queryResults, setQueryResults] = useState<FuseResult<Song>[]>([]);
 	const [showMobileMenu] = useMediaQuery("(max-width: 550px)");
 	const resultsBG = useColorModeValue("white", "gray.800");
 	const headerBG = useColorModeValue("gray.100", "gray.800");

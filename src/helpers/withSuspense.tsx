@@ -19,6 +19,7 @@ const withSuspense =
 					<Loader />
 				</Suspense>
 			);
+			// @ts-expect-error TODO: Fix this
 		if (FallbackComponent) fallbackLoader = <FallbackComponent {...props2} />;
 
 		return (

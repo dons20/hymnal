@@ -88,6 +88,7 @@ function Favourites() {
 
 	return (
 		<>
+			{/* @ts-expect-error Helmet no longer updated */}
 			<Helmet>
 				<title>{`Hymns for All Times | ${meta.page}`}</title>
 			</Helmet>
@@ -96,18 +97,21 @@ function Favourites() {
 				<Box ref={wrapperRef} pos="relative" overflow="hidden" h="100%">
 					<AutoSizer>
 						{({ height, width }) => (
-							<FixedSizeGrid
-								height={height}
-								width={width}
-								rowHeight={120}
-								columnWidth={width - window.innerWidth * 0.07}
-								columnCount={numColumns.current}
-								rowCount={numRows}
-								itemData={finalList}
-								style={{ overflowX: "hidden" }}
-							>
-								{Cell}
-							</FixedSizeGrid>
+							<>
+							{/** @ts-expect-error Fixed size grid has TS issue */}
+								<FixedSizeGrid
+									height={height}
+									width={width}
+									rowHeight={120}
+									columnWidth={width - window.innerWidth * 0.07}
+									columnCount={numColumns.current}
+									rowCount={numRows}
+									itemData={finalList}
+									style={{ overflowX: "hidden" }}
+								>
+									{Cell}
+								</FixedSizeGrid>
+							</>
 						)}
 					</AutoSizer>
 				</Box>
