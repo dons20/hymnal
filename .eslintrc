@@ -24,7 +24,7 @@
 		"airbnb",
 		"airbnb-typescript",
 		"airbnb/hooks",
-		"plugin:react/jsx-runtime",
+		// "plugin:react/jsx-runtime",
 		"plugin:import/typescript",
 		"prettier"
 	],
