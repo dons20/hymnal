@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { MouseEvent, useCallback, useEffect, useRef, useState } from "react";
 import { Input, InputGroup, InputRightElement } from "@chakra-ui/input";
 import { GridChildComponentProps, FixedSizeGrid } from "react-window";
 import { Box, Container, Grid, Text } from "@chakra-ui/layout";
@@ -8,10 +8,10 @@ import AutoSizer from "react-virtualized-auto-sizer";
 import { useDebouncedCallback } from "use-debounce";
 import { IconButton } from "@chakra-ui/button";
 import { useMainContext } from "utils/context";
+import Fuse, { FuseResult } from "fuse.js";
 import { FaSearch } from "react-icons/fa";
 import { Helmet } from "react-helmet";
 import { useQuery } from "helpers";
-import Fuse, { FuseResult } from "fuse.js";
 import "./Search.scss";
 
 const meta = {
@@ -25,8 +25,9 @@ function Search() {
 	const { songs, dispatch } = useMainContext();
 	const routerQuery = useQuery(location.search);
 	const extractedQuery = routerQuery.get("query");
+	const startsWithQuery = useState(extractedQuery && extractedQuery?.length > 0);
 	const fuse = new Fuse(songs!, { keys: ["number", "title"], minMatchCharLength: 1, threshold: 0.4 });
-	const [searchQuery, setSearchQuery] = useState("");
+	const [searchQuery, setSearchQuery] = useState(extractedQuery || "");
 	const [searchResults, setSearchResults] = useState<FuseResult<Song>[]>(
 		fuse.search(extractedQuery || searchQuery)
 	);
@@ -39,17 +40,21 @@ function Search() {
 	const handleSearch = useDebouncedCallback((value: string) => {
 		const result = fuse.search(value);
 		setSearchResults(result);
-	}, 300);
+	}, 300, { leading: true, trailing: true });
 
 	const submitQuery = (e: React.FormEvent<HTMLDivElement>) => {
 		e.preventDefault();
 		if (searchQuery.length > 0) handleSearch(searchQuery);
 	};
 
-	const searchQueryChange = (e: React.ChangeEvent<any>) => {
-		const searchValue = e.target.value || extractedQuery;
+	const searchQueryChange = <T,>(e: T | React.ChangeEvent<HTMLInputElement>) => {
+		const searchValue = (e as React.ChangeEvent<HTMLInputElement>).target.value || ((!startsWithQuery && extractedQuery) ? extractedQuery : '');
 		setSearchQuery(searchValue);
 		if (searchValue?.length > 0) handleSearch(searchValue);
+		else {
+			setSearchResults([]);
+			handleSearch.cancel();
+		}
 	};
 
 	/** Triggers navigation to a song at a specified index */
@@ -117,9 +122,9 @@ function Search() {
 				<Container centerContent>
 					<InputGroup size="lg" as="form" onSubmit={submitQuery} role="search" w="90%" mb="5">
 						<Input
-							defaultValue={extractedQuery || undefined}
 							value={searchQuery}
 							onChange={searchQueryChange}
+							onSubmit={searchQueryChange}
 							type="search"
 							placeholder="Search songs..."
 							pr="4.5rem"
@@ -131,7 +136,7 @@ function Search() {
 								h="1.75rem"
 								icon={<FaSearch />}
 								aria-label="Search Song Database"
-								onClick={searchQueryChange}
+								onClick={searchQueryChange<MouseEvent>}
 							/>
 						</InputRightElement>
 					</InputGroup>
