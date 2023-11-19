@@ -32,7 +32,8 @@ exports[`#Header should render correctly 1`] = `
         class="css-1tlocfr"
       >
         <form
-          class="chakra-input__group css-4302v8"
+          class="chakra-input__group css-bx0blc"
+          data-group="true"
           role="search"
         >
           <input
