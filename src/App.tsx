@@ -35,6 +35,8 @@ const ScrollRestoration = () => {
 function App() {
 	const pageBG = useColorModeValue("gray.200", "gray.800");
 	const { songs, dispatch } = useMainContext();
+	// const notSongListPage = !window.location.pathname.includes("/songs/index");
+	const notSongListPage = true;
 
 	useEffect(() => {
 		const handleOrientationChange = () => {
@@ -55,7 +57,7 @@ function App() {
 			<Box as="section" className={styles.app_body}>
 				<Header />
 				<ScrollRestoration />
-				<Box as="main" className={`${styles.app_inner} ${isMobile ? styles.app_inner_mobile : ""}`} bg={pageBG}>
+				<Box as="main" className={`${styles.app_inner} ${isMobile && notSongListPage ? styles.app_inner_mobile : ""}`} bg={pageBG}>
 					<PictureHeader />
 
 					<div className={styles.wrapper}>

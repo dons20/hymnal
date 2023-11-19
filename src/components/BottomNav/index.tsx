@@ -3,6 +3,7 @@ import { FaItunesNote, FaHome, FaStar } from "react-icons/fa";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useColorModeValue } from "@chakra-ui/color-mode";
 import { useMediaQuery } from "@chakra-ui/media-query";
+import { useDebouncedCallback } from "use-debounce";
 import { isMobile } from "react-device-detect";
 import { Box, Text } from "@chakra-ui/layout";
 import Button from "components/Button";
@@ -37,17 +38,25 @@ function MobileNavBar() {
 		},
 	];
 
-	useEffect(() => {
-		// Initial state
-		const scrollEventHandler = () => {
-			// detects new state and compares it with the new one
-			if (document.body.getBoundingClientRect().top > scrollPos.current) setScrollingDown(false);
-			else setScrollingDown(true);
-			// saves the new position for iteration.
-			scrollPos.current = document.body.getBoundingClientRect().top;
-		};
+	const scrollEventHandler = useDebouncedCallback(() => {
+		// If we're within 100px of the bottom, show the bottom nav regardless of scroll direction
+		const windowHeight = Math.round(window.innerHeight);
+		const documentHeight = Math.round(document.body.offsetHeight);
+		const scrollY = Math.round(window.scrollY);
+		
+		if (scrollY >= (documentHeight - windowHeight) - 100) {
+			setScrollingDown(false);
+		// detects new state and compares it with the new one
+		} else if (document.body.getBoundingClientRect().top > scrollPos.current) {
+			setScrollingDown(false);
+		} else setScrollingDown(true);
 
-		scrollPos.current = document.body.getBoundingClientRect().top;
+		// saves the new position for iteration.
+		scrollPos.current = Math.round(document.body.getBoundingClientRect().top);
+	}, 100, { leading: true, trailing: true });
+
+	useEffect(() => {
+		scrollPos.current = Math.round(document.body.getBoundingClientRect().top);
 		prevPath.current = pathname;
 		setScrollingDown(true);
 
@@ -57,7 +66,7 @@ function MobileNavBar() {
 		return () => {
 			window.removeEventListener("scroll", scrollEventHandler);
 		};
-	}, [setScrollingDown, pathname]);
+	}, [setScrollingDown, pathname, scrollEventHandler]);
 
 	function handleTabBarPress(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
 		const url = e.currentTarget.getAttribute("data-url") as string;

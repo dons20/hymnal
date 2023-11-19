@@ -85,7 +85,8 @@ function SongDisplay() {
 		updateFavesDB(faves);
 	};
 
-	const backToIndex = () => navigate("../index");
+	// Useful for navigating to the correct spot in the song list
+	const backToIndex = () => navigate("../index", { state: { songNumber: songToRender.number - 1 } });
 	const previousSong = () => navigate(`../${songToRender.number - 1}`);
 	const nextSong = () => navigate(`../${songToRender.number + 1}`);
 
