@@ -419,7 +419,7 @@ function SongList() {
 		if (location.state?.songNumber && finalList.length > 0) {
 			setTimeout(
 				() => {
-					gridRef.current?.scrollToItem({ rowIndex: location.state.songNumber, align: "start" });
+					gridRef.current?.scrollToItem({ rowIndex: location.state.songNumber / gridRef.current.props.columnCount, align: "start" });
 					navigate('.', { state: {}, replace: true })
 				},
 				100
