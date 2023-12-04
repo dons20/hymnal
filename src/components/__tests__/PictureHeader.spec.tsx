@@ -1,17 +1,17 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import PictureHeader from "components/PictureHeader";
+import { MainContextProvider } from "utils/context";
 import { BrowserRouter } from "react-router-dom";
-import { MainContextProvider } from "App";
 
 type ProviderT = {
 	children: React.ReactNode;
 	value: any;
 };
 
-const Providers = ({ children, value }: ProviderT) => {
-	return <MainContextProvider value={value}>{children}</MainContextProvider>;
-};
+const Providers = ({ children, value }: ProviderT) => (
+	<MainContextProvider value={value}>{children}</MainContextProvider>
+);
 
 describe("#PictureHeader", () => {
 	it("should render the correct title based on context props", async () => {

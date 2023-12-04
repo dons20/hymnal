@@ -1,7 +1,7 @@
 import { useColorModeValue } from "@chakra-ui/color-mode";
 import { Box, Image } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
-import { Button } from "components";
+import Button from "components/Button";
 import Loader from "components/Loader";
 
 interface CardBase {
@@ -35,7 +35,7 @@ const Card = ({ title, subtitle, primaryLink, primaryLabel, imageSrc, imageAlt }
 
 	return (
 		<Box className="card" bg={boxBG} p="4" shadow="md" borderRadius="sm">
-			<Box d="flex" justifyContent="space-between" alignItems="center" flexWrap="wrap">
+			<Box display="flex" justifyContent="space-between" alignItems="center" flexWrap="wrap">
 				<Box>{title}</Box>
 				<Box color={subtitleColor} fontSize="sm" as="span">
 					{subtitle}

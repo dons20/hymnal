@@ -15,6 +15,7 @@
 .gridItem {
 	align-content: center;
 	grid-template-rows: min-content;
+	grid-template-columns: 70px auto;
 	cursor: pointer;
 	transition: transform 0.1s ease-in-out;
 	will-change: transform;

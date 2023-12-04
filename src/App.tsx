@@ -1,12 +1,12 @@
-import React, { useReducer, useEffect, lazy } from "react";
-import { Route, Switch, Redirect, useLocation } from "react-router-dom";
+import { useEffect, lazy } from "react";
+import { Route, Routes, Navigate, useLocation } from "react-router-dom";
 import { useColorModeValue } from "@chakra-ui/color-mode";
-import { useSongLoader } from "components/CustomHooks";
 import withSuspense from "helpers/withSuspense";
+import { useMainContext } from "utils/context";
 import { isMobile } from "react-device-detect";
-import { createCtx } from "helpers";
-import styles from "./App.module.scss";
 import { Box } from "@chakra-ui/layout";
+
+import styles from "./App.module.scss";
 
 const HomeImport = lazy(() => import("pages/Home"));
 const SongsImport = lazy(() => import("pages/Songs"));
@@ -24,52 +24,6 @@ const Header = withSuspense<typeof HeaderImport, null>(HeaderImport, null);
 const BottomNav = withSuspense<typeof BottomNavImport, null>(BottomNavImport, null);
 const PictureHeader = withSuspense<typeof PictureHeaderImport, null>(PictureHeaderImport, null);
 
-const pages = {
-	HOME: "/home",
-	INDEX: "/songs",
-	FAVOURITES: "/favourites",
-	SETTINGS: "/settings",
-};
-
-type ACTIONTYPE =
-	| { type: "setTitle"; payload: string }
-	| { type: "setSubtitle"; payload: string }
-	| { type: "setWidth"; payload: number };
-
-type State = {
-	title: string;
-	subtitle: string;
-	width: number;
-};
-
-type CTX = {
-	dispatch: React.Dispatch<ACTIONTYPE>;
-	songs: Song[];
-	favourites: number[];
-	setFavourites: React.Dispatch<React.SetStateAction<number[]>>;
-	pages: typeof pages;
-	meta: State;
-};
-
-const initialAppState = {
-	title: "",
-	subtitle: "",
-	width: document.body.getBoundingClientRect().width,
-};
-
-function reducer(state: State, action: ACTIONTYPE): State {
-	switch (action.type) {
-		case "setTitle":
-			return { ...state, title: action.payload };
-		case "setSubtitle":
-			return { ...state, subtitle: action.payload };
-		case "setWidth":
-			return { ...state, width: action.payload };
-		default:
-			return state;
-	}
-}
-
 const ScrollRestoration = () => {
 	const { pathname } = useLocation();
 	useEffect(() => {
@@ -78,59 +32,48 @@ const ScrollRestoration = () => {
 	return null;
 };
 
-export const [useMainContext, MainContextProvider] = createCtx<CTX>();
-
 function App() {
-	const [state, dispatch] = useReducer(reducer, initialAppState);
-	const { songs, favourites, setFavourites } = useSongLoader();
 	const pageBG = useColorModeValue("gray.200", "gray.800");
-
-	function handleOrientationChange() {
-		dispatch({ type: "setWidth", payload: document.body.getBoundingClientRect().width });
-	}
+	const { songs, dispatch } = useMainContext();
+	// const notSongListPage = !window.location.pathname.includes("/songs/index");
+	const notSongListPage = true;
 
 	useEffect(() => {
-		window.addEventListener("orientationchange", handleOrientationChange, {
+		const handleOrientationChange = () => {
+			dispatch({ type: "setWidth", payload: document.body.getBoundingClientRect().width });
+		};
+
+		window.screen.orientation.addEventListener("change", handleOrientationChange, {
 			capture: false,
 			passive: true,
 		});
 		return function cleanup() {
-			window.addEventListener("orientationchange", handleOrientationChange);
+			window.screen.orientation.removeEventListener("change", handleOrientationChange);
 		};
-	}, []);
+	}, [dispatch]);
 
 	return (
-		<MainContextProvider value={{ meta: state, dispatch, songs, pages, favourites, setFavourites }}>
-			<Box className={styles.root}>
-				<Box as="section" className={styles.app_body}>
-					<Header />
-					<ScrollRestoration />
-					<Box
-						as="main"
-						className={`${styles.app_inner} ${isMobile ? styles.app_inner_mobile : ""}`}
-						bg={pageBG}
-					>
-						<PictureHeader />
+		<Box className={styles.root}>
+			<Box as="section" className={styles.app_body}>
+				<Header />
+				<ScrollRestoration />
+				<Box as="main" className={`${styles.app_inner} ${isMobile && notSongListPage ? styles.app_inner_mobile : ""}`} bg={pageBG}>
+					<PictureHeader />
 
-						<div className={styles.wrapper}>
-							<Switch>
-								<Route path="/home" component={Home} />
-								<Route path="/songs">{songs.length > 1 ? <Songs /> : <Loader />}</Route>
-								<Route path="/search" component={Search} />
-								<Route path="/favourites">
-									<Redirect to="/songs/favourites" />
-								</Route>
-								<Route>
-									<Redirect to="/home" />
-								</Route>
-							</Switch>
-						</div>
-					</Box>
-
-					<BottomNav />
+					<div className={styles.wrapper}>
+						<Routes>
+							<Route path="home" element={<Home />} />
+							<Route path="songs/*" element={songs.length > 1 ? <Songs /> : <Loader />} />
+							<Route path="search/*" element={<Search />} />
+							<Route path="favourites/*" element={<Navigate to="/songs/favourites" replace />} />
+							<Route path="/" element={<Navigate to="/home" replace />} />
+						</Routes>
+					</div>
 				</Box>
+
+				<BottomNav />
 			</Box>
-		</MainContextProvider>
+		</Box>
 	);
 }
 

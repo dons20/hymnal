@@ -3,9 +3,9 @@ import { useColorMode, useMediaQuery, useDisclosure, useColorModeValue, Box } fr
 import { FaSearch, FaSun, FaMoon, FaHome, FaBars } from "react-icons/fa";
 import { useDebouncedCallback } from "use-debounce";
 import withSuspense from "helpers/withSuspense";
-import { useHistory } from "react-router-dom";
-import { useMainContext } from "App";
-import Fuse from "fuse.js";
+import { useMainContext } from "utils/context";
+import { useNavigate } from "react-router-dom";
+import Fuse, { FuseResult } from "fuse.js";
 import "./Header.scss";
 
 import type {
@@ -27,7 +27,7 @@ import type {
 	ModalContent as ModalContentType,
 	ModalCloseButton as ModalCloseButtonType,
 	InputRightElement as InputRightElementType,
-} from "@chakra-ui/react/dist/types";
+} from "@chakra-ui/react/dist";
 
 /* Lazy Base Imports */
 const CloseButtonImport = lazy(() => import("@chakra-ui/react").then(m => ({ default: m.CloseButton })));
@@ -72,7 +72,7 @@ const VStack = withSuspense<typeof VStackType, null>(VStackImport, null);
 const Button = withSuspense<typeof ButtonImport, null>(ButtonImport, null);
 
 function Header() {
-	const history = useHistory();
+	const navigate = useNavigate();
 	const { songs } = useMainContext();
 	const { colorMode, toggleColorMode } = useColorMode();
 	const { isOpen, onOpen, onClose } = useDisclosure();
@@ -80,14 +80,27 @@ function Header() {
 	const fuse = new Fuse(songs!, { keys: ["number", "title"], minMatchCharLength: 2, threshold: 0.4 });
 	const [query, setQuery] = useState("");
 	const [mobileQuery, setMobileQuery] = useState("");
-	const [queryResults, setQueryResults] = useState<Fuse.FuseResult<Song>[]>([]);
+	const [queryResults, setQueryResults] = useState<FuseResult<Song>[]>([]);
 	const [showMobileMenu] = useMediaQuery("(max-width: 550px)");
 	const resultsBG = useColorModeValue("white", "gray.800");
 	const headerBG = useColorModeValue("gray.100", "gray.800");
 	const searchBG = useColorModeValue("gray.50", "gray.700");
 
 	/** Will navigate one level up in the application */
-	const back = () => history.push("/");
+	const GoHome = () => navigate("/");
+
+	const searchSongs = (_?: React.ChangeEvent<any>, mobile?: boolean) => {
+		const shouldSearchMobile = mobile && mobileQuery.length > 0;
+		const shouldSearchDesktop = !mobile && query.length > 0;
+		if (shouldSearchMobile || shouldSearchDesktop) {
+			onClose();
+			onModalClose();
+			setQuery("");
+			setMobileQuery("");
+			setQueryResults([]);
+			navigate(`/search?query=${shouldSearchMobile ? mobileQuery : query}`);
+		}
+	};
 
 	const submitQuery = (e: React.FormEvent<HTMLDivElement>) => {
 		e.preventDefault();
@@ -98,47 +111,36 @@ function Header() {
 		if (mobileQuery.length > 0) searchSongs(e, true);
 	};
 
-	const searchSongs = (e?: React.ChangeEvent<any>, mobile?: boolean) => {
-		const shouldSearchMobile = mobile && mobileQuery.length > 0;
-		const shouldSearchDesktop = !mobile && query.length > 0;
-		if (shouldSearchMobile || shouldSearchDesktop) {
-			onClose();
-			onModalClose();
-			setQuery("");
-			setMobileQuery("");
-			setQueryResults([]);
-			history.push(`/search?query=${shouldSearchMobile ? mobileQuery : query}`);
-		}
-	};
-
 	const mobileSearchQueryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const searchValue = e.target.value;
 		setMobileQuery(searchValue);
 	};
 
-	const searchQueryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const searchValue = e.target.value;
-		setQuery(searchValue);
-		if (searchValue.length > 0) handleSearch(searchValue);
-		else onClose();
-	};
-
 	const handleSearch = useDebouncedCallback((value: string) => {
+		if (value.length === 0) {
+			onClose();
+			return;
+		}
 		const result = fuse.search(value, { limit: 6 });
 		setQueryResults(result.slice(0, 6));
 		if (result.length > 0) onOpen();
-	}, 300);
+	}, 500);
+
+	const searchQueryChange = (value: string) => {
+		setQuery(value);
+		handleSearch(value);
+	};
 
 	const gotoSong = (index: number) => {
 		onClose();
 		setQuery("");
-		history.push(`/songs/${index}`);
+		navigate(`/songs/${index}`);
 	};
 
 	return (
 		<Box className="page-header" p={4} bg={headerBG}>
 			<Grid templateColumns="auto 1fr" alignItems="center" gap={10} justifyContent="space-between" px={5}>
-				<Heading size="md" onClick={back} cursor="pointer" display="flex" alignItems="center" width="auto">
+				<Heading size="md" onClick={GoHome} cursor="pointer" display="flex" alignItems="center" width="auto">
 					Hymns for All Times
 					<Icon as={FaHome} size={20} ml={3} />
 				</Heading>
@@ -149,17 +151,19 @@ function Header() {
 						aria-label="Open mobile menu"
 						justifySelf="flex-end"
 						onClick={onModalOpen}
+						data-testid="mobileMenuTrigger"
 					/>
 				) : (
 					<Grid templateColumns="minmax(auto, 300px) auto" gap={2} justifyContent="flex-end">
 						<InputGroup size="md" as="form" onSubmit={submitQuery} role="search">
 							<Input
 								value={query}
-								onChange={searchQueryChange}
+								onChange={(e: React.ChangeEvent<HTMLInputElement>) => searchQueryChange(e.target.value)}
 								type="search"
 								placeholder="Search songs..."
 								pr="4.5rem"
 								bg={searchBG}
+								data-testid="desktopSearch"
 							/>
 							<InputRightElement>
 								<IconButton
@@ -193,18 +197,20 @@ function Header() {
 						w={350}
 						px={5}
 						pb={5}
-						hidden={!isOpen || showMobileMenu}
+						hidden={!isOpen || showMobileMenu || undefined}
 						borderRadius="md"
 						shadow="md"
+						data-testid="searchResultsBox"
 					>
 						<CloseButton size="md" onClick={onClose} pos="absolute" top="1" right="5" />
-						<Grid gap={5} mt={10} w="100%">
+						<Grid gap={5} mt={10} w="100%" data-testid="searchItemsWrapper">
 							{queryResults.map(result => (
 								<Button
 									bg="blue.500"
 									onClick={() => gotoSong(result.item.number)}
 									overflow="hidden"
 									key={result.item.number}
+									role="button"
 								>
 									<Grid templateColumns="auto 1fr" gap="3" w="100%" justifyItems="left">
 										<Text size="sm" color="white">
@@ -236,6 +242,7 @@ function Header() {
 									placeholder="Search songs..."
 									pr="4.5rem"
 									bg={searchBG}
+									data-testid="mobileSearch"
 								/>
 								<InputRightElement>
 									<IconButton
@@ -243,7 +250,7 @@ function Header() {
 										h="1.75rem"
 										icon={<FaSearch />}
 										aria-label="Search Song Database"
-										onClick={e => searchSongs(e, true)}
+										onClick={(e: React.MouseEvent<HTMLButtonElement>) => searchSongs(e, true)}
 									/>
 								</InputRightElement>
 							</InputGroup>

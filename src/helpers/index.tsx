@@ -1,23 +1,48 @@
+/* eslint-disable no-console */
 import React from "react";
-import { SongsDB, version } from "data/songs";
+import axios from "axios";
+import hymns from "static/hymns.json";
+import setDebug from "utils/logger";
+
+interface SongPropsA {
+	number: number;
+	title: string;
+	verse: string[];
+	chorus: string;
+	author?: string;
+}
+interface SongPropsB {
+	number: number;
+	title: string;
+	verse: string[];
+	chorus: string;
+	author: string;
+}
+
+export type SongProps = SongPropsA | SongPropsB;
+
+export type SongsDB = { songs: SongProps[]; version: string };
+
+setDebug();
+const { debug } = window;
 
 /**
  * Loads songs from JSON and stores them locally
  */
-export async function loadNewSongs() {
+export async function loadNewSongs(fetchedSongs: SongProps[]) {
 	const localForage = await import("localforage");
-	const _songs = localForage.createInstance({ storeName: "items" });
-	const _version = localForage.createInstance({ storeName: "version" });
+	const songs = localForage.createInstance({ storeName: "items" });
+	const localVersion = localForage.createInstance({ storeName: "version" });
 	const favourites = localForage.createInstance({ storeName: "favourites" });
 
 	try {
 		await Promise.all([
-			SongsDB.forEach((song, i) => _songs.setItem(`${i}`, { ...song }).catch(e => console.info(e))),
-			_version.setItem("value", version).catch(e => console.info(e)),
+			fetchedSongs.forEach((song, i) => songs.setItem(`${i}`, { ...song }).catch(e => debug.info(e))),
+			localVersion.setItem("value", localVersion).catch(e => debug.info(e)),
 			favourites.clear(),
 		]);
 	} catch (err) {
-		console.info(err.message);
+		if (err instanceof Error) debug.info(err.message);
 	}
 }
 
@@ -32,23 +57,32 @@ export async function checkDB() {
 		description: "Stores the songs db and its version number",
 	});
 
+	let songsDB: SongsDB;
 	try {
-		console.log(`%cChecking if songs exist already`, "color: #3182ce; font-size: medium;");
-		const _songs = localForage.createInstance({ storeName: "items" });
-		const songsLength = await _songs.length();
-		if (songsLength < SongsDB.length) throw new Error("Items out of sync with latest items");
+		const fetchedData = process.env.NODE_ENV === "production" ? await axios.get<SongsDB>(process.env.HYMNS_URL || "https://f002.backblazeb2.com/file/hymnal/hymns.json") : { data: hymns };
+		if (!fetchedData.data) return;
+		songsDB = fetchedData.data;
 
-		console.log(`%cChecking for updates`, "color: #3182ce; font-size: medium;");
-		const _version = localForage.createInstance({ storeName: "version" });
-		if (!_version) throw new Error("No version stored");
-		const versionNumber = (await _version.getItem("value")) as string;
-		if (version !== versionNumber) throw new Error("Version mismatch, sync necessary");
+		debug.log(`%cChecking if songs exist already`, "color: #3182ce; font-size: medium;");
+		const songs = localForage.createInstance({ storeName: "items" });
+		const songsLength = await songs.length();
+		if (songsLength < songsDB.songs.length) {
+			debug.info("Items out of sync with latest items");
+			loadNewSongs(songsDB.songs);
+		}
 
-		console.log(`%cSongs found! Attempting to load...`, "color: #3182ce; font-size: medium;");
+		debug.log(`%cChecking for updates`, "color: #3182ce; font-size: medium;");
+		const localVersion = localForage.createInstance({ storeName: "version" });
+		if (!localVersion) throw new Error("No version stored");
+		const versionNumber = (await localVersion.getItem("value")) as string;
+		if (songsDB.version !== versionNumber) {
+			debug.info("Version mismatch, sync necessary");
+			loadNewSongs(songsDB.songs);
+		}
+
+		debug.log(`%cSongs found! Attempting to load...`, "color: #3182ce; font-size: medium;");
 	} catch (e) {
-		console.log(`%cLocal entries outdated or undefined, parsing songs DB...`, "color: #3182ce; font-size: medium;");
-		console.info(e.message);
-		loadNewSongs();
+		if (e instanceof Error) debug.error(e.message);
 	}
 }
 
@@ -67,7 +101,7 @@ export function createCtx<A extends {} | null>() {
 		if (c === undefined) throw new Error("useCtx must be inside a Provider with a value");
 		return c;
 	}
-	return [useCtx, ctx.Provider] as const; // 'as const' makes TypeScript infer a tuple
+	return [useCtx, ctx.Provider, ctx.Consumer] as const; // 'as const' makes TypeScript infer a tuple
 }
 
 export async function updateFavesDB(indexes: number[]) {
@@ -81,7 +115,7 @@ export async function updateFavesDB(indexes: number[]) {
 		description: "Your favourite songs",
 	});
 
-	for (let i = 0; i < indexes.length; i++) {
-		await localForage.setItem(`${indexes[i]}`, indexes[i]);
-	}
+	indexes.forEach(async item => {
+		await localForage.setItem(`${item}`, item);
+	});
 }

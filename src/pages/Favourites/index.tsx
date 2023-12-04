@@ -1,13 +1,12 @@
 import { useCallback, useEffect, useRef } from "react";
-import { useColorModeValue } from "@chakra-ui/color-mode";
-import { GridChildComponentProps } from "react-window";
-import AutoSizer from "react-virtualized-auto-sizer";
 import { Box, Container, Grid, Link as ChakraLink, Text } from "@chakra-ui/layout";
-import { FixedSizeGrid } from "react-window";
-import { useHistory } from "react-router";
-import { Helmet } from "react-helmet";
-import { useMainContext } from "App";
+import { GridChildComponentProps, FixedSizeGrid } from "react-window";
+import { useColorModeValue } from "@chakra-ui/color-mode";
+import AutoSizer from "react-virtualized-auto-sizer";
+import { useMainContext } from "utils/context";
+import { useNavigate } from "react-router";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet";
 
 const meta = {
 	title: "Favourites",
@@ -15,7 +14,7 @@ const meta = {
 };
 
 function Favourites() {
-	const history = useHistory();
+	const navigate = useNavigate();
 	const { songs, favourites, dispatch } = useMainContext();
 	const finalList = songs.filter(song => favourites.includes(song.number - 1)).sort((a, b) => a.number - b.number);
 	const pageBG = useColorModeValue("gray.200", "gray.800");
@@ -26,19 +25,19 @@ function Favourites() {
 
 	/** Triggers navigation to a song at a specified index */
 	const memoDisplaySong = useCallback(
-		e => {
-			function displaySong(e: React.MouseEvent<HTMLDivElement>) {
-				const songID = e.currentTarget.getAttribute("data-song-id");
-				history.push(`${process.env.PUBLIC_URL}/songs/${songID}`);
+		(e: React.MouseEvent<HTMLDivElement>) => {
+			function displaySong(ev: React.MouseEvent<HTMLDivElement>) {
+				const songID = ev.currentTarget.getAttribute("data-song-id");
+				navigate(`${process.env.PUBLIC_URL}/songs/${songID}`);
 			}
 
 			displaySong(e);
 		},
-		[history]
+		[navigate]
 	);
 
 	/** Renders a single cell */
-	const Cell = ({ columnIndex, rowIndex, style, data }: GridChildComponentProps) => {
+	const Cell = useCallback(({ columnIndex, rowIndex, style, data }: GridChildComponentProps) => {
 		const itemIndex = rowIndex * numColumns.current + columnIndex;
 		if (itemIndex >= finalList.length) return null;
 		return (
@@ -72,16 +71,16 @@ function Favourites() {
 				</Grid>
 			</Box>
 		);
-	};
+	}, [cellBG, finalList.length, memoDisplaySong]);
 
-	const EmptyListRender = () => (
+	const EmptyListRender = useCallback(() => (
 		<Container centerContent>
-			<Text>Sorry, it seems you haven't added any favourites yet!</Text>
+			<Text>Sorry, it seems you haven&apos;t added any favourites yet!</Text>
 			<ChakraLink as={Link} to="/songs/index" color="blue.500">
 				Browse Songs Index
 			</ChakraLink>
 		</Container>
-	);
+	), []);
 
 	useEffect(() => {
 		dispatch({ type: "setTitle", payload: meta.title });
@@ -89,6 +88,7 @@ function Favourites() {
 
 	return (
 		<>
+			{/* @ts-expect-error Helmet no longer updated */}
 			<Helmet>
 				<title>{`Hymns for All Times | ${meta.page}`}</title>
 			</Helmet>
@@ -97,18 +97,21 @@ function Favourites() {
 				<Box ref={wrapperRef} pos="relative" overflow="hidden" h="100%">
 					<AutoSizer>
 						{({ height, width }) => (
-							<FixedSizeGrid
-								height={height}
-								width={width}
-								rowHeight={120}
-								columnWidth={width - window.innerWidth * 0.07}
-								columnCount={numColumns.current}
-								rowCount={numRows}
-								itemData={finalList}
-								style={{ overflowX: "hidden" }}
-							>
-								{Cell}
-							</FixedSizeGrid>
+							<>
+							{/** @ts-expect-error Fixed size grid has TS issue */}
+								<FixedSizeGrid
+									height={height}
+									width={width}
+									rowHeight={120}
+									columnWidth={width - window.innerWidth * 0.07}
+									columnCount={numColumns.current}
+									rowCount={numRows}
+									itemData={finalList}
+									style={{ overflowX: "hidden" }}
+								>
+									{Cell}
+								</FixedSizeGrid>
+							</>
 						)}
 					</AutoSizer>
 				</Box>

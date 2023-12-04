@@ -1,18 +1,17 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { MouseEvent, useCallback, useEffect, useRef, useState } from "react";
 import { Input, InputGroup, InputRightElement } from "@chakra-ui/input";
+import { GridChildComponentProps, FixedSizeGrid } from "react-window";
 import { Box, Container, Grid, Text } from "@chakra-ui/layout";
 import { useColorModeValue } from "@chakra-ui/color-mode";
-import { GridChildComponentProps } from "react-window";
-import { useHistory, useLocation } from "react-router";
+import { useNavigate, useLocation } from "react-router";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { useDebouncedCallback } from "use-debounce";
 import { IconButton } from "@chakra-ui/button";
-import { FixedSizeGrid } from "react-window";
+import { useMainContext } from "utils/context";
+import Fuse, { FuseResult } from "fuse.js";
 import { FaSearch } from "react-icons/fa";
 import { Helmet } from "react-helmet";
-import { useMainContext } from "App";
 import { useQuery } from "helpers";
-import Fuse from "fuse.js";
 import "./Search.scss";
 
 const meta = {
@@ -21,14 +20,15 @@ const meta = {
 };
 
 function Search() {
-	const history = useHistory();
+	const navigate = useNavigate();
 	const location = useLocation();
 	const { songs, dispatch } = useMainContext();
 	const routerQuery = useQuery(location.search);
 	const extractedQuery = routerQuery.get("query");
+	const startsWithQuery = useState(extractedQuery && extractedQuery?.length > 0);
 	const fuse = new Fuse(songs!, { keys: ["number", "title"], minMatchCharLength: 1, threshold: 0.4 });
-	const [searchQuery, setSearchQuery] = useState("");
-	const [searchResults, setSearchResults] = useState<Fuse.FuseResult<Song>[]>(
+	const [searchQuery, setSearchQuery] = useState(extractedQuery || "");
+	const [searchResults, setSearchResults] = useState<FuseResult<Song>[]>(
 		fuse.search(extractedQuery || searchQuery)
 	);
 	const pageBG = useColorModeValue("gray.200", "gray.800");
@@ -37,45 +37,51 @@ function Search() {
 	const numRows = searchResults.length;
 	const numColumns = useRef(1);
 
+	const handleSearch = useDebouncedCallback((value: string) => {
+		const result = fuse.search(value);
+		setSearchResults(result);
+	}, 300, { leading: true, trailing: true });
+
 	const submitQuery = (e: React.FormEvent<HTMLDivElement>) => {
 		e.preventDefault();
 		if (searchQuery.length > 0) handleSearch(searchQuery);
 	};
 
-	const searchQueryChange = (e: React.ChangeEvent<any>) => {
-		const searchValue = e.target.value || extractedQuery;
+	const searchQueryChange = <T,>(e: T | React.ChangeEvent<HTMLInputElement>) => {
+		const searchValue = (e as React.ChangeEvent<HTMLInputElement>).target.value || ((!startsWithQuery && extractedQuery) ? extractedQuery : '');
 		setSearchQuery(searchValue);
 		if (searchValue?.length > 0) handleSearch(searchValue);
+		else {
+			setSearchResults([]);
+			handleSearch.cancel();
+		}
 	};
-
-	const handleSearch = useDebouncedCallback((value: string) => {
-		const result = fuse.search(value);
-		setSearchResults(result);
-	}, 300);
 
 	/** Triggers navigation to a song at a specified index */
 	const memoDisplaySong = useCallback(
-		e => {
-			function displaySong(e: React.MouseEvent<HTMLDivElement>) {
-				const songID = e.currentTarget.getAttribute("data-song-id");
-				history.push(`${process.env.PUBLIC_URL}/songs/${songID}`);
+		(e: React.MouseEvent<HTMLDivElement>) => {
+			function displaySong(ev: React.MouseEvent<HTMLDivElement>) {
+				const songID = ev.currentTarget.getAttribute("data-song-id");
+				navigate(`${process.env.PUBLIC_URL}/songs/${songID}`);
 			}
 			displaySong(e);
 		},
-		[history]
+		[navigate]
 	);
 
 	/** Renders a single cell */
-	const Cell = ({ columnIndex, rowIndex, style, data }: GridChildComponentProps) => {
+	const Cell = useCallback(({ columnIndex, rowIndex, style, data }: GridChildComponentProps) => {
 		const itemIndex = rowIndex * numColumns.current + columnIndex;
 		if (itemIndex >= searchResults.length) return null;
 		return (
 			<Box
 				key={data[itemIndex].item.number}
 				className="gridItemWrapper"
+				// @ts-ignore
 				style={style}
 				pl={window.innerWidth * 0.07}
 				cursor="default"
+				mt={2}
 			>
 				<Grid
 					h={100}
@@ -96,7 +102,7 @@ function Search() {
 				</Grid>
 			</Box>
 		);
-	};
+	}, [cellBG, memoDisplaySong, searchResults.length]);
 
 	useEffect(() => {
 		dispatch!({ type: "setTitle", payload: meta.title });
@@ -108,6 +114,7 @@ function Search() {
 
 	return (
 		<>
+			{/* @ts-expect-error Helmet no longer updated */}
 			<Helmet>
 				<title>{`Hymns for All Times | ${meta.page}`}</title>
 			</Helmet>
@@ -115,8 +122,9 @@ function Search() {
 				<Container centerContent>
 					<InputGroup size="lg" as="form" onSubmit={submitQuery} role="search" w="90%" mb="5">
 						<Input
-							value={extractedQuery || searchQuery}
+							value={searchQuery}
 							onChange={searchQueryChange}
+							onSubmit={searchQueryChange}
 							type="search"
 							placeholder="Search songs..."
 							pr="4.5rem"
@@ -128,7 +136,7 @@ function Search() {
 								h="1.75rem"
 								icon={<FaSearch />}
 								aria-label="Search Song Database"
-								onClick={searchQueryChange}
+								onClick={searchQueryChange<MouseEvent>}
 							/>
 						</InputRightElement>
 					</InputGroup>
@@ -137,18 +145,21 @@ function Search() {
 				<Box ref={wrapperRef} pos="relative" overflow="hidden" h="100%">
 					<AutoSizer>
 						{({ height, width }) => (
-							<FixedSizeGrid
-								height={height}
-								width={width}
-								rowHeight={120}
-								columnWidth={width - window.innerWidth * 0.07}
-								columnCount={numColumns.current}
-								rowCount={numRows}
-								itemData={searchResults}
-								style={{ overflowX: "hidden" }}
-							>
-								{Cell}
-							</FixedSizeGrid>
+							<>
+								{/** @ts-expect-error Fixed size grid has TS issue */}
+								<FixedSizeGrid
+									height={height}
+									width={width}
+									rowHeight={120}
+									columnWidth={width - window.innerWidth * 0.07}
+									columnCount={numColumns.current}
+									rowCount={numRows}
+									itemData={searchResults}
+									style={{ overflowX: "hidden" }}
+								>
+									{Cell}
+								</FixedSizeGrid>
+							</>
 						)}
 					</AutoSizer>
 				</Box>

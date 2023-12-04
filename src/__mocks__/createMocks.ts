@@ -1,6 +1,8 @@
 class Worker {
 	url: any;
+
 	onmessage: ({ ...props }) => void;
+
 	constructor(stringUrl: any) {
 		this.url = stringUrl;
 		this.onmessage = () => {};
