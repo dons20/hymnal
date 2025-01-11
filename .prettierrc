@@ -1,7 +1,9 @@
 {
 	"arrowParens": "avoid",
 	"printWidth": 120,
-	"useTabs": true,
+	"useTabs": false,
 	"tabWidth": 4,
-	"trailingComma": "es5"
+	"trailingComma": "es5",
+	"singleQuote": false,
+	"endOfLine": "crlf"
 }
