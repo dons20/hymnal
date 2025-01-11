@@ -3,7 +3,7 @@ import "react-app-polyfill/stable";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { ChakraProvider, ColorModeScript } from "@chakra-ui/react";
-import { createStandaloneToast } from '@chakra-ui/toast';
+import { createStandaloneToast } from "@chakra-ui/toast";
 import { customTheme } from "theme";
 
 import MainContext from "components/Providers";
@@ -18,15 +18,15 @@ const container = document.getElementById("root");
 const root = createRoot(container!);
 
 root.render(
-	<ChakraProvider resetCSS theme={customTheme}>
-		<ColorModeScript initialColorMode={customTheme.config.initialColorMode} />
-		<BrowserRouter>
-			<MainContext>
-				<App />	
-			</MainContext>
-		</BrowserRouter>
-		<ToastContainer />
-	</ChakraProvider>
+    <ChakraProvider resetCSS theme={customTheme}>
+        <ColorModeScript initialColorMode={customTheme.config.initialColorMode} />
+        <BrowserRouter>
+            <MainContext>
+                <App />
+            </MainContext>
+        </BrowserRouter>
+        <ToastContainer />
+    </ChakraProvider>
 );
 
 // If you want your app to work offline and load faster, you can change

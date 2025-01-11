@@ -25,56 +25,60 @@ const BottomNav = withSuspense<typeof BottomNavImport, null>(BottomNavImport, nu
 const PictureHeader = withSuspense<typeof PictureHeaderImport, null>(PictureHeaderImport, null);
 
 const ScrollRestoration = () => {
-	const { pathname } = useLocation();
-	useEffect(() => {
-		window.scrollTo(0, 0);
-	}, [pathname]);
-	return null;
+    const { pathname } = useLocation();
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [pathname]);
+    return null;
 };
 
 function App() {
-	const pageBG = useColorModeValue("gray.200", "gray.800");
-	const { songs, dispatch } = useMainContext();
-	// const notSongListPage = !window.location.pathname.includes("/songs/index");
-	const notSongListPage = true;
+    const pageBG = useColorModeValue("gray.200", "gray.800");
+    const { songs, dispatch } = useMainContext();
+    // const notSongListPage = !window.location.pathname.includes("/songs/index");
+    const notSongListPage = true;
 
-	useEffect(() => {
-		const handleOrientationChange = () => {
-			dispatch({ type: "setWidth", payload: document.body.getBoundingClientRect().width });
-		};
+    useEffect(() => {
+        const handleOrientationChange = () => {
+            dispatch({ type: "setWidth", payload: document.body.getBoundingClientRect().width });
+        };
 
-		window.screen.orientation.addEventListener("change", handleOrientationChange, {
-			capture: false,
-			passive: true,
-		});
-		return function cleanup() {
-			window.screen.orientation.removeEventListener("change", handleOrientationChange);
-		};
-	}, [dispatch]);
+        window.screen.orientation.addEventListener("change", handleOrientationChange, {
+            capture: false,
+            passive: true,
+        });
+        return function cleanup() {
+            window.screen.orientation.removeEventListener("change", handleOrientationChange);
+        };
+    }, [dispatch]);
 
-	return (
-		<Box className={styles.root}>
-			<Box as="section" className={styles.app_body}>
-				<Header />
-				<ScrollRestoration />
-				<Box as="main" className={`${styles.app_inner} ${isMobile && notSongListPage ? styles.app_inner_mobile : ""}`} bg={pageBG}>
-					<PictureHeader />
+    return (
+        <Box className={styles.root}>
+            <Box as="section" className={styles.app_body}>
+                <Header />
+                <ScrollRestoration />
+                <Box
+                    as="main"
+                    className={`${styles.app_inner} ${isMobile && notSongListPage ? styles.app_inner_mobile : ""}`}
+                    bg={pageBG}
+                >
+                    <PictureHeader />
 
-					<div className={styles.wrapper}>
-						<Routes>
-							<Route path="home" element={<Home />} />
-							<Route path="songs/*" element={songs.length > 1 ? <Songs /> : <Loader />} />
-							<Route path="search/*" element={<Search />} />
-							<Route path="favourites/*" element={<Navigate to="/songs/favourites" replace />} />
-							<Route path="/" element={<Navigate to="/home" replace />} />
-						</Routes>
-					</div>
-				</Box>
+                    <div className={styles.wrapper}>
+                        <Routes>
+                            <Route path="home" element={<Home />} />
+                            <Route path="songs/*" element={songs.length > 1 ? <Songs /> : <Loader />} />
+                            <Route path="search/*" element={<Search />} />
+                            <Route path="favourites/*" element={<Navigate to="/songs/favourites" replace />} />
+                            <Route path="/" element={<Navigate to="/home" replace />} />
+                        </Routes>
+                    </div>
+                </Box>
 
-				<BottomNav />
-			</Box>
-		</Box>
-	);
+                <BottomNav />
+            </Box>
+        </Box>
+    );
 }
 
 export default App;

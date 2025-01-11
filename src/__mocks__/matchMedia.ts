@@ -1,4 +1,3 @@
-// @ts-ignore
 window.matchMedia = jest.fn().mockImplementation(() => ({
     matches: false,
     media: "",

@@ -10,70 +10,77 @@ import App from "./App";
 jest.mock("__mocks__/createMocks.ts");
 
 beforeAll(async () => {
-	const addEventListener = jest.fn();
-	const removeEventListener = jest.fn();
-	jest.spyOn(console, "log").mockImplementation(() => {});
+    const addEventListener = jest.fn();
+    const removeEventListener = jest.fn();
+    jest.spyOn(console, "log").mockImplementation(() => {});
 
-	// @ts-ignore
-	window.screen.orientation = { addEventListener, removeEventListener };
-	window.scrollTo = jest.fn();
+    Object.defineProperty(window, "screen", {
+        value: {
+            orientation: {
+                addEventListener,
+                removeEventListener,
+            },
+        },
+        writable: true,
+    });
+    window.scrollTo = jest.fn();
 });
 
 afterEach(() => {
-	localforage.clear();
+    localforage.clear();
 });
 
 describe("#App", () => {
-	it("renders without crashing", async () => {
-		const songs = SongsDB;
-		const favourites: Song[] = [];
-		const spyConfig = jest.spyOn(localforage, "config");
-		const spyCreateInstance = jest.spyOn(localforage, "createInstance");
-		await waitFor(() => {
-			expect(spyConfig).toBeTruthy();
-		});
-		await waitFor(() => {
-			expect(spyCreateInstance).toBeTruthy();
-		});
-		jest.spyOn(console, "warn").mockImplementation(() => {});
+    it("renders without crashing", async () => {
+        const songs = SongsDB;
+        const favourites: Song[] = [];
+        const spyConfig = jest.spyOn(localforage, "config");
+        const spyCreateInstance = jest.spyOn(localforage, "createInstance");
+        await waitFor(() => {
+            expect(spyConfig).toBeTruthy();
+        });
+        await waitFor(() => {
+            expect(spyCreateInstance).toBeTruthy();
+        });
+        jest.spyOn(console, "warn").mockImplementation(() => {});
 
-		const { asFragment } = renderWithRouter(
-			<Suspense fallback="">
-				<Providers value={{ favourites, songs }}>
-					<App />
-				</Providers>
-			</Suspense>
-		);
+        const { asFragment } = renderWithRouter(
+            <Suspense fallback="">
+                <Providers value={{ favourites, songs }}>
+                    <App />
+                </Providers>
+            </Suspense>
+        );
 
-		expect(asFragment()).toMatchSnapshot();		
-	});
+        expect(asFragment()).toMatchSnapshot();
+    });
 });
 
 describe("#AppTest", () => {
-	it.skip("handles device rotations", async () => {
-		const spyConfig = jest.spyOn(localforage, "config");
-		const spyCreateInstance = jest.spyOn(localforage, "createInstance");
-		// jest.spyOn(window, "addEventListener").mockImplementation(() => {});
+    it.skip("handles device rotations", async () => {
+        const spyConfig = jest.spyOn(localforage, "config");
+        const spyCreateInstance = jest.spyOn(localforage, "createInstance");
+        // jest.spyOn(window, "addEventListener").mockImplementation(() => {});
 
-		await waitFor(() => {
-			expect(spyConfig).toBeTruthy();
-		});
-		await waitFor(() => {
-			expect(spyCreateInstance).toBeTruthy();
-		});
+        await waitFor(() => {
+            expect(spyConfig).toBeTruthy();
+        });
+        await waitFor(() => {
+            expect(spyCreateInstance).toBeTruthy();
+        });
 
-		renderWithRouter(
-			<Suspense fallback="">
-				<App />
-			</Suspense>,
-			{ route: "/home" }
-		);
+        renderWithRouter(
+            <Suspense fallback="">
+                <App />
+            </Suspense>,
+            { route: "/home" }
+        );
 
-		// expect(window.addEventListener).toHaveBeenCalledWith(< String, typeof Function, typeof {} > "");
-		resizeWindow(500, 800);
-		const container = screen.getByTestId("homeWrapper");
-		await waitFor(() => {
-			expect(container).toBeInTheDocument();
-		});
-	});
+        // expect(window.addEventListener).toHaveBeenCalledWith(< String, typeof Function, typeof {} > "");
+        resizeWindow(500, 800);
+        const container = screen.getByTestId("homeWrapper");
+        await waitFor(() => {
+            expect(container).toBeInTheDocument();
+        });
+    });
 });

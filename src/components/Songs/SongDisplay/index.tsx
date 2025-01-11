@@ -10,154 +10,160 @@ import { Button } from "components";
 import "./SongDisplay.scss";
 
 type ParamTypes = {
-	songID?: string;
+    songID?: string;
 };
 
 function SongDisplay() {
-	const navigate = useNavigate();
-	const { songID } = useParams<ParamTypes>();
-	const { songs, favourites, setFavourites, dispatch } = useMainContext();
-	const authorColor = useColorModeValue("#555555", "gray.300");
-	const songBG = useColorModeValue("gray.50", "inherit");
-	const songShadow = useColorModeValue("md", undefined);
-	const modalBG = useColorModeValue("gray.100", "gray.800");
-	const favActiveIconColor = useColorModeValue("var(--chakra-colors-red-500)", "var(--chakra-colors-red-300)");
-	const favIconColor = useColorModeValue("var(--chakra-colors-gray-600)", "var(--chakra-colors-gray-500)");
-	const favActiveIconBG = useColorModeValue("var(--chakra-colors-red-50)", "");
-	const songIndex = parseInt(songID || "1", 10) - 1;
-	const songToRender = songs.find(song => song.number === songIndex + 1) || null;
+    const navigate = useNavigate();
+    const { songID } = useParams<ParamTypes>();
+    const { songs, favourites, setFavourites, dispatch } = useMainContext();
+    const authorColor = useColorModeValue("#555555", "gray.300");
+    const songBG = useColorModeValue("gray.50", "inherit");
+    const songShadow = useColorModeValue("md", undefined);
+    const modalBG = useColorModeValue("gray.100", "gray.800");
+    const favActiveIconColor = useColorModeValue("var(--chakra-colors-red-500)", "var(--chakra-colors-red-300)");
+    const favIconColor = useColorModeValue("var(--chakra-colors-gray-600)", "var(--chakra-colors-gray-500)");
+    const favActiveIconBG = useColorModeValue("var(--chakra-colors-red-50)", "");
+    const songIndex = parseInt(songID || "1", 10) - 1;
+    const songToRender = songs.find(song => song.number === songIndex + 1) || null;
 
-	// Ensure the route parameter is a number before rendering anything
-	useEffect(() => {
-		if (!/\d+/.test(songID!)) navigate(-1);
-	}, [songID, navigate]);
+    // Ensure the route parameter is a number before rendering anything
+    useEffect(() => {
+        if (!/\d+/.test(songID!)) navigate(-1);
+    }, [songID, navigate]);
 
-	useEffect(() => {
-		if (songs.length > 1) dispatch!({ type: "setTitle", payload: songToRender?.title || "" });
-	}, [dispatch, songs, songToRender]);
+    useEffect(() => {
+        if (songs.length > 1) dispatch!({ type: "setTitle", payload: songToRender?.title || "" });
+    }, [dispatch, songs, songToRender]);
 
-	const songBody = useMemo(
-		() =>
-			songs.length > 1 &&
-			React.Children.toArray(
-				songToRender?.verse.map((verse, i) => {
-					if (i === 1 && songToRender.chorus) {
-						return (
-							<>
-								<Box className="chorus">
-									<span className="label">Chorus</span>
-									{songToRender.chorus}
-								</Box>
-								<Box className="verse">
-									<span className="label">Verse {i + 1}</span>
-									{verse}
-								</Box>
-							</>
-						);
-					}
+    const songBody = useMemo(
+        () =>
+            songs.length > 1 &&
+            React.Children.toArray(
+                songToRender?.verse.map((verse, i) => {
+                    if (i === 1 && songToRender.chorus) {
+                        return (
+                            <>
+                                <Box className="chorus">
+                                    <span className="label">Chorus</span>
+                                    {songToRender.chorus}
+                                </Box>
+                                <Box className="verse">
+                                    <span className="label">Verse {i + 1}</span>
+                                    {verse}
+                                </Box>
+                            </>
+                        );
+                    }
 
-					return (
-						<Box className="verse">
-							<span className="label">Verse {i + 1}</span>
-							{verse}
-						</Box>
-					);
-				})
-			),
-		[songs, songToRender]
-	);
+                    return (
+                        <Box className="verse">
+                            <span className="label">Verse {i + 1}</span>
+                            {verse}
+                        </Box>
+                    );
+                })
+            ),
+        [songs, songToRender]
+    );
 
-	if (songToRender === null) return <Navigate to="../index" replace />;
+    if (songToRender === null) return <Navigate to="../index" replace />;
 
-	const isFavourite = favourites.includes(songToRender.number - 1);
-	const isFirstSong = songToRender.number > 1;
-	const isLastSong = songToRender.number < songs.length - 1;
+    const isFavourite = favourites.includes(songToRender.number - 1);
+    const isFirstSong = songToRender.number > 1;
+    const isLastSong = songToRender.number < songs.length - 1;
 
-	const toggleFavourite = (number: number) => {
-		let faves = [];
-		if (favourites.includes(number - 1)) {
-			faves = favourites.filter(fave => fave !== number - 1);
-			setFavourites(faves);
-		} else {
-			faves = [...favourites, number - 1];
-			setFavourites(faves);
-		}
-		updateFavesDB(faves);
-	};
+    const toggleFavourite = (number: number) => {
+        let faves = [];
+        if (favourites.includes(number - 1)) {
+            faves = favourites.filter(fave => fave !== number - 1);
+            setFavourites(faves);
+        } else {
+            faves = [...favourites, number - 1];
+            setFavourites(faves);
+        }
+        updateFavesDB(faves);
+    };
 
-	// Useful for navigating to the correct spot in the song list
-	const backToIndex = () => navigate("../index", { state: { songNumber: songToRender.number - 1 } });
-	const previousSong = () => navigate(`../${songToRender.number - 1}`);
-	const nextSong = () => navigate(`../${songToRender.number + 1}`);
+    // Useful for navigating to the correct spot in the song list
+    const backToIndex = () => navigate("../index", { state: { songNumber: songToRender.number - 1 } });
+    const previousSong = () => navigate(`../${songToRender.number - 1}`);
+    const nextSong = () => navigate(`../${songToRender.number + 1}`);
 
-	return (
-		<Container
-			className="container"
-			maxW="container.lg"
-			bg={songBG}
-			shadow={songShadow}
-			my={4}
-			py="1rem"
-			px="1.5rem"
-		>
-			{/* @ts-expect-error Helmet no longer updated */}
-			<Helmet>
-				<title>{`Hymns for All Times | ${songToRender!.title}`}</title>
-			</Helmet>
-			<Box className="header" pos="relative" pr="5">
-				<Text># {songToRender!.number}</Text>
-				<Text>{songToRender!.title}</Text>
-				<Box>
-					<IconButton
-						colorScheme="gray"
-						icon={<FaBook color={favIconColor} />}
-						onClick={backToIndex}
-						_hover={{ shadow: "md" }}
-						bgColor={modalBG}
-						aria-label="Back to songs index"
-						variant="outline"
-						size="lg"
-						maxW="60px"
-						pr={1}
-						mr={5}
-					/>
-					<IconButton
-						colorScheme={isFavourite ? "red" : "gray"}
-						bgColor={isFavourite ? favActiveIconBG : modalBG}
-						_hover={{ shadow: "md" }}
-						icon={<FaHeart color={isFavourite ? favActiveIconColor : favIconColor} />}
-						aria-label="Add to Favourites"
-						size="lg"
-						variant="outline"
-						className="faveIcon"
-						onClick={() => toggleFavourite(songToRender.number)}
-						maxW="60px"
-					/>
-				</Box>
-			</Box>
-			<Box className="body">{songBody}</Box>
-			{songToRender.author && (
-				<Text className="footer" color={authorColor}>
-					{songToRender.author}
-				</Text>
-			)}
-			<SimpleGrid columns={{ sm: isFirstSong || isLastSong ? 1 : 2 }} justifyContent={{ md: "space-around" }} mb={5} mt={5} spacing={5}>
-				{isFirstSong && (
-					<Button onClick={previousSong} flex="1">
-						<Icon as={FaArrowCircleLeft} size={20} mr={3} /> Previous Song
-					</Button>
-				)}
-				{isLastSong && (
-					<Button onClick={nextSong} flex="1">
-						Next Song <Icon as={FaArrowCircleRight} size={20} ml={3} />
-					</Button>
-				)}
-			</SimpleGrid>
-			<Button onClick={backToIndex} variant="outline">
-				Back to Index
-			</Button>
-		</Container>
-	);
+    return (
+        <Container
+            className="container"
+            maxW="container.lg"
+            bg={songBG}
+            shadow={songShadow}
+            my={4}
+            py="1rem"
+            px="1.5rem"
+        >
+            {/* @ts-expect-error Helmet no longer updated */}
+            <Helmet>
+                <title>{`Hymns for All Times | ${songToRender!.title}`}</title>
+            </Helmet>
+            <Box className="header" pos="relative" pr="5">
+                <Text># {songToRender!.number}</Text>
+                <Text>{songToRender!.title}</Text>
+                <Box>
+                    <IconButton
+                        colorScheme="gray"
+                        icon={<FaBook color={favIconColor} />}
+                        onClick={backToIndex}
+                        _hover={{ shadow: "md" }}
+                        bgColor={modalBG}
+                        aria-label="Back to songs index"
+                        variant="outline"
+                        size="lg"
+                        maxW="60px"
+                        pr={1}
+                        mr={5}
+                    />
+                    <IconButton
+                        colorScheme={isFavourite ? "red" : "gray"}
+                        bgColor={isFavourite ? favActiveIconBG : modalBG}
+                        _hover={{ shadow: "md" }}
+                        icon={<FaHeart color={isFavourite ? favActiveIconColor : favIconColor} />}
+                        aria-label="Add to Favourites"
+                        size="lg"
+                        variant="outline"
+                        className="faveIcon"
+                        onClick={() => toggleFavourite(songToRender.number)}
+                        maxW="60px"
+                    />
+                </Box>
+            </Box>
+            <Box className="body">{songBody}</Box>
+            {songToRender.author && (
+                <Text className="footer" color={authorColor}>
+                    {songToRender.author}
+                </Text>
+            )}
+            <SimpleGrid
+                columns={{ sm: isFirstSong || isLastSong ? 1 : 2 }}
+                justifyContent={{ md: "space-around" }}
+                mb={5}
+                mt={5}
+                spacing={5}
+            >
+                {isFirstSong && (
+                    <Button onClick={previousSong} flex="1">
+                        <Icon as={FaArrowCircleLeft} size={20} mr={3} /> Previous Song
+                    </Button>
+                )}
+                {isLastSong && (
+                    <Button onClick={nextSong} flex="1">
+                        Next Song <Icon as={FaArrowCircleRight} size={20} ml={3} />
+                    </Button>
+                )}
+            </SimpleGrid>
+            <Button onClick={backToIndex} variant="outline">
+                Back to Index
+            </Button>
+        </Container>
+    );
 }
 
 export default SongDisplay;

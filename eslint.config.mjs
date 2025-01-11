@@ -14,10 +14,13 @@ export default tseslint.config(
     js.configs.recommended,
     tseslint.configs.recommended,
     prettierConfig,
-    { ignores: ["**/serviceWorker.js"] },
+    { ignores: ["**/serviceWorker.js", "scripts", "public"] },
     {
         files: ["**/*.js"],
         extends: [tseslint.configs.disableTypeChecked],
+        languageOptions: {
+            globals: globals.node,
+        },
     },
     {
         files: ["**/*.{ts,tsx}"],
@@ -36,6 +39,7 @@ export default tseslint.config(
                 project: "./tsconfig.json",
                 globals: {
                     ...globals.browser,
+                    ...globals.node,
                 },
             },
         },
@@ -70,6 +74,8 @@ export default tseslint.config(
             "react/jsx-no-bind": "off",
             "react/prop-types": "off",
             "react/function-component-definition": "off",
+            "@typescript-eslint/no-unused-vars": "off",
+            "@typescript-eslint/no-empty-object-type": "off",
         },
     },
     {
