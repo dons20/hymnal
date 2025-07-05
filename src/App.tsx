@@ -1,20 +1,18 @@
 import { useEffect, lazy } from "react";
 import { Route, Routes, Navigate, useLocation } from "react-router-dom";
-import { useColorModeValue } from "@chakra-ui/color-mode";
-import withSuspense from "helpers/withSuspense";
-import { useMainContext } from "utils/context";
-import { isMobile } from "react-device-detect";
-import { Box } from "@chakra-ui/layout";
+import withSuspense from "@/helpers/withSuspense";
+import { useMainContext } from "@/utils/context";
 
 import styles from "./App.module.scss";
+import { Container } from "@mantine/core";
 
-const HomeImport = lazy(() => import("pages/Home"));
-const SongsImport = lazy(() => import("pages/Songs"));
-const SearchImport = lazy(() => import("pages/Search"));
-const LoaderImport = lazy(() => import("components/Loader"));
-const HeaderImport = lazy(() => import("components/Header"));
-const BottomNavImport = lazy(() => import("components/BottomNav"));
-const PictureHeaderImport = lazy(() => import("components/PictureHeader"));
+const HomeImport = lazy(() => import("@/pages/Home"));
+const SongsImport = lazy(() => import("@/pages/Songs"));
+const SearchImport = lazy(() => import("@/pages/Search"));
+const LoaderImport = lazy(() => import("@/components/Loader"));
+const HeaderImport = lazy(() => import("@/components/Header"));
+const BottomNavImport = lazy(() => import("@/components/BottomNav"));
+const PictureHeaderImport = lazy(() => import("@/components/PictureHeader"));
 
 const Home = withSuspense<typeof HomeImport>(HomeImport);
 const Songs = withSuspense<typeof SongsImport>(SongsImport);
@@ -53,12 +51,12 @@ function App() {
     }, [dispatch]);
 
     return (
-        <Box className={styles.root}>
-            <Box as="section" className={styles.app_body}>
+        <Container className={styles.root}>
+            <Container component="section" className={styles.app_body}>
                 <Header />
                 <ScrollRestoration />
-                <Box
-                    as="main"
+                <Container
+                    component="main"
                     className={`${styles.app_inner} ${isMobile && notSongListPage ? styles.app_inner_mobile : ""}`}
                     bg={pageBG}
                 >
@@ -73,11 +71,11 @@ function App() {
                             <Route path="/" element={<Navigate to="/home" replace />} />
                         </Routes>
                     </div>
-                </Box>
+                </Container>
 
                 <BottomNav />
-            </Box>
-        </Box>
+            </Container>
+        </Container>
     );
 }
 

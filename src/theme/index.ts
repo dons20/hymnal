@@ -1,21 +1,11 @@
-import { extendTheme } from "@chakra-ui/react";
-import { mode } from "@chakra-ui/theme-tools";
-import type { Dict } from "@chakra-ui/utils";
+import { createTheme } from '@mantine/core';
 
-const config = {
-    initialColorMode: "system",
-};
-
-export const customTheme = extendTheme({
-    config,
-    style: {
-        global: (props: Dict<unknown>) => ({
-            body: {
-                color: mode("gray.800", "whiteAlpha.700")(props),
-                bg: mode("white", "gray.800")(props),
-            },
-        }),
-    },
+export const theme = createTheme({
+    
+  /** Put your mantine theme override here */
 });
 
-export default customTheme;
+// color: mode("gray.800", "whiteAlpha.700")(props),
+// bg: mode("white", "gray.800")(props),
+
+export default theme;
