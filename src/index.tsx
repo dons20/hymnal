@@ -1,5 +1,4 @@
 // Maintain load order for correct initial loading, modify carefully
-import "react-app-polyfill/stable";
 import '@mantine/core/styles.css';
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";

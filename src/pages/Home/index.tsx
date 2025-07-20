@@ -1,11 +1,9 @@
 import { useEffect } from "react";
-import { Box, SimpleGrid, useColorModeValue } from "@chakra-ui/react";
-import { useMainContext } from "utils/context";
-import { Helmet } from "react-helmet";
-import { Card } from "components";
+import { useMainContext } from "@/utils/context";
+import { Card } from "@/components";
 
-import favourites from "img/favourites.svg";
-import songs from "img/songs.svg";
+import favourites from "@/img/favourites.svg";
+import songs from "@/img/songs.svg";
 import "./Home.scss";
 
 const meta = {

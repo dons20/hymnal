@@ -1,7 +1,7 @@
 import React from "react";
-import { useSongLoader } from "components/CustomHooks";
-import { MainContextProvider, pages, ACTIONTYPE, State } from "utils/context";
-import { Loader } from "components";
+import { useSongLoader } from "@/components/CustomHooks";
+import { MainContextProvider, pages, ACTIONTYPE, State } from "@/utils/context";
+import { Loader } from "@/components";
 
 type PropsT = {
     children: React.ReactNode;
@@ -30,7 +30,9 @@ function MainContext({ children }: PropsT) {
     const { songs, favourites, setFavourites } = useSongLoader();
     const [state, dispatch] = React.useReducer(reducer, initialAppState);
 
-    if (songs.length === 0) return <Loader />;
+    if (songs.length === 0) {
+        return <Loader />;
+    }
 
     return (
         <MainContextProvider value={{ meta: state, songs, favourites, setFavourites, dispatch, pages }}>

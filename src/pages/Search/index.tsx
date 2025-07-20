@@ -1,17 +1,12 @@
 import { MouseEvent, useCallback, useEffect, useRef, useState } from "react";
-import { Input, InputGroup, InputRightElement } from "@chakra-ui/input";
 import { GridChildComponentProps, FixedSizeGrid } from "react-window";
-import { Box, Container, Grid, Text } from "@chakra-ui/layout";
-import { useColorModeValue } from "@chakra-ui/color-mode";
 import { useNavigate, useLocation } from "react-router";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { useDebouncedCallback } from "use-debounce";
-import { IconButton } from "@chakra-ui/button";
-import { useMainContext } from "utils/context";
+import { useMainContext } from "@/utils/context";
 import Fuse, { FuseResult } from "fuse.js";
 import { FaSearch } from "react-icons/fa";
-import { Helmet } from "react-helmet";
-import { useQuery } from "helpers";
+import { useQuery } from "@/helpers";
 import "./Search.scss";
 
 const meta = {
