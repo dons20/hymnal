@@ -1,9 +1,9 @@
 import { Suspense } from "react";
 import { render, screen } from "@testing-library/react";
-import SongDisplay from "components/Songs/SongDisplay";
-import { MemoryRouter } from "react-router-dom";
-import { Providers } from "helpers/tests";
-import { SongsDB } from "data/songs";
+import SongDisplay from "@/components/Songs/SongDisplay";
+import { MemoryRouter } from "react-router";
+import { Providers } from "@/helpers/tests";
+import { SongsDB } from "@/data/songs";
 
 describe("#SongDisplay", () => {
     it("renders the matching song based on the route", () => {

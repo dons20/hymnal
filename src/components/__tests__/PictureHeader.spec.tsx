@@ -1,8 +1,8 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import PictureHeader from "components/PictureHeader";
-import { CTX, MainContextProvider } from "utils/context";
-import { BrowserRouter } from "react-router-dom";
+import PictureHeader from "@/components/PictureHeader";
+import { CTX, MainContextProvider } from "@/utils/context";
+import { BrowserRouter } from "react-router";
 
 type ProviderT = {
     children: React.ReactNode;

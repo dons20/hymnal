@@ -1,17 +1,18 @@
-import { Heading, Box, useColorModeValue } from "@chakra-ui/react";
-import { useMainContext } from "utils/context";
+import { Title, Box, useMantineColorScheme } from "@mantine/core";
+import { useMainContext } from "../../utils/context";
 import "./PictureHeader.scss";
 
 function PictureHeader() {
     const { meta } = useMainContext();
-    const headerOverlay = useColorModeValue("#0d222f", "#061a2b");
+    const { colorScheme } = useMantineColorScheme();
+    const isDark = colorScheme === 'dark';
 
     return (
-        <Box className="picture-header" bgColor={headerOverlay}>
+        <Box className="picture-header" bg={isDark ? '#061a2b' : '#0d222f'}>
             <Box className="bgImgCont">
                 <Box className="hCont">
-                    {meta.title && <Heading className="heading">{meta.title}</Heading>}
-                    {meta.subtitle && <Heading className="heading">{meta.subtitle}</Heading>}
+                    {meta.title && <Title className="heading">{meta.title}</Title>}
+                    {meta.subtitle && <Title className="heading">{meta.subtitle}</Title>}
                 </Box>
             </Box>
         </Box>

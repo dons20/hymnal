@@ -23,3 +23,14 @@
 		transform: translateY(-2px);
 	}
 }
+
+.search-result-item {
+    &:hover > div {
+        background-color: var(--mantine-color-blue-6) !important;
+        color: white !important;
+        
+        .mantine-Text-root {
+            color: white !important;
+        }
+    }
+}

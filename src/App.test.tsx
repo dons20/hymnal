@@ -1,10 +1,10 @@
 // jest.mock("localforage");
 import { Suspense } from "react";
 import { screen, waitFor } from "@testing-library/react";
-import { renderWithRouter } from "utils/tests";
-import { Providers, resizeWindow } from "helpers/tests";
+import { renderWithRouter } from "@/utils/tests";
+import { Providers, resizeWindow } from "@/helpers/tests";
 import localforage from "localforage";
-import { SongsDB } from "data/songs";
+import { SongsDB } from "@/data/songs";
 import App from "./App";
 
 jest.mock("__mocks__/createMocks.ts");

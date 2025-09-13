@@ -1,4 +1,6 @@
 import { useEffect } from "react";
+import { Helmet } from "react-helmet";
+import { Box, SimpleGrid, useMantineColorScheme } from "@mantine/core";
 import { useMainContext } from "@/utils/context";
 import { Card } from "@/components";
 
@@ -13,7 +15,8 @@ const meta = {
 
 function HomeScreen() {
     const { pages, dispatch } = useMainContext();
-    const pageBG = useColorModeValue("gray.200", "gray.800");
+    const { colorScheme } = useMantineColorScheme();
+    const isDark = colorScheme === 'dark';
 
     useEffect(() => {
         dispatch!({ type: "setTitle", payload: meta.title });
@@ -21,17 +24,15 @@ function HomeScreen() {
 
     return (
         <>
-            {/* @ts-expect-error Helmet no longer updated */}
             <Helmet>
                 <title>{`Hymns for All Times | ${meta.page}`}</title>
             </Helmet>
-            <Box bg={pageBG} h="100%" data-testid="homeWrapper">
+            <Box bg={isDark ? 'gray.8' : 'gray.2'} h="100%" data-testid="homeWrapper">
                 <SimpleGrid
-                    minChildWidth={{ base: "260px", sm: "380px" }}
-                    spacingX="30px"
-                    spacingY="15px"
+                    cols={{ base: 1, sm: 2 }}
                     className="grid"
-                    maxWidth={{ md: "800px" }}
+                    maw="800px"
+                    m="0 auto"
                 >
                     <Card
                         title="Songs"

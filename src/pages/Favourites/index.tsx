@@ -1,11 +1,9 @@
 import { useCallback, useEffect, useRef } from "react";
-import { Box, Container, Grid, Link as ChakraLink, Text } from "@chakra-ui/layout";
+import { Box, Container, SimpleGrid, Anchor, Text, useMantineColorScheme } from "@mantine/core";
 import { GridChildComponentProps, FixedSizeGrid } from "react-window";
-import { useColorModeValue } from "@chakra-ui/color-mode";
 import AutoSizer from "react-virtualized-auto-sizer";
-import { useMainContext } from "utils/context";
-import { useNavigate } from "react-router";
-import { Link } from "react-router-dom";
+import { useMainContext } from "../../utils/context";
+import { useNavigate, Link } from "react-router";
 import { Helmet } from "react-helmet";
 
 const meta = {
@@ -17,8 +15,8 @@ function Favourites() {
     const navigate = useNavigate();
     const { songs, favourites, dispatch } = useMainContext();
     const finalList = songs.filter(song => favourites.includes(song.number - 1)).sort((a, b) => a.number - b.number);
-    const pageBG = useColorModeValue("gray.200", "gray.800");
-    const cellBG = useColorModeValue("gray.50", "gray.700");
+    const { colorScheme } = useMantineColorScheme();
+    const isDark = colorScheme === 'dark';
     const wrapperRef = useRef<HTMLDivElement>(null);
     const numRows = favourites.length;
     const numColumns = useRef(1);
@@ -40,49 +38,62 @@ function Favourites() {
     const Cell = useCallback(
         ({ columnIndex, rowIndex, style, data }: GridChildComponentProps) => {
             const itemIndex = rowIndex * numColumns.current + columnIndex;
-            if (itemIndex >= finalList.length) return null;
+            if (itemIndex >= finalList.length) {
+                return null;
+            }
             return (
                 <Box
                     key={data[itemIndex].number}
                     className="gridItemWrapper"
-                    style={style}
-                    pl={window.innerWidth * 0.07}
-                    cursor="default"
+                    style={{ cursor: 'default', ...style }}
+                    pl={`${window.innerWidth * 0.07}px`}
                 >
-                    <Grid
+                    <SimpleGrid
                         data-song-id={data[itemIndex].number}
                         h={100}
-                        px={3}
-                        py={3}
-                        alignItems="center"
-                        maxW="800px"
-                        margin="auto"
-                        bg={cellBG}
+                        px="md"
+                        py="md"
+                        style={{ 
+                            alignItems: 'center', 
+                            maxWidth: '800px', 
+                            margin: 'auto',
+                            cursor: 'pointer',
+                            transition: 'transform 0.1s ease-in-out',
+                            willChange: 'transform'
+                        }}
+                        bg={isDark ? 'gray.7' : 'gray.1'}
                         onClick={memoDisplaySong}
-                        templateColumns="80px 1fr"
-                        shadow="md"
-                        borderRadius="md"
-                        cursor="pointer"
-                        transition="transform 0.1s ease-in-out"
-                        willChange="transform"
-                        _hover={{ transform: "translateY(-2px)" }}
+                        cols={2}
+                        spacing="md"
+                        styles={{
+                            root: {
+                                boxShadow: 'var(--mantine-shadow-md)',
+                                borderRadius: 'var(--mantine-radius-md)',
+                            }
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = 'translateY(-2px)';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = 'translateY(0px)';
+                        }}
                     >
-                        <Text className="listNumber"># {data[itemIndex].number}</Text>
+                        <Text className="listNumber" fw={600}># {data[itemIndex].number}</Text>
                         <Text className="listTitle">{data[itemIndex].title}</Text>
-                    </Grid>
+                    </SimpleGrid>
                 </Box>
             );
         },
-        [cellBG, finalList.length, memoDisplaySong]
+        [isDark, finalList.length, memoDisplaySong]
     );
 
     const EmptyListRender = useCallback(
         () => (
-            <Container centerContent>
+            <Container style={{ textAlign: 'center' }}>
                 <Text>Sorry, it seems you haven&apos;t added any favourites yet!</Text>
-                <ChakraLink as={Link} to="/songs/index" color="blue.500">
+                <Anchor component={Link} to="/songs/index" c="blue.5">
                     Browse Songs Index
-                </ChakraLink>
+                </Anchor>
             </Container>
         ),
         []
@@ -94,17 +105,15 @@ function Favourites() {
 
     return (
         <>
-            {/* @ts-expect-error Helmet no longer updated */}
             <Helmet>
                 <title>{`Hymns for All Times | ${meta.page}`}</title>
             </Helmet>
-            <Grid pt={5} templateRows="1fr" h="100%" bg={pageBG}>
+            <SimpleGrid pt="md" h="100%" bg={isDark ? 'gray.8' : 'gray.2'} cols={1}>
                 {finalList.length === 0 && <EmptyListRender />}
-                <Box ref={wrapperRef} pos="relative" overflow="hidden" h="100%">
+                <Box ref={wrapperRef} pos="relative" style={{ overflow: 'hidden' }} h="100%">
                     <AutoSizer>
                         {({ height, width }) => (
                             <>
-                                {/** @ts-expect-error Fixed size grid has TS issue */}
                                 <FixedSizeGrid
                                     height={height}
                                     width={width}
@@ -121,7 +130,7 @@ function Favourites() {
                         )}
                     </AutoSizer>
                 </Box>
-            </Grid>
+            </SimpleGrid>
         </>
     );
 }

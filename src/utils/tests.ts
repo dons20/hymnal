@@ -1,5 +1,5 @@
 import { render } from "@testing-library/react";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter } from "react-router";
 
 export const renderWithRouter = (
     ui: React.ReactElement<unknown, string | React.JSXElementConstructor<unknown>>,

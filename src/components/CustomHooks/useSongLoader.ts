@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import hymns from "static/hymns.json";
-import setDebug from "utils/logger";
-import { SongsDB } from "helpers";
+import hymns from "../../static/hymns.json";
+import setDebug from "../../utils/logger";
+import { SongsDB } from "../../helpers";
 import axios from "axios";
 
 const dbName = "Songs";

@@ -1,4 +1,5 @@
-import { createCtx } from "helpers";
+import { createCtx } from "../helpers";
+import { MantineColorScheme } from '@mantine/core';
 
 export const pages = {
     HOME: "/home",
@@ -11,12 +12,14 @@ export type State = {
     title: string;
     subtitle: string;
     width: number;
+    colorScheme: MantineColorScheme;
 };
 
 export type ACTIONTYPE =
     | { type: "setTitle"; payload: string }
     | { type: "setSubtitle"; payload: string }
-    | { type: "setWidth"; payload: number };
+    | { type: "setWidth"; payload: number }
+    | { type: "setColorScheme"; payload: MantineColorScheme };
 
 export type CTX = {
     dispatch: React.Dispatch<ACTIONTYPE>;

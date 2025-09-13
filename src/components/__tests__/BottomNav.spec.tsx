@@ -1,14 +1,13 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { BrowserRouter, MemoryRouter } from "react-router-dom";
-import { resizeWindow } from "helpers/tests";
-import * as rdd from "react-device-detect";
-import { BottomNav } from "components";
+import { BrowserRouter, MemoryRouter } from "react-router";
+import { resizeWindow } from "@/helpers/tests";
+import { BottomNav } from "@/components";
 
-Object.defineProperty(rdd, "isMobile", {
-    value: true,
-    writable: true,
-});
+// Object.defineProperty(rdd, "isMobile", {
+//     value: true,
+//     writable: true,
+// });
 const user = userEvent.setup();
 
 beforeEach(() => {

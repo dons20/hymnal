@@ -1,12 +1,14 @@
 :root {
 	--header-font: "PT Sans", sans-serif;
 	--body-font: "Noto Sans", sans-serif;
-	--primary-color: #1890ff;
-	--accent-color: #0e66b9;
-	--dim-color: #0e66b9;
-	--dark-neutral-color: #444444;
-	--background-color: #ffffff;
-	--background-color-alt: #f5f5f5;
+
+	/* Map your custom tokens to Mantine theme variables */
+	--primary-color: var(--mantine-primary-color-6);
+	--accent-color: var(--mantine-primary-color-7);
+	--dim-color: var(--mantine-color-dimmed);
+	--dark-neutral-color: var(--mantine-color-dark-5);
+	--background-color: var(--mantine-color-body);
+	--background-color-alt: var(--mantine-color-gray-0);
 }
 
 body {
@@ -16,6 +18,8 @@ body {
 		"Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
+	background: var(--background-color);
+	color: var(--mantine-color-text);
 }
 
 html,
@@ -35,21 +39,23 @@ body,
 }
 
 ::-webkit-scrollbar-thumb {
-	background-color: var(--chakra-colors-whiteAlpha-700);
 	border-radius: 20px;
 	border: 6px solid transparent;
 	background-clip: content-box;
 }
 
-::-webkit-scrollbar-thumb:hover {
-	background-color: var(--chakra-colors-whiteAlpha-600);
+/* Dark scheme scrollbar (white-ish thumb) */
+html[data-mantine-color-scheme="dark"] ::-webkit-scrollbar-thumb {
+	background-color: rgba(255, 255, 255, 0.35);
+}
+html[data-mantine-color-scheme="dark"] ::-webkit-scrollbar-thumb:hover {
+	background-color: rgba(255, 255, 255, 0.5);
 }
 
-html[data-theme="light"] {
-	& ::-webkit-scrollbar-thumb {
-		background-color: var(--chakra-colors-blackAlpha-400);
-		&:hover {
-			background-color: var(--chakra-colors-blackAlpha-300);
-		}
-	}
+/* Light scheme scrollbar (black-ish thumb) */
+html[data-mantine-color-scheme="light"] ::-webkit-scrollbar-thumb {
+	background-color: rgba(0, 0, 0, 0.35);
+}
+html[data-mantine-color-scheme="light"] ::-webkit-scrollbar-thumb:hover {
+	background-color: rgba(0, 0, 0, 0.25);
 }

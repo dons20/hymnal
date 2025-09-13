@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { render, screen, within } from "@testing-library/react";
-import { Link, BrowserRouter } from "react-router-dom";
-import Button from "components/Button";
+import { Link, BrowserRouter } from "react-router";
+import Button from "@/components/Button";
 
 describe("#Button", () => {
     it("should render the provided children", () => {
@@ -15,7 +15,7 @@ describe("#Button", () => {
         render(
             <BrowserRouter>
                 <Suspense fallback={<></>}>
-                    <Button as={Link} to="/" data-testid="button">
+                    <Button component={Link} to="/" data-testid="button">
                         Sample Button Text
                     </Button>
                 </Suspense>

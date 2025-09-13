@@ -1,12 +1,14 @@
-import { MouseEvent, useCallback, useEffect, useRef, useState } from "react";
-import { GridChildComponentProps, FixedSizeGrid } from "react-window";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { FixedSizeGrid } from "react-window";
 import { useNavigate, useLocation } from "react-router";
+import { Box, Container, SimpleGrid, TextInput, ActionIcon, useMantineColorScheme, Text, UnstyledButton } from "@mantine/core";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { useDebouncedCallback } from "use-debounce";
-import { useMainContext } from "@/utils/context";
+import { useMainContext } from "../../utils/context";
 import Fuse, { FuseResult } from "fuse.js";
 import { FaSearch } from "react-icons/fa";
-import { useQuery } from "@/helpers";
+import { useQuery } from "../../helpers";
+import { Helmet } from "react-helmet";
 import "./Search.scss";
 
 const meta = {
@@ -18,17 +20,14 @@ function Search() {
     const navigate = useNavigate();
     const location = useLocation();
     const { songs, dispatch } = useMainContext();
+    const { colorScheme } = useMantineColorScheme();
+    const isDark = colorScheme === 'dark';
     const routerQuery = useQuery(location.search);
     const extractedQuery = routerQuery.get("query");
-    const startsWithQuery = useState(extractedQuery && extractedQuery?.length > 0);
-    const fuse = new Fuse(songs!, { keys: ["number", "title"], minMatchCharLength: 1, threshold: 0.4 });
+    const fuse = new Fuse(songs, { keys: ["number", "title"], minMatchCharLength: 1, threshold: 0.4 });
     const [searchQuery, setSearchQuery] = useState(extractedQuery || "");
     const [searchResults, setSearchResults] = useState<FuseResult<Song>[]>(fuse.search(extractedQuery || searchQuery));
-    const pageBG = useColorModeValue("gray.200", "gray.800");
-    const cellBG = useColorModeValue("gray.50", "gray.700");
     const wrapperRef = useRef<HTMLDivElement>(null);
-    const numRows = searchResults.length;
-    const numColumns = useRef(1);
 
     const handleSearch = useDebouncedCallback(
         (value: string) => {
@@ -39,132 +38,154 @@ function Search() {
         { leading: true, trailing: true }
     );
 
-    const submitQuery = (e: React.FormEvent<HTMLDivElement>) => {
+    const submitQuery = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (searchQuery.length > 0) handleSearch(searchQuery);
+        if (searchQuery.length > 0) {
+            handleSearch(searchQuery);
+        }
     };
 
-    const searchQueryChange = <T,>(e: T | React.ChangeEvent<HTMLInputElement>) => {
-        const searchValue =
-            (e as React.ChangeEvent<HTMLInputElement>).target.value ||
-            (!startsWithQuery && extractedQuery ? extractedQuery : "");
-        setSearchQuery(searchValue);
-        if (searchValue?.length > 0) handleSearch(searchValue);
-        else {
+    const searchQueryChange = (value: string) => {
+        setSearchQuery(value);
+        if (value.length > 0) {
+            handleSearch(value);
+        } else {
             setSearchResults([]);
             handleSearch.cancel();
         }
     };
 
     /** Triggers navigation to a song at a specified index */
-    const memoDisplaySong = useCallback(
-        (e: React.MouseEvent<HTMLDivElement>) => {
-            function displaySong(ev: React.MouseEvent<HTMLDivElement>) {
-                const songID = ev.currentTarget.getAttribute("data-song-id");
-                navigate(`${process.env.PUBLIC_URL}/songs/${songID}`);
-            }
-            displaySong(e);
+    const navigateToSong = useCallback(
+        (songNumber: number) => {
+            navigate(`/song/${songNumber}`);
         },
         [navigate]
     );
 
-    /** Renders a single cell */
-    const Cell = useCallback(
-        ({ columnIndex, rowIndex, style, data }: GridChildComponentProps) => {
-            const itemIndex = rowIndex * numColumns.current + columnIndex;
-            if (itemIndex >= searchResults.length) return null;
-            return (
-                <Box
-                    key={data[itemIndex].item.number}
-                    className="gridItemWrapper"
-                    style={style}
-                    pl={window.innerWidth * 0.07}
-                    cursor="default"
-                    mt={2}
-                >
-                    <Grid
-                        h={100}
-                        px={3}
-                        py={3}
-                        maxW="800px"
-                        mx="auto"
-                        bg={cellBG}
-                        onClick={memoDisplaySong}
-                        templateColumns="40px 1fr"
-                        shadow="md"
-                        borderRadius="md"
-                        className="gridItem"
-                        data-song-id={data[itemIndex].item.number}
-                    >
-                        <Text className="listNumber">{data[itemIndex].item.number}</Text>
-                        <Text className="listTitle">{data[itemIndex].item.title}</Text>
-                    </Grid>
-                </Box>
-            );
-        },
-        [cellBG, memoDisplaySong, searchResults.length]
-    );
-
     useEffect(() => {
-        dispatch!({ type: "setTitle", payload: meta.title });
+        dispatch({ type: "setTitle", payload: meta.title });
     }, [dispatch]);
 
     useEffect(() => {
-        if (extractedQuery) handleSearch(extractedQuery);
+        if (extractedQuery) {
+            handleSearch(extractedQuery);
+        }
     }, [extractedQuery, handleSearch]);
 
     return (
         <>
-            {/* @ts-expect-error Helmet no longer updated */}
             <Helmet>
                 <title>{`Hymns for All Times | ${meta.page}`}</title>
             </Helmet>
-            <Grid pt={7} templateRows="auto 1fr" h="100%" bg={pageBG}>
-                <Container centerContent>
-                    <InputGroup size="lg" as="form" onSubmit={submitQuery} role="search" w="90%" mb="5">
-                        <Input
+            <Box pt="lg" h="100vh" bg={isDark ? 'gray.8' : 'gray.2'}>
+                <Container style={{ textAlign: 'center' }} mb="lg">
+                    <form onSubmit={submitQuery}>
+                        <TextInput
+                            size="lg"
+                            placeholder="Search hymns and songs..."
                             value={searchQuery}
-                            onChange={searchQueryChange}
-                            onSubmit={searchQueryChange}
-                            type="search"
-                            placeholder="Search songs..."
-                            pr="4.5rem"
-                            backgroundColor={cellBG}
+                            onChange={(e) => searchQueryChange(e.currentTarget.value)}
+                            rightSection={
+                                <ActionIcon
+                                    type="submit"
+                                    variant="filled"
+                                    color="blue"
+                                    aria-label="Search"
+                                >
+                                    <FaSearch />
+                                </ActionIcon>
+                            }
+                            style={{ maxWidth: '600px', width: '90%' }}
                         />
-                        <InputRightElement>
-                            <IconButton
-                                size="sm"
-                                h="1.75rem"
-                                icon={<FaSearch />}
-                                aria-label="Search Song Database"
-                                onClick={searchQueryChange<MouseEvent>}
-                            />
-                        </InputRightElement>
-                    </InputGroup>
+                    </form>
                 </Container>
 
-                <Box ref={wrapperRef} pos="relative" overflow="hidden" h="100%">
-                    <AutoSizer>
-                        {({ height, width }) => (
-                            <>
-                                {/** @ts-expect-error Fixed size grid has TS issue */}
+                {searchResults.length > 0 && (
+                    <Container>
+                        <Text size="sm" c="dimmed" ta="center" mb="md">
+                            Found {searchResults.length} result{searchResults.length !== 1 ? 's' : ''}
+                        </Text>
+                    </Container>
+                )}
+
+                <Box 
+                    ref={wrapperRef} 
+                    style={{ 
+                        height: 'calc(100vh - 200px)', 
+                        overflow: 'hidden'
+                    }}
+                >
+                    {searchResults.length > 0 ? (
+                        <AutoSizer>
+                            {({ height, width }) => (
                                 <FixedSizeGrid
                                     height={height}
                                     width={width}
                                     rowHeight={120}
-                                    columnWidth={width - window.innerWidth * 0.07}
-                                    columnCount={numColumns.current}
-                                    rowCount={numRows}
+                                    columnWidth={Math.min(width - 40, 800)}
+                                    columnCount={1}
+                                    rowCount={searchResults.length}
                                     itemData={searchResults}
                                     style={{ overflowX: "hidden" }}
                                 >
-                                    {Cell}
+                                    {({ rowIndex, style, data }) => {
+                                        const result = data[rowIndex];
+                                        if (!result) {
+                                            return null;
+                                        }
+
+                                        return (
+                                            <div style={{...style, padding: '8px 20px'}}>
+                                                <UnstyledButton
+                                                    onClick={() => navigateToSong(result.item.number)}
+                                                    style={{ width: '100%' }}
+                                                    className="search-result-item"
+                                                >
+                                                    <Box
+                                                        p="md"
+                                                        style={{
+                                                            border: "1px solid var(--mantine-color-gray-3)",
+                                                            borderRadius: "var(--mantine-radius-md)",
+                                                            backgroundColor: isDark ? 'var(--mantine-color-gray-7)' : 'white',
+                                                            cursor: 'pointer',
+                                                            transition: 'all 0.2s ease',
+                                                            maxWidth: '800px',
+                                                            margin: '0 auto'
+                                                        }}
+                                                    >
+                                                        <SimpleGrid cols={2} style={{ alignItems: 'center' }}>
+                                                            <Text fw={700} size="lg">#{result.item.number}</Text>
+                                                            <Text fw={600} size="md">{result.item.title}</Text>
+                                                        </SimpleGrid>
+                                                        {result.item.author && (
+                                                            <Text size="sm" c="dimmed" mt="xs">
+                                                                by {result.item.author}
+                                                            </Text>
+                                                        )}
+                                                    </Box>
+                                                </UnstyledButton>
+                                            </div>
+                                        );
+                                    }}
                                 </FixedSizeGrid>
-                            </>
-                        )}
-                    </AutoSizer>
+                            )}
+                        </AutoSizer>
+                    ) : searchQuery.length > 0 ? (
+                        <Container>
+                            <Text ta="center" c="dimmed" mt="xl">
+                                No results found for "{searchQuery}"
+                            </Text>
+                        </Container>
+                    ) : (
+                        <Container>
+                            <Text ta="center" c="dimmed" mt="xl">
+                                Enter a search term to find hymns and songs
+                            </Text>
+                        </Container>
+                    )}
                 </Box>
-            </Grid>
+            </Box>
         </>
     );
 }

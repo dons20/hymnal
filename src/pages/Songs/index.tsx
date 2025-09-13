@@ -1,19 +1,20 @@
 import { lazy } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
-import { Box, useColorModeValue } from "@chakra-ui/react";
-import withSuspense from "helpers/withSuspense";
+import { Routes, Route, Navigate } from "react-router";
+import { Box, useMantineColorScheme } from "@mantine/core";
+import withSuspense from "../../helpers/withSuspense";
 
 import "./Songs.scss";
 
-const SongList = withSuspense(lazy(() => import("components/Songs/SongList")));
-const SongDisplay = withSuspense(lazy(() => import("components/Songs/SongDisplay")));
-const Favourites = withSuspense(lazy(() => import("pages/Favourites")));
+const SongList = withSuspense(lazy(() => import("../../components/Songs/SongList")));
+const SongDisplay = withSuspense(lazy(() => import("../../components/Songs/SongDisplay")));
+const Favourites = withSuspense(lazy(() => import("../Favourites")));
 
 function Listing() {
-    const pageBG = useColorModeValue("gray.200", "gray.800");
+    const { colorScheme } = useMantineColorScheme();
+    const isDark = colorScheme === 'dark';
 
     return (
-        <Box className="songs" bg={pageBG}>
+        <Box className="songs" bg={isDark ? 'gray.8' : 'gray.2'}>
             <Routes>
                 <Route path="index" element={<SongList />} />
                 <Route path="favourites" element={<Favourites />} />

@@ -1,9 +1,9 @@
 import { Suspense } from "react";
 import { render, screen } from "@testing-library/react";
-import SongList from "components/Songs/SongList";
-import { MemoryRouter } from "react-router-dom";
-import { type CTX, MainContextProvider } from "utils/context";
-import { SongsDB } from "data/songs";
+import SongList from "@/components/Songs/SongList";
+import { MemoryRouter } from "react-router";
+import { type CTX, MainContextProvider } from "@/utils/context";
+import { SongsDB } from "@/data/songs";
 
 type ProviderT = {
     children: React.ReactNode;
@@ -29,7 +29,6 @@ describe("#SongList", () => {
             </MemoryRouter>
         );
         const title = await screen.findByText(songs[0].title);
-        // eslint-disable-next-line testing-library/no-debugging-utils
         screen.debug(title, 20000);
         expect(title).toBeInTheDocument();
     });

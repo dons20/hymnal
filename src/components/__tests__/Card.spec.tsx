@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
-import { BrowserRouter } from "react-router-dom";
-import { Card } from "components";
+import { BrowserRouter } from "react-router";
+import { Card } from "@/components";
 import SampleImg from "img/favourites.svg";
 
 describe("#Card", () => {

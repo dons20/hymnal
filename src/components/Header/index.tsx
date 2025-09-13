@@ -1,130 +1,53 @@
-import React, { lazy, useState } from "react";
-import { useColorMode, useMediaQuery, useDisclosure, useColorModeValue, Box } from "@chakra-ui/react";
+import { useState } from "react";
+import { 
+    Group, 
+    TextInput, 
+    ActionIcon, 
+    Title, 
+    useMantineColorScheme,
+    Modal,
+    Stack,
+    Portal,
+    Paper,
+    Text,
+    UnstyledButton,
+    CloseButton,
+    Box,
+    SimpleGrid
+} from "@mantine/core";
+import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import { FaSearch, FaSun, FaMoon, FaHome, FaBars } from "react-icons/fa";
+import { useNavigate } from "react-router";
 import { useDebouncedCallback } from "use-debounce";
-import withSuspense from "helpers/withSuspense";
-import { useMainContext } from "utils/context";
-import { useNavigate } from "react-router-dom";
+import { useMainContext } from "../../utils/context";
 import Fuse, { FuseResult } from "fuse.js";
 import "./Header.scss";
 
-import type {
-    Icon as IconType,
-    Grid as GridType,
-    Text as TextType,
-    Fade as FadeType,
-    Input as InputType,
-    Modal as ModalType,
-    Portal as PortalType,
-    VStack as VStackType,
-    Heading as HeadingType,
-    ModalBody as ModalBodyType,
-    IconButton as IconButtonType,
-    InputGroup as InputGroupType,
-    ModalHeader as ModalHeaderType,
-    CloseButton as CloseButtonType,
-    ModalOverlay as ModalOverlayType,
-    ModalContent as ModalContentType,
-    ModalCloseButton as ModalCloseButtonType,
-    InputRightElement as InputRightElementType,
-    //@ts-expect-error Types not defined
-} from "@chakra-ui/react/dist";
-
-/* Lazy Base Imports */
-const CloseButtonImport = lazy(() => import("@chakra-ui/react").then(m => ({ default: m.CloseButton })));
-const FadeImport = lazy(() => import("@chakra-ui/react").then(m => ({ default: m.Fade })));
-const GridImport = lazy(() => import("@chakra-ui/react").then(m => ({ default: m.Grid })));
-const HeadingImport = lazy(() => import("@chakra-ui/react").then(m => ({ default: m.Heading })));
-const InputImport = lazy(() => import("@chakra-ui/react").then(m => ({ default: m.Input })));
-const IconImport = lazy(() => import("@chakra-ui/react").then(m => ({ default: m.Icon })));
-const IconButtonImport = lazy(() => import("@chakra-ui/react").then(m => ({ default: m.IconButton })));
-const InputGroupImport = lazy(() => import("@chakra-ui/react").then(m => ({ default: m.InputGroup })));
-const InputRightElementImport = lazy(() => import("@chakra-ui/react").then(m => ({ default: m.InputRightElement })));
-const ModalImport = lazy(() => import("@chakra-ui/react").then(m => ({ default: m.Modal })));
-const ModalOverlayImport = lazy(() => import("@chakra-ui/react").then(m => ({ default: m.ModalOverlay })));
-const ModalContentImport = lazy(() => import("@chakra-ui/react").then(m => ({ default: m.ModalContent })));
-const ModalHeaderImport = lazy(() => import("@chakra-ui/react").then(m => ({ default: m.ModalHeader })));
-const ModalCloseButtonImport = lazy(() => import("@chakra-ui/react").then(m => ({ default: m.ModalCloseButton })));
-const ModalBodyImport = lazy(() => import("@chakra-ui/react").then(m => ({ default: m.ModalBody })));
-const PortalImport = lazy(() => import("@chakra-ui/react").then(m => ({ default: m.Portal })));
-const TextImport = lazy(() => import("@chakra-ui/react").then(m => ({ default: m.Text })));
-const VStackImport = lazy(() => import("@chakra-ui/react").then(m => ({ default: m.VStack })));
-const ButtonImport = lazy(() => import("components/Button"));
-
-/* With Suspense Wrapper */
-const Fade = withSuspense<typeof FadeType>(FadeImport);
-const Grid = withSuspense<typeof GridType, null>(GridImport, null);
-const Heading = withSuspense<typeof HeadingType, null>(HeadingImport, null);
-const Input = withSuspense<typeof InputType, null>(InputImport, null);
-const Icon = withSuspense<typeof IconType>(IconImport);
-const CloseButton = withSuspense<typeof CloseButtonType>(CloseButtonImport);
-const IconButton = withSuspense<typeof IconButtonType>(IconButtonImport);
-const InputGroup = withSuspense<typeof InputGroupType, null>(InputGroupImport, null);
-const InputRightElement = withSuspense<typeof InputRightElementType, null>(InputRightElementImport, null);
-const Modal = withSuspense<typeof ModalType, null>(ModalImport, null);
-const ModalOverlay = withSuspense<typeof ModalOverlayType, null>(ModalOverlayImport, null);
-const ModalContent = withSuspense<typeof ModalContentType, null>(ModalContentImport, null);
-const ModalHeader = withSuspense<typeof ModalHeaderType, null>(ModalHeaderImport, null);
-const ModalCloseButton = withSuspense<typeof ModalCloseButtonType, null>(ModalCloseButtonImport, null);
-const ModalBody = withSuspense<typeof ModalBodyType, null>(ModalBodyImport, null);
-const Portal = withSuspense<typeof PortalType, null>(PortalImport, null);
-const Text = withSuspense<typeof TextType>(TextImport);
-const VStack = withSuspense<typeof VStackType, null>(VStackImport, null);
-const Button = withSuspense<typeof ButtonImport, null>(ButtonImport, null);
-
-function Header() {
+const Header = () => {
     const navigate = useNavigate();
     const { songs } = useMainContext();
-    const { colorMode, toggleColorMode } = useColorMode();
-    const { isOpen, onOpen, onClose } = useDisclosure();
-    const { isOpen: isModalOpen, onOpen: onModalOpen, onClose: onModalClose } = useDisclosure();
-    const fuse = new Fuse(songs!, { keys: ["number", "title"], minMatchCharLength: 2, threshold: 0.4 });
+    const { colorScheme, toggleColorScheme } = useMantineColorScheme();
+    const [isDropdownOpen, { open: openDropdown, close: closeDropdown }] = useDisclosure(false);
+    const [isMobileModalOpen, { open: openMobileModal, close: closeMobileModal }] = useDisclosure(false);
+    const isMobile = useMediaQuery('(max-width: 550px)');
+    
+    const fuse = new Fuse(songs, { keys: ["number", "title"], minMatchCharLength: 2, threshold: 0.4 });
     const [query, setQuery] = useState("");
     const [mobileQuery, setMobileQuery] = useState("");
     const [queryResults, setQueryResults] = useState<FuseResult<Song>[]>([]);
-    const [showMobileMenu] = useMediaQuery("(max-width: 550px)");
-    const resultsBG = useColorModeValue("white", "gray.800");
-    const headerBG = useColorModeValue("gray.100", "gray.800");
-    const searchBG = useColorModeValue("gray.50", "gray.700");
 
-    /** Will navigate one level up in the application */
-    const GoHome = () => navigate("/");
-
-    const searchSongs = (_?: React.ChangeEvent<unknown>, mobile?: boolean) => {
-        const shouldSearchMobile = mobile && mobileQuery.length > 0;
-        const shouldSearchDesktop = !mobile && query.length > 0;
-        if (shouldSearchMobile || shouldSearchDesktop) {
-            onClose();
-            onModalClose();
-            setQuery("");
-            setMobileQuery("");
-            setQueryResults([]);
-            navigate(`/search?query=${shouldSearchMobile ? mobileQuery : query}`);
-        }
-    };
-
-    const submitQuery = (e: React.FormEvent<HTMLDivElement>) => {
-        e.preventDefault();
-        if (query.length > 0) searchSongs();
-    };
-    const submitMobileQuery = (e: React.FormEvent<HTMLDivElement>) => {
-        e.preventDefault();
-        if (mobileQuery.length > 0) searchSongs(e, true);
-    };
-
-    const mobileSearchQueryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const searchValue = e.target.value;
-        setMobileQuery(searchValue);
-    };
+    const handleHomeClick = () => navigate("/");
 
     const handleSearch = useDebouncedCallback((value: string) => {
         if (value.length === 0) {
-            onClose();
+            closeDropdown();
             return;
         }
         const result = fuse.search(value, { limit: 6 });
         setQueryResults(result.slice(0, 6));
-        if (result.length > 0) onOpen();
+        if (result.length > 0) {
+            openDropdown();
+        }
     }, 500);
 
     const searchQueryChange = (value: string) => {
@@ -132,143 +55,211 @@ function Header() {
         handleSearch(value);
     };
 
-    const gotoSong = (index: number) => {
-        onClose();
+    const mobileSearchQueryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const searchValue = e.target.value;
+        setMobileQuery(searchValue);
+    };
+
+    const searchSongs = (_?: React.FormEvent, mobile?: boolean) => {
+        const shouldSearchMobile = mobile && mobileQuery.length > 0;
+        const shouldSearchDesktop = !mobile && query.length > 0;
+        if (shouldSearchMobile || shouldSearchDesktop) {
+            closeDropdown();
+            closeMobileModal();
+            setQuery("");
+            setMobileQuery("");
+            setQueryResults([]);
+            navigate(`/search?query=${shouldSearchMobile ? mobileQuery : query}`);
+        }
+    };
+
+    const submitQuery = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        if (query.length > 0) {
+            searchSongs();
+        }
+    };
+
+    const submitMobileQuery = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        if (mobileQuery.length > 0) {
+            searchSongs(e, true);
+        }
+    };
+
+    const gotoSong = (songNumber: number) => {
+        closeDropdown();
         setQuery("");
-        navigate(`/songs/${index}`);
+        navigate(`/song/${songNumber}`);
     };
 
     return (
-        <Box className="page-header" p={4} bg={headerBG}>
-            <Grid templateColumns="auto 1fr" alignItems="center" gap={10} justifyContent="space-between" px={5}>
-                <Heading size="md" onClick={GoHome} cursor="pointer" display="flex" alignItems="center" width="auto">
-                    Hymns for All Times
-                    <Icon as={FaHome} size={20} ml={3} />
-                </Heading>
-                {showMobileMenu ? (
-                    <IconButton
-                        size="xs"
-                        icon={<FaBars />}
-                        aria-label="Open mobile menu"
-                        justifySelf="flex-end"
-                        onClick={onModalOpen}
-                        data-testid="mobileMenuTrigger"
-                    />
-                ) : (
-                    <Grid templateColumns="minmax(auto, 300px) auto" gap={2} justifyContent="flex-end">
-                        <InputGroup size="md" as="form" onSubmit={submitQuery} role="search">
-                            <Input
-                                value={query}
-                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => searchQueryChange(e.target.value)}
-                                type="search"
-                                placeholder="Search songs..."
-                                pr="4.5rem"
-                                bg={searchBG}
-                                data-testid="desktopSearch"
-                            />
-                            <InputRightElement>
-                                <IconButton
-                                    size="sm"
-                                    h="1.75rem"
-                                    icon={<FaSearch />}
-                                    aria-label="Search Song Database"
-                                    onClick={searchSongs}
-                                />
-                            </InputRightElement>
-                        </InputGroup>
-
-                        <IconButton
-                            size="md"
-                            w="1.5rem"
-                            onClick={toggleColorMode}
-                            icon={colorMode === "light" ? <FaMoon /> : <FaSun />}
-                            aria-label="Toggle Color Mode"
-                        />
-                    </Grid>
-                )}
-            </Grid>
-            <Fade in={isOpen}>
-                <Portal>
-                    <Box
-                        bg={resultsBG}
-                        pos="absolute"
-                        zIndex={105}
-                        top="60px"
-                        right="65"
-                        w={350}
-                        px={5}
-                        pb={5}
-                        hidden={!isOpen || showMobileMenu || undefined}
-                        borderRadius="md"
-                        shadow="md"
-                        data-testid="searchResultsBox"
+        <>
+            <Group 
+                justify="space-between" 
+                p="md" 
+                className="page-header"
+                style={{ 
+                    position: "sticky", 
+                    top: 0, 
+                    zIndex: 100, 
+                    backgroundColor: colorScheme === 'dark' ? 'var(--mantine-color-gray-8)' : 'var(--mantine-color-gray-1)',
+                    borderBottom: `1px solid ${colorScheme === 'dark' ? 'var(--mantine-color-gray-7)' : 'var(--mantine-color-gray-3)'}`
+                }}
+            >
+                <Group style={{ cursor: 'pointer' }} onClick={handleHomeClick}>
+                    <ActionIcon 
+                        variant="subtle" 
+                        size="lg" 
+                        aria-label="Home"
                     >
-                        <CloseButton size="md" onClick={onClose} pos="absolute" top="1" right="5" />
-                        <Grid gap={5} mt={10} w="100%" data-testid="searchItemsWrapper">
-                            {queryResults.map(result => (
-                                <Button
-                                    bg="blue.500"
-                                    onClick={() => gotoSong(result.item.number)}
-                                    overflow="hidden"
-                                    key={result.item.number}
-                                    role="button"
-                                >
-                                    <Grid templateColumns="auto 1fr" gap="3" w="100%" justifyItems="left">
-                                        <Text size="sm" color="white">
-                                            {result.item.number}
-                                        </Text>
-                                        <Text size="sm" color="white">
-                                            {result.item.title}
-                                        </Text>
-                                    </Grid>
-                                </Button>
-                            ))}
-                        </Grid>
-                    </Box>
-                </Portal>
-            </Fade>
+                        <FaHome size={16} />
+                    </ActionIcon>
+                    <Title order={3}>Hymns for All Times</Title>
+                </Group>
 
-            <Modal isOpen={isModalOpen} onClose={onModalClose}>
-                <ModalOverlay />
-                <ModalContent pb={10}>
-                    <ModalHeader>Menu</ModalHeader>
-                    <ModalCloseButton />
-                    <ModalBody>
-                        <VStack spacing="4">
-                            <InputGroup size="md" as="form" onSubmit={submitMobileQuery}>
-                                <Input
-                                    type="search"
-                                    value={mobileQuery}
-                                    onChange={mobileSearchQueryChange}
+                {isMobile ? (
+                    <ActionIcon
+                        variant="subtle"
+                        size="lg"
+                        onClick={openMobileModal}
+                        aria-label="Open mobile menu"
+                        data-testid="mobileMenuTrigger"
+                    >
+                        <FaBars size={16} />
+                    </ActionIcon>
+                ) : (
+                    <Group>
+                        <Box style={{ position: 'relative' }}>
+                            <form onSubmit={submitQuery}>
+                                <TextInput
                                     placeholder="Search songs..."
-                                    pr="4.5rem"
-                                    bg={searchBG}
-                                    data-testid="mobileSearch"
+                                    value={query}
+                                    onChange={(e) => searchQueryChange(e.currentTarget.value)}
+                                    rightSection={
+                                        <ActionIcon
+                                            type="submit"
+                                            variant="filled"
+                                            color="blue"
+                                            aria-label="Search Song Database"
+                                            onClick={() => searchSongs()}
+                                        >
+                                            <FaSearch size={14} />
+                                        </ActionIcon>
+                                    }
+                                    style={{ minWidth: 300 }}
+                                    data-testid="desktopSearch"
                                 />
-                                <InputRightElement>
-                                    <IconButton
-                                        size="sm"
-                                        h="1.75rem"
-                                        icon={<FaSearch />}
-                                        aria-label="Search Song Database"
-                                        onClick={(e: React.MouseEvent<HTMLButtonElement>) => searchSongs(e, true)}
-                                    />
-                                </InputRightElement>
-                            </InputGroup>
+                            </form>
 
-                            <Button
-                                leftIcon={colorMode === "light" ? <FaMoon /> : <FaSun />}
-                                onClick={toggleColorMode}
-                                w="100%"
-                            >
-                                Toggle {colorMode === "light" ? "Dark" : "Light"} Mode
-                            </Button>
-                        </VStack>
-                    </ModalBody>
-                </ModalContent>
+                            {/* Search Results Dropdown */}
+                            {isDropdownOpen && !isMobile && (
+                                <Portal>
+                                    <Paper
+                                        shadow="md"
+                                        p="md"
+                                        style={{
+                                            position: 'absolute',
+                                            top: '60px',
+                                            right: '65px',
+                                            width: 350,
+                                            zIndex: 105,
+                                        }}
+                                        data-testid="searchResultsBox"
+                                    >
+                                        <CloseButton
+                                            onClick={closeDropdown}
+                                            style={{ position: 'absolute', top: 8, right: 8 }}
+                                        />
+                                        <Stack gap="xs" mt="lg" data-testid="searchItemsWrapper">
+                                            {queryResults.map((result) => (
+                                                <UnstyledButton
+                                                    key={result.item.number}
+                                                    onClick={() => gotoSong(result.item.number)}
+                                                    style={{
+                                                        padding: '8px',
+                                                        borderRadius: 'var(--mantine-radius-sm)',
+                                                        backgroundColor: 'var(--mantine-color-blue-6)',
+                                                        color: 'white',
+                                                        width: '100%'
+                                                    }}
+                                                    role="button"
+                                                >
+                                                    <SimpleGrid cols={2} style={{ textAlign: 'left' }}>
+                                                        <Text size="sm" fw={600}>
+                                                            #{result.item.number}
+                                                        </Text>
+                                                        <Text size="sm" fw={600}>
+                                                            {result.item.title}
+                                                        </Text>
+                                                    </SimpleGrid>
+                                                </UnstyledButton>
+                                            ))}
+                                        </Stack>
+                                    </Paper>
+                                </Portal>
+                            )}
+                        </Box>
+                        
+                        <ActionIcon
+                            variant="subtle"
+                            size="lg"
+                            onClick={toggleColorScheme}
+                            aria-label="Toggle color scheme"
+                        >
+                            {colorScheme === 'dark' ? <FaSun size={16} /> : <FaMoon size={16} />}
+                        </ActionIcon>
+                    </Group>
+                )}
+            </Group>
+
+            {/* Mobile Modal */}
+            <Modal
+                opened={isMobileModalOpen}
+                onClose={closeMobileModal}
+                title="Menu"
+                centered
+            >
+                <Stack gap="lg">
+                    <form onSubmit={submitMobileQuery}>
+                        <TextInput
+                            placeholder="Search songs..."
+                            value={mobileQuery}
+                            onChange={mobileSearchQueryChange}
+                            rightSection={
+                                <ActionIcon
+                                    type="submit"
+                                    variant="filled"
+                                    color="blue"
+                                    aria-label="Search Song Database"
+                                    onClick={(e) => searchSongs(e, true)}
+                                >
+                                    <FaSearch size={14} />
+                                </ActionIcon>
+                            }
+                            data-testid="mobileSearch"
+                        />
+                    </form>
+
+                    <UnstyledButton
+                        onClick={toggleColorScheme}
+                        style={{
+                            padding: '12px',
+                            borderRadius: 'var(--mantine-radius-sm)',
+                            backgroundColor: 'var(--mantine-color-blue-6)',
+                            color: 'white',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px'
+                        }}
+                    >
+                        {colorScheme === 'dark' ? <FaSun size={16} /> : <FaMoon size={16} />}
+                        <Text>Toggle {colorScheme === 'light' ? 'Dark' : 'Light'} Mode</Text>
+                    </UnstyledButton>
+                </Stack>
             </Modal>
-        </Box>
+        </>
     );
-}
+};
 
 export default Header;

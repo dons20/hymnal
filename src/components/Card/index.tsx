@@ -1,8 +1,6 @@
-import { useColorModeValue } from "@chakra-ui/color-mode";
-import { Box, Image } from "@chakra-ui/react";
-import { Link } from "react-router-dom";
-import Button from "components/Button";
-import Loader from "components/Loader";
+import { useMantineColorScheme, Image, Card as MantineCard, Text, Group } from "@mantine/core";
+import { Link } from "react-router";
+import Button from "../Button";
 
 interface CardBase {
     /** A title for the card */
@@ -30,37 +28,32 @@ interface CardWithoutImage extends CardBase {
 type CardP = CardWithImage | CardWithoutImage;
 
 const Card = ({ title, subtitle, primaryLink, primaryLabel, imageSrc, imageAlt }: CardP) => {
-    const boxBG = useColorModeValue("white", "gray.600");
-    const subtitleColor = useColorModeValue("gray.600", "gray.200");
+    const { colorScheme } = useMantineColorScheme();
+    const isDark = colorScheme === 'dark';
 
     return (
-        <Box className="card" bg={boxBG} p="4" shadow="md" borderRadius="sm">
-            <Box display="flex" justifyContent="space-between" alignItems="center" flexWrap="wrap">
-                <Box>{title}</Box>
-                <Box color={subtitleColor} fontSize="sm" as="span">
+        <MantineCard className="card" p="md" shadow="md" radius="sm" withBorder>
+            <Group justify="space-between" align="center" wrap="wrap">
+                <Text fw={500}>{title}</Text>
+                <Text c={isDark ? 'gray.4' : 'gray.6'} size="sm">
                     {subtitle}
-                </Box>
-            </Box>
+                </Text>
+            </Group>
             {imageSrc && (
                 <Image
                     loading="lazy"
-                    boxSize="280px"
-                    objectFit="contain"
-                    fallback={<Loader />}
+                    h={280}
+                    w="100%"
+                    fit="contain"
                     alt={imageAlt}
                     src={imageSrc}
-                    htmlHeight="300px"
-                    htmlWidth="300px"
-                    h="100%"
-                    w="100%"
-                    marginBottom="6"
-                    minH={280}
+                    mb="md"
                 />
             )}
-            <Button size="md" colorScheme="blue" as={Link} to={primaryLink}>
+            <Button size="md" color="blue" component={Link} to={primaryLink}>
                 {primaryLabel}
             </Button>
-        </Box>
+        </MantineCard>
     );
 };
 

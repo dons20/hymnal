@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-function-type */
 import { lazy, Suspense } from "react";
 
-const Loader = lazy(() => import("components/Loader"));
+const Loader = lazy(() => import("../components/Loader"));
 
 const withSuspense =
     <P extends React.FC | Function, Q = void>(

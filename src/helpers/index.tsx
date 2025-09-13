@@ -1,7 +1,7 @@
 import React from "react";
 import axios from "axios";
-import hymns from "static/hymns.json";
-import setDebug from "utils/logger";
+import hymns from "../static/hymns.json";
+import setDebug from "../utils/logger";
 
 interface SongPropsA {
     number: number;

@@ -1,5 +1,5 @@
 import { act } from "react-dom/test-utils";
-import { CTX, MainContextProvider } from "utils/context";
+import { CTX, MainContextProvider } from "../utils/context";
 
 type ProviderT = {
     children: React.ReactNode;
