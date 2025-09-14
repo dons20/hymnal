@@ -4,7 +4,7 @@ import { FaHeart } from "react-icons/fa";
 import { useNavigate } from "react-router";
 import { useMainContext } from "../../../utils/context";
 import { updateFavesDB } from "../../../helpers";
-import { Helmet } from "react-helmet";
+import { Helmet } from "@dr.pogodin/react-helmet";
 import "./SongList.scss";
 
 interface Song {

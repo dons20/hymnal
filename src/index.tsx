@@ -6,6 +6,7 @@ import { BrowserRouter } from "react-router";
 
 import MainContext from "@/components/Providers";
 import { MantineProvider, ColorSchemeScript } from "@mantine/core";
+import { HelmetProvider } from '@dr.pogodin/react-helmet';
 import { ModalsProvider } from '@mantine/modals';
 import { Notifications } from '@mantine/notifications';
 import { theme } from "@/theme";
@@ -18,7 +19,7 @@ const container = document.getElementById("root");
 const root = createRoot(container!);
 
 root.render(
-    <>
+    <HelmetProvider>
         <ColorSchemeScript defaultColorScheme="auto" />
         <MantineProvider theme={theme} defaultColorScheme="auto">
             <ModalsProvider>
@@ -30,5 +31,5 @@ root.render(
                 </BrowserRouter>
             </ModalsProvider>
         </MantineProvider>
-    </>
+    </HelmetProvider>
 );

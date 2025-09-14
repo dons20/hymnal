@@ -1,11 +1,11 @@
 import { useEffect } from "react";
-import { Helmet } from "react-helmet";
-import { Box, SimpleGrid, useMantineColorScheme } from "@mantine/core";
+import { useMantineColorScheme, ActionIcon } from "@mantine/core";
+import { Helmet } from "@dr.pogodin/react-helmet";
+import { Link } from "react-router";
+import { FaSun, FaMoon } from "react-icons/fa";
 import { useMainContext } from "@/utils/context";
-import { Card } from "@/components";
+import { HomepageSearch } from "@/components";
 
-import favourites from "@/img/favourites.svg";
-import songs from "@/img/songs.svg";
 import "./Home.scss";
 
 const meta = {
@@ -13,9 +13,12 @@ const meta = {
     page: "Home",
 };
 
+// Music note symbols for the animated background
+const musicNotes = ['♪', '♫', '♬', '♩', '♭', '♮', '♯', '𝄞', '𝄢', '𝄡', '♪', '♫'];
+
 function HomeScreen() {
     const { pages, dispatch } = useMainContext();
-    const { colorScheme } = useMantineColorScheme();
+    const { colorScheme, toggleColorScheme } = useMantineColorScheme();
     const isDark = colorScheme === 'dark';
 
     useEffect(() => {
@@ -27,32 +30,74 @@ function HomeScreen() {
             <Helmet>
                 <title>{`Hymns for All Times | ${meta.page}`}</title>
             </Helmet>
-            <Box bg={isDark ? 'gray.8' : 'gray.2'} h="100%" data-testid="homeWrapper">
-                <SimpleGrid
-                    cols={{ base: 1, sm: 2 }}
-                    className="grid"
-                    maw="800px"
-                    m="0 auto"
-                >
-                    <Card
-                        title="Songs"
-                        subtitle="View a listing of all songs"
-                        imageSrc={songs}
-                        imageAlt="Placeholder for Songs"
-                        primaryLink={pages.INDEX}
-                        primaryLabel="View Songs"
-                    />
+            
+            {/* Animated Background */}
+            <div className={`splash-background ${isDark ? 'dark-theme' : 'light-theme'}`}>
+                {musicNotes.map((note, index) => (
+                    <div 
+                        key={index}
+                        className={`music-note ${isDark ? 'dark-theme' : 'light-theme'}`}
+                        style={{
+                            animationDelay: `${-index * 2}s`,
+                            top: `${10 + (index * 7)}%`
+                        }}
+                    >
+                        {note}
+                    </div>
+                ))}
+            </div>
 
-                    <Card
-                        title="Favourites"
-                        subtitle="View your favourite songs"
-                        imageSrc={favourites}
-                        imageAlt="Placeholder for Favourites"
-                        primaryLink={pages.FAVOURITES}
-                        primaryLabel="View Favourites"
-                    />
-                </SimpleGrid>
-            </Box>
+            {/* Theme Toggle Button */}
+            <ActionIcon
+                className="theme-toggle"
+                variant="filled"
+                size="lg"
+                onClick={toggleColorScheme}
+                aria-label="Toggle color scheme"
+                style={{
+                    position: 'fixed',
+                    top: '20px',
+                    right: '20px',
+                    zIndex: 1000,
+                    backgroundColor: isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)',
+                    backdropFilter: 'blur(10px)',
+                    border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.2)'}`,
+                    color: isDark ? '#fff' : '#1976d2'
+                }}
+            >
+                {isDark ? <FaSun size={18} /> : <FaMoon size={18} />}
+            </ActionIcon>
+
+            {/* Main Splash Content */}
+            <div className="splash-container" data-testid="homeWrapper">
+                <h1 className={`splash-title ${isDark ? 'dark-theme' : 'light-theme'}`}>
+                    Hymns for All Times
+                </h1>
+                
+                <p className={`splash-subtitle ${isDark ? 'dark-theme' : 'light-theme'}`}>
+                    Discover and explore beautiful hymns for worship and reflection
+                </p>
+
+                {/* Homepage Search */}
+                <HomepageSearch isDark={isDark} />
+
+                {/* CTA Buttons */}
+                <div className="cta-buttons">
+                    <Link 
+                        to={pages.INDEX}
+                        className={`cta-button secondary ${isDark ? 'dark-theme' : ''}`}
+                    >
+                        Browse All Songs
+                    </Link>
+                    
+                    <Link 
+                        to={pages.FAVOURITES}
+                        className={`cta-button secondary ${isDark ? 'dark-theme' : ''}`}
+                    >
+                        View Favourites
+                    </Link>
+                </div>
+            </div>
         </>
     );
 }

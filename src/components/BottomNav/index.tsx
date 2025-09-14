@@ -15,6 +15,9 @@ function MobileNavBar() {
     const prevPath = useRef<string | null>(null);
     const isMobileScreen = useMediaQuery('(max-width: 768px)');
     const iconsOnly = useMediaQuery('(max-width: 475px)');
+    
+    // Check if we're on the homepage
+    const isHomePage = pathname === '/' || pathname === '/home';
 
     const tabValues = [
         {
@@ -76,8 +79,8 @@ function MobileNavBar() {
         navigate(url);
     }
 
-    // Only show on mobile screens and when at bottom
-    if (!isMobileScreen || !isAtBottom) {
+    // Only show on mobile screens and when at bottom, but not on homepage
+    if (!isMobileScreen || !isAtBottom || isHomePage) {
         return null;
     }
 

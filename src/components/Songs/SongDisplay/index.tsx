@@ -5,7 +5,7 @@ import { Navigate, useNavigate, useParams } from "react-router";
 import { useReducedMotion } from "@mantine/hooks";
 import { useMainContext } from "../../../utils/context";
 import { updateFavesDB } from "../../../helpers";
-import { Helmet } from "react-helmet";
+import { Helmet } from "@dr.pogodin/react-helmet";
 import { Button } from "../../index";
 import "./SongDisplay.scss";
 

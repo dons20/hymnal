@@ -1,10 +1,9 @@
 import { useCallback, useEffect, useRef } from "react";
 import { Box, Container, SimpleGrid, Anchor, Text, useMantineColorScheme } from "@mantine/core";
-import { GridChildComponentProps, FixedSizeGrid } from "react-window";
-import AutoSizer from "react-virtualized-auto-sizer";
+import { CellComponentProps, Grid } from "react-window";
 import { useMainContext } from "../../utils/context";
 import { useNavigate, Link } from "react-router";
-import { Helmet } from "react-helmet";
+import { Helmet } from "@dr.pogodin/react-helmet";
 
 const meta = {
     title: "Favourites",
@@ -36,7 +35,7 @@ function Favourites() {
 
     /** Renders a single cell */
     const Cell = useCallback(
-        ({ columnIndex, rowIndex, style, data }: GridChildComponentProps) => {
+        ({ columnIndex, rowIndex, style, data }: CellComponentProps<{ data: Song[]}>) => {
             const itemIndex = rowIndex * numColumns.current + columnIndex;
             if (itemIndex >= finalList.length) {
                 return null;
@@ -111,24 +110,14 @@ function Favourites() {
             <SimpleGrid pt="md" h="100%" bg={isDark ? 'gray.8' : 'gray.2'} cols={1}>
                 {finalList.length === 0 && <EmptyListRender />}
                 <Box ref={wrapperRef} pos="relative" style={{ overflow: 'hidden' }} h="100%">
-                    <AutoSizer>
-                        {({ height, width }) => (
-                            <>
-                                <FixedSizeGrid
-                                    height={height}
-                                    width={width}
-                                    rowHeight={120}
-                                    columnWidth={width - window.innerWidth * 0.07}
-                                    columnCount={numColumns.current}
-                                    rowCount={numRows}
-                                    itemData={finalList}
-                                    style={{ overflowX: "hidden" }}
-                                >
-                                    {Cell}
-                                </FixedSizeGrid>
-                            </>
-                        )}
-                    </AutoSizer>
+                    <Grid
+                        rowHeight={120}
+                        columnWidth="50%"
+                        columnCount={numColumns.current}
+                        rowCount={numRows}
+                        cellProps={{ data: finalList }}
+                        cellComponent={Cell}
+                    />
                 </Box>
             </SimpleGrid>
         </>

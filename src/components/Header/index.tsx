@@ -17,7 +17,7 @@ import {
 } from "@mantine/core";
 import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import { FaSearch, FaSun, FaMoon, FaHome, FaBars } from "react-icons/fa";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router";
 import { useDebouncedCallback } from "use-debounce";
 import { useMainContext } from "../../utils/context";
 import Fuse, { FuseResult } from "fuse.js";
@@ -25,11 +25,15 @@ import "./Header.scss";
 
 const Header = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const { songs } = useMainContext();
     const { colorScheme, toggleColorScheme } = useMantineColorScheme();
     const [isDropdownOpen, { open: openDropdown, close: closeDropdown }] = useDisclosure(false);
     const [isMobileModalOpen, { open: openMobileModal, close: closeMobileModal }] = useDisclosure(false);
     const isMobile = useMediaQuery('(max-width: 550px)');
+    
+    // Check if we're on the homepage
+    const isHomePage = location.pathname === '/' || location.pathname === '/home';
     
     const fuse = new Fuse(songs, { keys: ["number", "title"], minMatchCharLength: 2, threshold: 0.4 });
     const [query, setQuery] = useState("");
@@ -92,6 +96,11 @@ const Header = () => {
         setQuery("");
         navigate(`/song/${songNumber}`);
     };
+
+    // Don't render the header on homepage
+    if (isHomePage) {
+        return null;
+    }
 
     return (
         <>

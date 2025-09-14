@@ -4,5 +4,6 @@ import Header from "./Header";
 import Button from "./Button";
 import BottomNav from "./BottomNav";
 import PictureHeader from "./PictureHeader";
+import HomepageSearch from "./HomepageSearch";
 
-export { BottomNav, Button, Header, PictureHeader, Card, Loader };
+export { BottomNav, Button, Header, PictureHeader, Card, Loader, HomepageSearch };

@@ -12,7 +12,6 @@ const SongDisplayImport = lazy(() => import("@/components/Songs/SongDisplay"));
 const SearchImport = lazy(() => import("@/pages/Search"));
 const LoaderImport = lazy(() => import("@/components/Loader"));
 const HeaderImport = lazy(() => import("@/components/Header"));
-const BottomNavImport = lazy(() => import("@/components/BottomNav"));
 const PictureHeaderImport = lazy(() => import("@/components/PictureHeader"));
 
 const Home = withSuspense<typeof HomeImport>(HomeImport);
@@ -21,7 +20,6 @@ const SongDisplay = withSuspense<typeof SongDisplayImport>(SongDisplayImport);
 const Search = withSuspense<typeof SearchImport>(SearchImport);
 const Loader = withSuspense<typeof LoaderImport, null>(LoaderImport, null);
 const Header = withSuspense<typeof HeaderImport, null>(HeaderImport, null);
-const BottomNav = withSuspense<typeof BottomNavImport, null>(BottomNavImport, null);
 const PictureHeader = withSuspense<typeof PictureHeaderImport, null>(PictureHeaderImport, null);
 
 const ScrollRestoration = () => {
@@ -36,8 +34,12 @@ function App() {
     const { colorScheme } = useMantineColorScheme();
     const isDark = colorScheme === 'dark';
     const { songs, dispatch } = useMainContext();
+    const location = useLocation();
     // const notSongListPage = !window.location.pathname.includes("/songs/index");
     const notSongListPage = true;
+    
+    // Check if we're on the homepage
+    const isHomePage = location.pathname === '/' || location.pathname === '/home';
 
     useEffect(() => {
         const handleOrientationChange = () => {
@@ -56,15 +58,15 @@ function App() {
     return (
         <Container className={styles.root} fluid>
             <Container component="section" className={styles.app_body} fluid>
-                <Header />
+                {!isHomePage && <Header />}
                 <ScrollRestoration />
                 <Container
                     component="main"
                     className={`${styles.app_inner} ${notSongListPage ? styles.app_inner_mobile : ""}`}
-                    bg={isDark ? 'gray.8' : 'gray.2'}
+                    bg={!isHomePage && isDark ? 'gray.8' : !isHomePage ? 'gray.2' : undefined}
                     fluid
                 >
-                    <PictureHeader />
+                    {!isHomePage && <PictureHeader />}
 
                     <div className={styles.wrapper}>
                         <Routes>
@@ -77,8 +79,6 @@ function App() {
                         </Routes>
                     </div>
                 </Container>
-
-                <BottomNav />
             </Container>
         </Container>
     );
