@@ -1,44 +1,44 @@
 .songs > .container {
-	display: grid;
-	grid-row: 1 / span 2;
-	grid-auto-rows: max-content;
-	justify-content: center;
-	grid-template-columns: minmax(auto, var(--chakra-sizes-container-md));
+  display: grid;
+  grid-row: 1 / span 2;
+  grid-auto-rows: max-content;
+  justify-content: center;
+  grid-template-columns: minmax(auto, var(--chakra-sizes-container-md));
 
-	& > .body {
-		margin: 20px auto;
-		display: grid;
-		white-space: pre-line;
-		grid-row-gap: 2.5rem;
-		// width: 100%;
-		// max-width: var(--chakra-sizes-container-sm);
-	}
+  & > .body {
+    margin: 20px auto;
+    display: grid;
+    white-space: pre-line;
+    grid-row-gap: 2.5rem;
+    // width: 100%;
+    // max-width: var(--chakra-sizes-container-sm);
+  }
 
-	& > .header {
-		align-items: center;
-		gap: 15px;
-		display: grid;
-		font-weight: bold;
-		margin: auto;
-		max-width: 1000px;
-		width: 100%;
-	}
+  & > .header {
+    align-items: center;
+    gap: 15px;
+    display: grid;
+    font-weight: bold;
+    margin: auto;
+    max-width: 1000px;
+    width: 100%;
+  }
 
-	& > .footer {
-		justify-self: flex-end;
-		font-style: italic;
-	}
+  & > .footer {
+    justify-self: flex-end;
+    font-style: italic;
+  }
 
-	& .label {
-		display: block;
-		font-style: italic;
-		font-size: calc(10px + 1vmin);
-		font-weight: 600;
-	}
+  & .label {
+    display: block;
+    font-style: italic;
+    font-size: calc(10px + 1vmin);
+    font-weight: 600;
+  }
 
-	@media only screen and (min-width: 550px) {
-		& > .header {
-			grid-template-columns: auto 1fr auto 50px;
-		}
-	}
+  @media only screen and (min-width: 550px) {
+    & > .header {
+      grid-template-columns: auto 1fr auto 50px;
+    }
+  }
 }

@@ -1,35 +1,36 @@
 // Maintain load order for correct initial loading, modify carefully
 import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
-import { createRoot } from "react-dom/client";
-import { BrowserRouter } from "react-router";
 
-import MainContext from "@/components/Providers";
-import { MantineProvider, ColorSchemeScript } from "@mantine/core";
 import { HelmetProvider } from '@dr.pogodin/react-helmet';
+import { createRoot } from 'react-dom/client';
+import { BrowserRouter } from 'react-router';
+import { ColorSchemeScript, MantineProvider } from '@mantine/core';
 import { ModalsProvider } from '@mantine/modals';
 import { Notifications } from '@mantine/notifications';
-import { theme } from "@/theme";
-import "focus-visible/dist/focus-visible";
-import "./index.scss";
+import MainContext from '@/components/Providers';
+import { theme } from '@/theme';
 
-import App from "./App";
+import 'focus-visible/dist/focus-visible';
+import './index.scss';
 
-const container = document.getElementById("root");
+import App from './App';
+
+const container = document.getElementById('root');
 const root = createRoot(container!);
 
 root.render(
-    <HelmetProvider>
-        <ColorSchemeScript defaultColorScheme="auto" />
-        <MantineProvider theme={theme} defaultColorScheme="auto">
-            <ModalsProvider>
-                <Notifications />
-                <BrowserRouter>
-                    <MainContext>
-                        <App />
-                    </MainContext>
-                </BrowserRouter>
-            </ModalsProvider>
-        </MantineProvider>
-    </HelmetProvider>
+  <HelmetProvider>
+    <ColorSchemeScript defaultColorScheme="auto" />
+    <MantineProvider theme={theme} defaultColorScheme="auto">
+      <ModalsProvider>
+        <Notifications />
+        <BrowserRouter>
+          <MainContext>
+            <App />
+          </MainContext>
+        </BrowserRouter>
+      </ModalsProvider>
+    </MantineProvider>
+  </HelmetProvider>
 );

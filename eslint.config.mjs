@@ -1,11 +1,20 @@
 import mantine from 'eslint-config-mantine';
-import tseslint from 'typescript-eslint';
+import { defineConfig } from 'eslint/config';
 
-export default tseslint.config(
+export default defineConfig(
   ...mantine,
+  {
+    files: ['**/*.{ts,tsx,mts,cts}'],
+    rules: {
+      curly: ['error', 'multi'],
+    },
+  },
   { ignores: ['**/*.{mjs,cjs,js,d.ts,d.mts}', './.storybook/main.ts'] },
   {
     files: ['**/*.story.tsx'],
-    rules: { 'no-console': 'off' },
+    rules: {
+      'no-console': 'off',
+      curly: ['error', 'multi'],
+    },
   }
 );

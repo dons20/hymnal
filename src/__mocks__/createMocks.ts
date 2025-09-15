@@ -1,16 +1,16 @@
 class Worker {
-    url: unknown;
+  url: unknown;
 
-    onmessage: ({ ...props }) => void;
+  onmessage: ({ ...props }) => void;
 
-    constructor(stringUrl: unknown) {
-        this.url = stringUrl;
-        this.onmessage = () => {};
-    }
+  constructor(stringUrl: unknown) {
+    this.url = stringUrl;
+    this.onmessage = () => {};
+  }
 
-    postMessage(msg: Record<string, unknown>) {
-        this.onmessage(msg);
-    }
+  postMessage(msg: Record<string, unknown>) {
+    this.onmessage(msg);
+  }
 }
 
 // @ts-expect-error Mocked Worker

@@ -28,7 +28,7 @@ const meta = {
 function Cell({ rowIndex, style, data }: CellComponentProps<{ data: FuseResult<Song>[] }>) {
   const navigate = useNavigate();
   const { colorScheme } = useMantineColorScheme();
-    const isDark = colorScheme === 'dark';
+  const isDark = colorScheme === 'dark';
 
   /** Triggers navigation to a song at a specified index */
   const navigateToSong = useCallback(
@@ -39,9 +39,9 @@ function Cell({ rowIndex, style, data }: CellComponentProps<{ data: FuseResult<S
   );
 
   const result = data[rowIndex];
-  if (!result) {
+  if (!result) 
     return null;
-  }
+  
 
   return (
     <div style={{ ...style, padding: '8px 20px' }}>
@@ -110,16 +110,16 @@ function Search() {
 
   const submitQuery = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (searchQuery.length > 0) {
+    if (searchQuery.length > 0) 
       handleSearch(searchQuery);
-    }
+    
   };
 
   const searchQueryChange = (value: string) => {
     setSearchQuery(value);
-    if (value.length > 0) {
+    if (value.length > 0) 
       handleSearch(value);
-    } else {
+     else {
       setSearchResults([]);
       handleSearch.cancel();
     }
@@ -130,9 +130,9 @@ function Search() {
   }, [dispatch]);
 
   useEffect(() => {
-    if (extractedQuery) {
+    if (extractedQuery) 
       handleSearch(extractedQuery);
-    }
+    
   }, [extractedQuery, handleSearch]);
 
   return (

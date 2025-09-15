@@ -1,105 +1,102 @@
-import { useEffect } from "react";
-import { useMantineColorScheme, ActionIcon } from "@mantine/core";
-import { Helmet } from "@dr.pogodin/react-helmet";
-import { Link } from "react-router";
-import { FaSun, FaMoon } from "react-icons/fa";
-import { useMainContext } from "@/utils/context";
-import { HomepageSearch } from "@/components";
+import { useEffect } from 'react';
+import { Helmet } from '@dr.pogodin/react-helmet';
+import { FaMoon, FaSun } from 'react-icons/fa';
+import { Link } from 'react-router';
+import { ActionIcon, useMantineColorScheme } from '@mantine/core';
+import { HomepageSearch } from '@/components';
+import { useMainContext } from '@/utils/context';
 
-import "./Home.scss";
+import './Home.scss';
 
 const meta = {
-    title: "Homepage",
-    page: "Home",
+  title: 'Homepage',
+  page: 'Home',
 };
 
 // Music note symbols for the animated background
 const musicNotes = ['♪', '♫', '♬', '♩', '♭', '♮', '♯', '𝄞', '𝄢', '𝄡', '♪', '♫'];
 
 function HomeScreen() {
-    const { pages, dispatch } = useMainContext();
-    const { colorScheme, toggleColorScheme } = useMantineColorScheme();
-    const isDark = colorScheme === 'dark';
+  const { pages, dispatch } = useMainContext();
+  const { colorScheme, toggleColorScheme } = useMantineColorScheme();
+  const isDark = colorScheme === 'dark';
 
-    useEffect(() => {
-        dispatch!({ type: "setTitle", payload: meta.title });
-    }, [dispatch]);
+  useEffect(() => {
+    dispatch!({ type: 'setTitle', payload: meta.title });
+  }, [dispatch]);
 
-    return (
-        <>
-            <Helmet>
-                <title>{`Hymns for All Times | ${meta.page}`}</title>
-            </Helmet>
-            
-            {/* Animated Background */}
-            <div className={`splash-background ${isDark ? 'dark-theme' : 'light-theme'}`}>
-                {musicNotes.map((note, index) => (
-                    <div 
-                        key={index}
-                        className={`music-note ${isDark ? 'dark-theme' : 'light-theme'}`}
-                        style={{
-                            animationDelay: `${-index * 2}s`,
-                            top: `${10 + (index * 7)}%`
-                        }}
-                    >
-                        {note}
-                    </div>
-                ))}
-            </div>
+  return (
+    <>
+      <Helmet>
+        <title>{`Hymns for All Times | ${meta.page}`}</title>
+      </Helmet>
 
-            {/* Theme Toggle Button */}
-            <ActionIcon
-                className="theme-toggle"
-                variant="filled"
-                size="lg"
-                onClick={toggleColorScheme}
-                aria-label="Toggle color scheme"
-                style={{
-                    position: 'fixed',
-                    top: '20px',
-                    right: '20px',
-                    zIndex: 1000,
-                    backgroundColor: isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)',
-                    backdropFilter: 'blur(10px)',
-                    border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.2)'}`,
-                    color: isDark ? '#fff' : '#1976d2'
-                }}
-            >
-                {isDark ? <FaSun size={18} /> : <FaMoon size={18} />}
-            </ActionIcon>
+      {/* Animated Background */}
+      <div className={`splash-background ${isDark ? 'dark-theme' : 'light-theme'}`}>
+        {musicNotes.map((note, index) => (
+          <div
+            key={index}
+            className={`music-note ${isDark ? 'dark-theme' : 'light-theme'}`}
+            style={{
+              animationDelay: `${-index * 2}s`,
+              top: `${10 + index * 7}%`,
+            }}
+          >
+            {note}
+          </div>
+        ))}
+      </div>
 
-            {/* Main Splash Content */}
-            <div className="splash-container" data-testid="homeWrapper">
-                <h1 className={`splash-title ${isDark ? 'dark-theme' : 'light-theme'}`}>
-                    Hymns for All Times
-                </h1>
-                
-                <p className={`splash-subtitle ${isDark ? 'dark-theme' : 'light-theme'}`}>
-                    Discover and explore beautiful hymns for worship and reflection
-                </p>
+      {/* Theme Toggle Button */}
+      <ActionIcon
+        className="theme-toggle"
+        variant="filled"
+        size="lg"
+        onClick={toggleColorScheme}
+        aria-label="Toggle color scheme"
+        style={{
+          position: 'fixed',
+          top: '20px',
+          right: '20px',
+          zIndex: 1000,
+          backgroundColor: isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)',
+          backdropFilter: 'blur(10px)',
+          border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.2)'}`,
+          color: isDark ? '#fff' : '#1976d2',
+        }}
+      >
+        {isDark ? <FaSun size={18} /> : <FaMoon size={18} />}
+      </ActionIcon>
 
-                {/* Homepage Search */}
-                <HomepageSearch isDark={isDark} />
+      {/* Main Splash Content */}
+      <div className="splash-container" data-testid="homeWrapper">
+        <h1 className={`splash-title ${isDark ? 'dark-theme' : 'light-theme'}`}>
+          Hymns for All Times
+        </h1>
 
-                {/* CTA Buttons */}
-                <div className="cta-buttons">
-                    <Link 
-                        to={pages.INDEX}
-                        className={`cta-button secondary ${isDark ? 'dark-theme' : ''}`}
-                    >
-                        Browse All Songs
-                    </Link>
-                    
-                    <Link 
-                        to={pages.FAVOURITES}
-                        className={`cta-button secondary ${isDark ? 'dark-theme' : ''}`}
-                    >
-                        View Favourites
-                    </Link>
-                </div>
-            </div>
-        </>
-    );
+        <p className={`splash-subtitle ${isDark ? 'dark-theme' : 'light-theme'}`}>
+          Discover and explore beautiful hymns for worship and reflection
+        </p>
+
+        {/* Homepage Search */}
+        <HomepageSearch isDark={isDark} />
+
+        {/* CTA Buttons */}
+        <div className="cta-buttons">
+          <Link to={pages.INDEX} className={`cta-button secondary ${isDark ? 'dark-theme' : ''}`}>
+            Browse All Songs
+          </Link>
+
+          <Link
+            to={pages.FAVOURITES}
+            className={`cta-button secondary ${isDark ? 'dark-theme' : ''}`}
+          >
+            View Favourites
+          </Link>
+        </div>
+      </div>
+    </>
+  );
 }
 
 export default HomeScreen;
