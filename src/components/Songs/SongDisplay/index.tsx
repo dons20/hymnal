@@ -312,6 +312,7 @@ function SongDisplay() {
                 right={0}
                 bottom={0}
                 bg={isDark ? 'gray.9' : 'white'}
+                className="presentation-mode"
                 style={{
                   ...styles,
                   zIndex: 9999,

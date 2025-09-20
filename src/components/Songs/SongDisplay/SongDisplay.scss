@@ -13,17 +13,6 @@
     justify-content: center;
   }
 
-  & > .header {
-    // align-items: center;
-    // gap: 15px;
-    // display: grid;
-    // font-weight: bold;
-    // margin: auto;
-    // max-width: 1000px;
-    // width: 100%;
-    // margin-bottom: 2rem;
-  }
-
   & > .footer {
     justify-self: flex-end;
     font-style: italic;
@@ -43,4 +32,29 @@
   //     grid-template-columns: auto 1fr auto 50px;
   //   }
   // }
+}
+
+// Presentation mode styles
+.presentation-mode {
+  // Prevent text selection on mobile devices in presentation mode
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  
+  // Prevent tap highlighting on mobile
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  
+  // Prevent context menu on long press
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+
+  // Additional mobile-specific touch optimizations
+  @media (max-width: 768px) {
+    touch-action: manipulation;
+    -ms-touch-action: manipulation;
+  }
 }
