@@ -40,7 +40,7 @@ function Favourites() {
     ({ columnIndex, rowIndex, style, data }: CellComponentProps<{ data: Song[] }>) => {
       const itemIndex = rowIndex * numColumns.current + columnIndex;
       if (itemIndex >= finalList.length) 
-        return null;
+        {return null;}
       
       return (
         <Box

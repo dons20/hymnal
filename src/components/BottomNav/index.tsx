@@ -47,9 +47,9 @@ function MobileNavBar() {
 
       // Show when near bottom (within 100px) on mobile devices only
       if (isMobileScreen && scrollY >= documentHeight - windowHeight - 100) 
-        setIsAtBottom(true);
+        {setIsAtBottom(true);}
        else 
-        setIsAtBottom(false);
+        {setIsAtBottom(false);}
       
     },
     100,
@@ -65,12 +65,12 @@ function MobileNavBar() {
       // Check initial position
       scrollEventHandler();
     } else 
-      setIsAtBottom(false);
+      {setIsAtBottom(false);}
     
 
     return () => {
       if (isMobileScreen) 
-        window.removeEventListener('scroll', scrollEventHandler);
+        {window.removeEventListener('scroll', scrollEventHandler);}
       
     };
   }, [pathname, scrollEventHandler, isMobileScreen]);
@@ -82,7 +82,7 @@ function MobileNavBar() {
 
   // Only show on mobile screens and when at bottom, but not on homepage
   if (!isMobileScreen || !isAtBottom || isHomePage) 
-    return null;
+    {return null;}
   
 
   return (

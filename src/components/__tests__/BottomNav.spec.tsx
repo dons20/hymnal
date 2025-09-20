@@ -2,6 +2,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter, MemoryRouter } from 'react-router';
 import { BottomNav } from '@/components';
+import { MantineProvider } from '@mantine/core';
 import { resizeWindow } from '@/helpers/tests';
 
 // Object.defineProperty(rdd, "isMobile", {
@@ -11,21 +12,17 @@ import { resizeWindow } from '@/helpers/tests';
 const user = userEvent.setup();
 
 beforeEach(() => {
-  window.matchMedia = jest.fn().mockImplementation(() => ({
-    matches: false,
-    media: '',
-    onchange: null,
-    addListener: jest.fn(),
-    removeListener: jest.fn(),
-  }));
+  // matchMedia mock is provided in vitest.setup.mjs globally, keep here if tests override
 });
 
 describe('#BottomNav', () => {
   it('should render correctly', () => {
     const { asFragment } = render(
-      <MemoryRouter>
-        <BottomNav />
-      </MemoryRouter>
+      <MantineProvider defaultColorScheme="light">
+        <MemoryRouter>
+          <BottomNav />
+        </MemoryRouter>
+      </MantineProvider>
     );
     const Navbar = screen.getByTestId('bottomNavWrapper');
     const HomeButton = screen.getByTestId('Home');
@@ -40,9 +37,11 @@ describe('#BottomNav', () => {
   });
   it('shows only icons on smaller screens', () => {
     render(
-      <MemoryRouter>
-        <BottomNav />
-      </MemoryRouter>
+      <MantineProvider defaultColorScheme="light">
+        <MemoryRouter>
+          <BottomNav />
+        </MemoryRouter>
+      </MantineProvider>
     );
     resizeWindow(450, 500);
     const HomeButton = screen.getByTestId('Home');
@@ -60,9 +59,11 @@ describe('#BottomNav', () => {
   });
   it('navigates to the correct route when each button is clicked', async () => {
     render(
-      <BrowserRouter>
-        <BottomNav />
-      </BrowserRouter>
+      <MantineProvider defaultColorScheme="light">
+        <BrowserRouter>
+          <BottomNav />
+        </BrowserRouter>
+      </MantineProvider>
     );
     const HomeButton = screen.getByTestId('Home');
     const SongsButton = screen.getByTestId('Songs');

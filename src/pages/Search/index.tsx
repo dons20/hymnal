@@ -40,7 +40,7 @@ function Cell({ rowIndex, style, data }: CellComponentProps<{ data: FuseResult<S
 
   const result = data[rowIndex];
   if (!result) 
-    return null;
+    {return null;}
   
 
   return (
@@ -111,14 +111,14 @@ function Search() {
   const submitQuery = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (searchQuery.length > 0) 
-      handleSearch(searchQuery);
+      {handleSearch(searchQuery);}
     
   };
 
   const searchQueryChange = (value: string) => {
     setSearchQuery(value);
     if (value.length > 0) 
-      handleSearch(value);
+      {handleSearch(value);}
      else {
       setSearchResults([]);
       handleSearch.cancel();
@@ -131,7 +131,7 @@ function Search() {
 
   useEffect(() => {
     if (extractedQuery) 
-      handleSearch(extractedQuery);
+      {handleSearch(extractedQuery);}
     
   }, [extractedQuery, handleSearch]);
 

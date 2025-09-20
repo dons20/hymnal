@@ -6,9 +6,11 @@ import {
   ActionIcon,
   Box,
   Container,
+  Flex,
   Group,
-  SimpleGrid,
+  Portal,
   Text,
+  Title,
   Transition,
   useMantineColorScheme,
 } from '@mantine/core';
@@ -46,6 +48,23 @@ function SongDisplay() {
     if (songs.length > 1) dispatch!({ type: 'setTitle', payload: songToRender?.title || '' });
   }, [dispatch, songs, songToRender]);
 
+  // ESC key handler for presentation mode
+  useEffect(() => {
+    const handleEscKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && presentationMode) {
+        closePresentationMode();
+      }
+    };
+
+    if (presentationMode) {
+      document.addEventListener('keydown', handleEscKey);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscKey);
+    };
+  }, [presentationMode]);
+
   // Create presentation slides in the correct order (V1 -> C -> V2 -> C -> V3 -> C)
   const presentationSlides = useMemo(() => {
     if (!songToRender) return [];
@@ -62,12 +81,13 @@ function SongDisplay() {
       });
 
       // Add chorus after each verse (except if it's the last verse and no chorus exists)
-      if (hasChorus)
+      if (hasChorus) {
         slides.push({
           type: 'chorus',
           content: songToRender.chorus,
           label: 'Chorus',
         });
+      }
     });
 
     return slides;
@@ -78,7 +98,7 @@ function SongDisplay() {
       songs.length > 1 &&
       React.Children.toArray(
         songToRender?.verse.map((verse, i) => {
-          if (i === 1 && songToRender.chorus)
+          if (i === 1 && songToRender.chorus) {
             return (
               <>
                 <Box className="chorus">
@@ -86,27 +106,32 @@ function SongDisplay() {
                     component="span"
                     className="label"
                     fw={600}
-                    size="sm"
+                    size="lg"
                     c={isDark ? 'gray.4' : 'gray.6'}
                   >
                     Chorus
                   </Text>
-                  <Text>{songToRender.chorus}</Text>
+                  <Text style={{ fontSize: 'clamp(16px, 2.5vw, 20px)', lineHeight: 1.6 }}>
+                    {songToRender.chorus}
+                  </Text>
                 </Box>
                 <Box className="verse">
                   <Text
                     component="span"
                     className="label"
                     fw={600}
-                    size="sm"
+                    size="lg"
                     c={isDark ? 'gray.4' : 'gray.6'}
                   >
                     Verse {i + 1}
                   </Text>
-                  <Text>{verse}</Text>
+                  <Text style={{ fontSize: 'clamp(16px, 2.5vw, 20px)', lineHeight: 1.6 }}>
+                    {verse}
+                  </Text>
                 </Box>
               </>
             );
+          }
 
           return (
             <Box className="verse">
@@ -114,12 +139,12 @@ function SongDisplay() {
                 component="span"
                 className="label"
                 fw={600}
-                size="sm"
+                size="lg"
                 c={isDark ? 'gray.4' : 'gray.6'}
               >
                 Verse {i + 1}
               </Text>
-              <Text>{verse}</Text>
+              <Text style={{ fontSize: 'clamp(16px, 2.5vw, 20px)', lineHeight: 1.6 }}>{verse}</Text>
             </Box>
           );
         })
@@ -157,12 +182,12 @@ function SongDisplay() {
   };
 
   const nextSlide = () => {
-    if (reducedMotion)
-      if (currentSlide < presentationSlides.length - 1)
+    if (reducedMotion) {
+      if (currentSlide < presentationSlides.length - 1) {
         // No animation for users who prefer reduced motion
         setCurrentSlide(currentSlide + 1);
-      else setCurrentSlide(0);
-    else {
+      } else setCurrentSlide(0);
+    } else {
       // Animate slide transition for users who don't mind motion
       setSlideTransitioning(true);
       setTimeout(() => {
@@ -185,140 +210,152 @@ function SongDisplay() {
     const currentSlideData = presentationSlides[currentSlide];
 
     return (
-      <Transition mounted={presentationMode} transition="fade" duration={reducedMotion ? 0 : 300}>
-        {(styles) => (
-          <Box
-            pos="fixed"
-            top={0}
-            left={0}
-            right={0}
-            bottom={0}
-            bg={isDark ? 'gray.9' : 'white'}
-            style={{
-              ...styles,
-              zIndex: 9999,
-              cursor: 'pointer',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'center',
-              padding: '2rem',
-              paddingTop: '4rem', // Extra padding to avoid close button
-              paddingBottom: '4rem', // Extra padding for navigation dots
-            }}
-            onClick={nextSlide}
+      <>
+        {/* Render regular content but hidden */}
+        <div style={{ display: 'none' }}>
+          <Container className="container" size="lg" my="md" py="lg" px="xl">
+            <Helmet>
+              <title>{`Hymns for All Times | ${songToRender!.title}`}</title>
+            </Helmet>
+          </Container>
+        </div>
+
+        {/* Portal for presentation mode - rendered outside component tree */}
+        <Portal>
+          <Transition
+            mounted={presentationMode}
+            transition="fade"
+            duration={reducedMotion ? 0 : 300}
           >
-            {/* Close button - positioned safely at top right */}
-            <ActionIcon
-              pos="absolute"
-              top={16}
-              right={16}
-              variant="filled"
-              size="lg"
-              color="gray"
-              onClick={(e) => {
-                e.stopPropagation();
-                closePresentationMode();
-              }}
-              style={{
-                zIndex: 10000,
-                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
-                color: isDark ? 'white' : 'black',
-                backdropFilter: 'blur(8px)',
-                border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)'}`,
-              }}
-            >
-              ✕
-            </ActionIcon>
-
-            {/* Slide content with transition */}
-            <Transition
-              mounted={!slideTransitioning}
-              transition="fade"
-              duration={reducedMotion ? 0 : 150}
-            >
-              {(contentStyles) => (
-                <Box
-                  style={{
-                    ...contentStyles,
-                    textAlign: 'center',
-                    maxWidth: '90vw',
-                    width: '100%',
-                    flex: 1,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}
-                >
-                  <Text
-                    size="lg"
-                    fw={600}
-                    mb="xl"
-                    c={isDark ? 'blue.4' : 'blue.6'}
-                    style={{ fontSize: 'clamp(1.2rem, 3vw, 2rem)' }}
-                  >
-                    {currentSlideData.label}
-                  </Text>
-                  <Text
-                    lh={1.4}
-                    style={{
-                      whiteSpace: 'pre-line',
-                      wordBreak: 'break-word',
-                      maxHeight: '60vh',
-                      overflow: 'auto',
-                      fontSize: 'clamp(1.2rem, 4vw, 3rem)',
-                      textAlign: 'center',
-                    }}
-                  >
-                    {currentSlideData.content}
-                  </Text>
-                </Box>
-              )}
-            </Transition>
-
-            {/* Navigation indicators - positioned safely at bottom */}
-            <Group
-              pos="absolute"
-              bottom={16}
-              left="50%"
-              style={{
-                transform: 'translateX(-50%)',
-                backgroundColor: isDark ? 'rgba(0, 0, 0, 0.3)' : 'rgba(255, 255, 255, 0.8)',
-                padding: '8px 12px',
-                borderRadius: '20px',
-                backdropFilter: 'blur(8px)',
-                border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}`,
-              }}
-              gap="xs"
-            >
-              {presentationSlides.map((_, index) => (
-                <Box
-                  key={index}
-                  w={8}
-                  h={8}
-                  bg={index === currentSlide ? 'blue.5' : isDark ? 'gray.5' : 'gray.4'}
-                  style={{
-                    borderRadius: '50%',
-                    cursor: 'pointer',
-                    transition: reducedMotion ? 'none' : 'all 0.2s ease',
-                  }}
+            {(styles) => (
+              <Box
+                pos="fixed"
+                top={0}
+                left={0}
+                right={0}
+                bottom={0}
+                bg={isDark ? 'gray.9' : 'white'}
+                style={{
+                  ...styles,
+                  zIndex: 9999,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  padding: '2rem',
+                  paddingTop: '4rem',
+                  paddingBottom: '4rem',
+                }}
+                onClick={nextSlide}
+              >
+                {/* Close button - positioned safely at top right */}
+                <ActionIcon
+                  pos="absolute"
+                  top={16}
+                  right={16}
+                  variant="outline"
+                  size="lg"
+                  color="red"
                   onClick={(e) => {
                     e.stopPropagation();
-                    if (!reducedMotion) {
-                      setSlideTransitioning(true);
-                      setTimeout(() => {
-                        setCurrentSlide(index);
-                        setSlideTransitioning(false);
-                      }, 150);
-                    } else setCurrentSlide(index);
+                    closePresentationMode();
                   }}
-                />
-              ))}
-            </Group>
-          </Box>
-        )}
-      </Transition>
+                  style={{ zIndex: 10000 }}
+                >
+                  ✕
+                </ActionIcon>
+
+                {/* Slide content with transition */}
+                <Transition
+                  mounted={!slideTransitioning}
+                  transition="fade"
+                  duration={reducedMotion ? 0 : 150}
+                >
+                  {(contentStyles) => (
+                    <Box
+                      style={{
+                        ...contentStyles,
+                        textAlign: 'center',
+                        maxWidth: '90vw',
+                        width: '100%',
+                        flex: 1,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <Text
+                        size="lg"
+                        fw={600}
+                        mb="xl"
+                        c={isDark ? 'blue.4' : 'blue.6'}
+                        style={{ fontSize: 'clamp(1.2rem, 3vw, 2rem)' }}
+                      >
+                        {currentSlideData.label}
+                      </Text>
+                      <Text
+                        lh={1.4}
+                        style={{
+                          whiteSpace: 'pre-line',
+                          wordBreak: 'break-word',
+                          maxHeight: '60vh',
+                          overflow: 'auto',
+                          fontSize: 'clamp(1.2rem, 4vw, 3rem)',
+                          textAlign: 'center',
+                        }}
+                      >
+                        {currentSlideData.content}
+                      </Text>
+                    </Box>
+                  )}
+                </Transition>
+
+                {/* Navigation indicators - positioned safely at bottom */}
+                <Group
+                  pos="absolute"
+                  bottom={16}
+                  left="50%"
+                  style={{
+                    transform: 'translateX(-50%)',
+                    backgroundColor: isDark ? 'rgba(0, 0, 0, 0.3)' : 'rgba(255, 255, 255, 0.8)',
+                    padding: '8px 12px',
+                    borderRadius: '20px',
+                    backdropFilter: 'blur(8px)',
+                    border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}`,
+                  }}
+                  gap="xs"
+                >
+                  {presentationSlides.map((_, index) => (
+                    <Box
+                      key={index}
+                      w={8}
+                      h={8}
+                      bg={index === currentSlide ? 'blue.5' : isDark ? 'gray.5' : 'gray.4'}
+                      style={{
+                        borderRadius: '50%',
+                        cursor: 'pointer',
+                        transition: reducedMotion ? 'none' : 'all 0.2s ease',
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (!reducedMotion) {
+                          setSlideTransitioning(true);
+                          setTimeout(() => {
+                            setCurrentSlide(index);
+                            setSlideTransitioning(false);
+                          }, 150);
+                        } else setCurrentSlide(index);
+                      }}
+                    />
+                  ))}
+                </Group>
+              </Box>
+            )}
+          </Transition>
+        </Portal>
+      </>
     );
   }
 
@@ -326,21 +363,29 @@ function SongDisplay() {
     <Container
       className="container"
       size="lg"
-      bg={isDark ? 'inherit' : 'gray.1'}
-      style={{ boxShadow: isDark ? undefined : 'var(--mantine-shadow-md)' }}
       my="md"
       py="lg"
       px="xl"
+      bg={colorScheme === 'dark' ? 'transparent' : 'white'}
     >
       <Helmet>
         <title>{`Hymns for All Times | ${songToRender!.title}`}</title>
       </Helmet>
-      <Box className="header" pos="relative" pr="lg">
-        <Text fw={600}># {songToRender!.number}</Text>
-        <Text size="xl" fw={500}>
-          {songToRender!.title}
-        </Text>
-        <Group gap="xs" pos="absolute" top={0} right={0}>
+      <Flex
+        className="header"
+        pos="relative"
+        pr="lg"
+        justify="space-between"
+        wrap="wrap"
+        gap="md"
+        maw={800}
+        m="auto"
+        mb="lg"
+      >
+        <Title order={2} fw={500}>
+          # {songToRender!.number} {songToRender!.title}
+        </Title>
+        <Group gap="xs">
           <ActionIcon
             variant="outline"
             color="gray"
@@ -377,28 +422,98 @@ function SongDisplay() {
             <FaExpand />
           </ActionIcon>
         </Group>
-      </Box>
+      </Flex>
       <Box className="body">{songBody}</Box>
       {songToRender.author && (
-        <Text className="footer" c={isDark ? 'gray.3' : 'gray.7'}>
+        <Text className="footer" c={isDark ? 'gray.3' : 'gray.7'} fs="italic" ta="right">
           {songToRender.author}
         </Text>
       )}
-      <SimpleGrid cols={isFirstSong && isLastSong ? 2 : 1} mt="lg" mb="md" spacing="md">
-        {isFirstSong && (
-          <Button onClick={previousSong} leftSection={<FaArrowCircleLeft />} flex="1">
-            Previous Song
+      <Box mt="lg" mb="md" maw={1200} mx="auto">
+        <Flex gap="md" direction={{ base: 'row' }} justify="center" wrap="wrap" align="stretch">
+          {isFirstSong && (
+            <Button
+              onClick={previousSong}
+              leftSection={<FaArrowCircleLeft />}
+              size="md"
+              style={{
+                flex: 1,
+                maxWidth: '500px',
+                minHeight: '42px',
+              }}
+            >
+              Previous Song
+            </Button>
+          )}
+          {isLastSong && (
+            <Button
+              onClick={nextSong}
+              rightSection={<FaArrowCircleRight />}
+              size="md"
+              style={{
+                flex: 1,
+                maxWidth: '500px',
+                minHeight: '42px',
+              }}
+            >
+              Next Song
+            </Button>
+          )}
+          {/* When there's no previous button, wrap next and back to index */}
+          {!isFirstSong && isLastSong && (
+            <Button
+              onClick={backToIndex}
+              variant="outline"
+              size="md"
+              style={{
+                maxWidth: '500px',
+                minHeight: '42px',
+                flex: 1,
+              }}
+            >
+              Back to Index
+            </Button>
+          )}
+        </Flex>
+
+        {/* Show back to index button separately when both prev/next exist */}
+        {isFirstSong && isLastSong && (
+          <Button
+            onClick={backToIndex}
+            variant="outline"
+            fullWidth
+            mt="md"
+            size="md"
+            style={{
+              maxWidth: '500px',
+              minHeight: '42px',
+              marginLeft: 'auto',
+              marginRight: 'auto',
+            }}
+          >
+            Back to Index
           </Button>
         )}
-        {isLastSong && (
-          <Button onClick={nextSong} rightSection={<FaArrowCircleRight />} flex="1">
-            Next Song
+
+        {/* Show back to index button when only previous exists */}
+        {isFirstSong && !isLastSong && (
+          <Button
+            onClick={backToIndex}
+            variant="outline"
+            fullWidth
+            mt="md"
+            size="md"
+            style={{
+              maxWidth: '500px',
+              minHeight: '42px',
+              marginLeft: 'auto',
+              marginRight: 'auto',
+            }}
+          >
+            Back to Index
           </Button>
         )}
-      </SimpleGrid>
-      <Button onClick={backToIndex} variant="outline" fullWidth>
-        Back to Index
-      </Button>
+      </Box>
     </Container>
   );
 }

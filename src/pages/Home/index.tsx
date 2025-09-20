@@ -14,7 +14,7 @@ const meta = {
 };
 
 // Music note symbols for the animated background
-const musicNotes = ['♪', '♫', '♬', '♩', '♭', '♮', '♯', '𝄞', '𝄢', '𝄡', '♪', '♫'];
+const musicNotes = ['♪', '♫', '♬', '♩', '♭', '♮', '♯', '𝄞', '𝄢', '♬', '♪', '♫'];
 
 function HomeScreen() {
   const { pages, dispatch } = useMainContext();
@@ -50,7 +50,9 @@ function HomeScreen() {
       {/* Theme Toggle Button */}
       <ActionIcon
         className="theme-toggle"
-        variant="filled"
+        variant="outline"
+        color="blue"
+        radius="md"
         size="lg"
         onClick={toggleColorScheme}
         aria-label="Toggle color scheme"
@@ -59,9 +61,6 @@ function HomeScreen() {
           top: '20px',
           right: '20px',
           zIndex: 1000,
-          backgroundColor: isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)',
-          backdropFilter: 'blur(10px)',
-          border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.2)'}`,
           color: isDark ? '#fff' : '#1976d2',
         }}
       >

@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
-import SampleImg from 'img/favourites.svg';
+import SampleImg from '@/img/favourites.svg';
 import { BrowserRouter } from 'react-router';
+import { MantineProvider } from '@mantine/core';
 import { Card } from '@/components';
 
 describe('#Card', () => {
@@ -14,9 +15,11 @@ describe('#Card', () => {
       imageAlt: 'Sample Image',
     };
     render(
-      <BrowserRouter>
-        <Card {...props} />
-      </BrowserRouter>
+      <MantineProvider defaultColorScheme="light">
+        <BrowserRouter>
+          <Card {...props} />
+        </BrowserRouter>
+      </MantineProvider>
     );
     const title = screen.getByText(props.title);
     const subtitle = screen.getByText(props.subtitle);

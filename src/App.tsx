@@ -63,11 +63,12 @@ function App() {
           component="main"
           className={`${styles.app_inner} ${notSongListPage ? styles.app_inner_mobile : ''}`}
           bg={!isHomePage && isDark ? 'gray.8' : !isHomePage ? 'gray.2' : undefined}
+          p={0}
           fluid
         >
           {!isHomePage && <PictureHeader />}
 
-          <div className={styles.wrapper}>
+          <div className={!isHomePage ? styles.wrapper : undefined}>
             <Routes>
               <Route path="home" element={<Home />} />
               <Route path="songs/*" element={songs.length > 1 ? <Songs /> : <Loader />} />

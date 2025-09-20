@@ -1,6 +1,6 @@
 import { lazy } from 'react';
 import { Navigate, Route, Routes } from 'react-router';
-import { Box, useMantineColorScheme } from '@mantine/core';
+import { Box } from '@mantine/core';
 import withSuspense from '../../helpers/withSuspense';
 
 import './Songs.scss';
@@ -10,11 +10,9 @@ const SongDisplay = withSuspense(lazy(() => import('../../components/Songs/SongD
 const Favourites = withSuspense(lazy(() => import('../Favourites')));
 
 function Listing() {
-  const { colorScheme } = useMantineColorScheme();
-  const isDark = colorScheme === 'dark';
 
   return (
-    <Box className="songs" bg={isDark ? 'gray.8' : 'gray.2'}>
+    <Box className="songs">
       <Routes>
         <Route path="index" element={<SongList />} />
         <Route path="favourites" element={<Favourites />} />

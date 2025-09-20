@@ -1,15 +1,26 @@
 .songs {
-  .song-item {
+  .songItem {
+    background-color: light-dark(white, var(--mantine-color-dark-6));
+    color: light-dark(var(--mantine-color-dark-7), var(--mantine-color-gray-2));
+    border: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+    
     &:hover {
-      .mantine-Group-root {
         background: var(--mantine-primary-color-7);
         color: white;
 
         .mantine-Text-root {
           color: white;
         }
-      }
+
+        .mantine-ActionIcon-root {
+          color: white;
+          border-color: white;
+        }
     }
+  }
+
+  .songWrapper {
+    padding: 3px 0;
   }
 
   .listItem {

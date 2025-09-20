@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router';
+import { MantineProvider } from '@mantine/core';
 import PictureHeader from '@/components/PictureHeader';
 import { CTX, MainContextProvider } from '@/utils/context';
 
@@ -20,11 +21,13 @@ describe('#PictureHeader', () => {
       subtitle: 'Test Subtitle',
     };
     render(
-      <BrowserRouter>
-        <Providers value={{ meta }}>
-          <PictureHeader />
-        </Providers>
-      </BrowserRouter>
+      <MantineProvider defaultColorScheme="light">
+        <BrowserRouter>
+          <Providers value={{ meta }}>
+            <PictureHeader />
+          </Providers>
+        </BrowserRouter>
+      </MantineProvider>
     );
     expect(await screen.findByText(meta.title)).toBeInTheDocument();
     expect(await screen.findByText(meta.subtitle)).toBeInTheDocument();

@@ -41,7 +41,7 @@ function MainContext({ children }: PropsT) {
   }, [colorScheme]);
 
   if (songs.length === 0) 
-    return <Loader />;
+    {return <Loader />;}
   
 
   return (

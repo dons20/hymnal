@@ -6,15 +6,11 @@ export default defineConfig(
   {
     files: ['**/*.{ts,tsx,mts,cts}'],
     rules: {
-      curly: ['error', 'multi'],
+      curly: ['error', 'multi-line'],
     },
   },
   { ignores: ['**/*.{mjs,cjs,js,d.ts,d.mts}', './.storybook/main.ts'] },
   {
     files: ['**/*.story.tsx'],
-    rules: {
-      'no-console': 'off',
-      curly: ['error', 'multi'],
-    },
   }
 );

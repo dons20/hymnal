@@ -6,6 +6,24 @@
   }
 }
 
+.menu-link {
+  cursor: pointer;
+  padding: 10px 12px;
+  border-radius: var(--mantine-radius-sm);
+  background: transparent;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+body[data-mantine-color-scheme='dark'] .menu-link:hover {
+  background-color: var(--mantine-color-gray-7);
+  color: #fff;
+}
+
+body[data-mantine-color-scheme='light'] .menu-link:hover {
+  background-color: var(--mantine-color-gray-2);
+  color: var(--mantine-color-dark-6);
+}
+
 @media only screen and (max-width: 575px) {
   .page-header {
     & .search {
