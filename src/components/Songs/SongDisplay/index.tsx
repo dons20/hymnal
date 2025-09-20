@@ -36,6 +36,10 @@ function SongDisplay() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [slideTransitioning, setSlideTransitioning] = useState(false);
 
+  // Touch handling state for swipe detection
+  const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null);
+  const [touchEnd, setTouchEnd] = useState<{ x: number; y: number } | null>(null);
+
   const songIndex = parseInt(songID || '1', 10) - 1;
   const songToRender = songs.find((song) => song.number === songIndex + 1) || null;
 
@@ -96,59 +100,57 @@ function SongDisplay() {
   const songBody = useMemo(
     () =>
       songs.length > 1 &&
-      React.Children.toArray(
-        songToRender?.verse.map((verse, i) => {
-          if (i === 1 && songToRender.chorus) {
-            return (
-              <>
-                <Box className="chorus">
-                  <Text
-                    component="span"
-                    className="label"
-                    fw={600}
-                    size="lg"
-                    c={isDark ? 'gray.4' : 'gray.6'}
-                  >
-                    Chorus
-                  </Text>
-                  <Text style={{ fontSize: 'clamp(16px, 2.5vw, 20px)', lineHeight: 1.6 }}>
-                    {songToRender.chorus}
-                  </Text>
-                </Box>
-                <Box className="verse">
-                  <Text
-                    component="span"
-                    className="label"
-                    fw={600}
-                    size="lg"
-                    c={isDark ? 'gray.4' : 'gray.6'}
-                  >
-                    Verse {i + 1}
-                  </Text>
-                  <Text style={{ fontSize: 'clamp(16px, 2.5vw, 20px)', lineHeight: 1.6 }}>
-                    {verse}
-                  </Text>
-                </Box>
-              </>
-            );
-          }
-
+      songToRender?.verse.map((verse, i) => {
+        if (i === 1 && songToRender.chorus) {
           return (
-            <Box className="verse">
-              <Text
-                component="span"
-                className="label"
-                fw={600}
-                size="lg"
-                c={isDark ? 'gray.4' : 'gray.6'}
-              >
-                Verse {i + 1}
-              </Text>
-              <Text style={{ fontSize: 'clamp(16px, 2.5vw, 20px)', lineHeight: 1.6 }}>{verse}</Text>
-            </Box>
+            <React.Fragment key={`verse-chorus-${i}`}>
+              <Box className="chorus">
+                <Text
+                  component="span"
+                  className="label"
+                  fw={600}
+                  size="lg"
+                  c={isDark ? 'gray.4' : 'gray.6'}
+                >
+                  Chorus
+                </Text>
+                <Text style={{ fontSize: 'clamp(16px, 2.5vw, 20px)', lineHeight: 1.6 }}>
+                  {songToRender.chorus}
+                </Text>
+              </Box>
+              <Box className="verse">
+                <Text
+                  component="span"
+                  className="label"
+                  fw={600}
+                  size="lg"
+                  c={isDark ? 'gray.4' : 'gray.6'}
+                >
+                  Verse {i + 1}
+                </Text>
+                <Text style={{ fontSize: 'clamp(16px, 2.5vw, 20px)', lineHeight: 1.6 }}>
+                  {verse}
+                </Text>
+              </Box>
+            </React.Fragment>
           );
-        })
-      ),
+        }
+
+        return (
+          <Box key={`verse-${i}`} className="verse">
+            <Text
+              component="span"
+              className="label"
+              fw={600}
+              size="lg"
+              c={isDark ? 'gray.4' : 'gray.6'}
+            >
+              Verse {i + 1}
+            </Text>
+            <Text style={{ fontSize: 'clamp(16px, 2.5vw, 20px)', lineHeight: 1.6 }}>{verse}</Text>
+          </Box>
+        );
+      }),
     [songs, songToRender, isDark]
   );
 
@@ -196,6 +198,81 @@ function SongDisplay() {
 
         setSlideTransitioning(false);
       }, 150);
+    }
+  };
+
+  const previousSlide = () => {
+    if (reducedMotion) {
+      if (currentSlide > 0) {
+        setCurrentSlide(currentSlide - 1);
+      } else setCurrentSlide(presentationSlides.length - 1);
+    } else {
+      setSlideTransitioning(true);
+      setTimeout(() => {
+        if (currentSlide > 0) setCurrentSlide(currentSlide - 1);
+        else setCurrentSlide(presentationSlides.length - 1);
+        
+        setSlideTransitioning(false);
+      }, 150);
+    }
+  };
+
+  // Swipe detection constants
+  const minSwipeDistance = 50;
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart({
+      x: e.targetTouches[0].clientX,
+      y: e.targetTouches[0].clientY,
+    });
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd({
+      x: e.targetTouches[0].clientX,
+      y: e.targetTouches[0].clientY,
+    });
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+
+    const distanceX = touchStart.x - touchEnd.x;
+    const distanceY = touchStart.y - touchEnd.y;
+    const isHorizontalSwipe = Math.abs(distanceX) > Math.abs(distanceY);
+
+    if (isHorizontalSwipe && Math.abs(distanceX) > minSwipeDistance) {
+      if (distanceX > 0) {
+        // Swipe left - go to next slide
+        nextSlide();
+      } else {
+        // Swipe right - go to previous slide
+        previousSlide();
+      }
+    }
+  };
+
+  // Enhanced tap handling for directional navigation
+  const handlePresentationClick = (e: React.MouseEvent<HTMLElement>) => {
+    const target = e.currentTarget;
+    const rect = target.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const width = rect.width;
+    
+    // Define tap areas: left 25%, center 50%, right 25%
+    const leftAreaEnd = width * 0.25;
+    const rightAreaStart = width * 0.75;
+    
+    if (x < leftAreaEnd) {
+      // Tap on left area - go to previous slide
+      previousSlide();
+    } else if (x > rightAreaStart) {
+      // Tap on right area - go to next slide
+      nextSlide();
+    } else {
+      // Tap on center area - go to next slide (existing behavior)
+      nextSlide();
     }
   };
 
@@ -247,7 +324,10 @@ function SongDisplay() {
                   paddingTop: '4rem',
                   paddingBottom: '4rem',
                 }}
-                onClick={nextSlide}
+                onClick={handlePresentationClick}
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
               >
                 {/* Close button - positioned safely at top right */}
                 <ActionIcon

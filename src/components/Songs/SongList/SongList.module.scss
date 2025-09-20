@@ -3,16 +3,23 @@
     background-color: light-dark(white, var(--mantine-color-dark-6));
     color: light-dark(var(--mantine-color-dark-7), var(--mantine-color-gray-2));
     border: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+    width: calc(100% - 6px);
+    margin: 3px 0 3px 6px;
+    padding: 8px;
+
+    @media screen and (min-width: 768px) {
+      box-shadow: var(--mantine-shadow-sm);
+    }
     
     &:hover {
         background: var(--mantine-primary-color-7);
         color: white;
 
-        .mantine-Text-root {
+        :global(.mantine-Text-root) {
           color: white;
         }
 
-        .mantine-ActionIcon-root {
+        :global(.mantine-ActionIcon-root) {
           color: white;
           border-color: white;
         }

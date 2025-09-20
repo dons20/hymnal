@@ -1,99 +1,124 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { Helmet } from '@dr.pogodin/react-helmet';
 import { Link, useNavigate } from 'react-router';
-import { CellComponentProps, Grid } from 'react-window';
-import { Anchor, Box, Container, SimpleGrid, Text, useMantineColorScheme } from '@mantine/core';
+import { List, RowComponentProps } from 'react-window';
+import { FaHeart } from 'react-icons/fa';
+import { 
+  ActionIcon, 
+  Anchor, 
+  Box, 
+  Container, 
+  Group, 
+  Text, 
+  UnstyledButton, 
+  useMantineColorScheme 
+} from '@mantine/core';
 import { useMainContext } from '../../utils/context';
+import { updateFavesDB } from '../../helpers';
+import classes from './Favourites.module.scss';
 
 const meta = {
   title: 'Favourites',
   page: 'Favourites',
 };
 
+const calculateRowHeight = () => {
+  const isMobile = window.innerWidth < 768;
+  return isMobile ? 100 : 80;
+};
+
+const itemStyle = {
+  border: '1px solid var(--mantine-color-gray-3)',
+  borderRadius: 'var(--mantine-radius-md)',
+  transition: 'all 0.2s ease',
+  marginBottom: '8px',
+};
+
 function Favourites() {
   const navigate = useNavigate();
-  const { songs, favourites, dispatch } = useMainContext();
-  const finalList = songs
-    .filter((song) => favourites.includes(song.number - 1))
-    .sort((a, b) => a.number - b.number);
+  const { songs, favourites, setFavourites, dispatch } = useMainContext();
   const { colorScheme } = useMantineColorScheme();
   const isDark = colorScheme === 'dark';
-  const wrapperRef = useRef<HTMLDivElement>(null);
-  const numRows = favourites.length;
-  const numColumns = useRef(1);
 
-  /** Triggers navigation to a song at a specified index */
-  const memoDisplaySong = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
-      function displaySong(ev: React.MouseEvent<HTMLDivElement>) {
-        const songID = ev.currentTarget.getAttribute('data-song-id');
-        navigate(`${process.env.PUBLIC_URL}/songs/${songID}`);
-      }
+  const finalList = useMemo(() => 
+    songs
+      .filter((song) => favourites.includes(song.number - 1))
+      .sort((a, b) => a.number - b.number),
+    [songs, favourites]
+  );
 
-      displaySong(e);
+  const handleSongClick = useCallback(
+    (songNumber: number) => {
+      navigate(`/song/${songNumber}`);
     },
     [navigate]
   );
 
-  /** Renders a single cell */
-  const Cell = useCallback(
-    ({ columnIndex, rowIndex, style, data }: CellComponentProps<{ data: Song[] }>) => {
-      const itemIndex = rowIndex * numColumns.current + columnIndex;
-      if (itemIndex >= finalList.length) 
-        {return null;}
-      
+  const handleFavoriteToggle = useCallback(
+    (songNumber: number) => {
+      const newFavorites = favourites.filter((fave) => fave !== songNumber - 1);
+      setFavourites(newFavorites);
+      updateFavesDB(newFavorites);
+    },
+    [favourites, setFavourites]
+  );
+
+  const Row = useCallback(
+    ({ index, style }: RowComponentProps) => {
+      const song = finalList[index];
       return (
-        <Box
-          key={data[itemIndex].number}
-          className="gridItemWrapper"
-          style={{ cursor: 'default', ...style }}
-          pl={`${window.innerWidth * 0.07}px`}
-        >
-          <SimpleGrid
-            data-song-id={data[itemIndex].number}
-            h={100}
-            px="md"
-            py="md"
-            style={{
-              alignItems: 'center',
-              maxWidth: '800px',
-              margin: 'auto',
-              cursor: 'pointer',
-              transition: 'transform 0.1s ease-in-out',
-              willChange: 'transform',
-            }}
-            bg={isDark ? 'gray.7' : 'gray.1'}
-            onClick={memoDisplaySong}
-            cols={2}
-            spacing="md"
-            styles={{
-              root: {
-                boxShadow: 'var(--mantine-shadow-md)',
-                borderRadius: 'var(--mantine-radius-md)',
-              },
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-2px)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0px)';
-            }}
+        <div style={{ ...style, padding: '4px 20px' }}>
+          <UnstyledButton
+            onClick={() => handleSongClick(song.number)}
+            w="100%"
           >
-            <Text className="listNumber" fw={600}>
-              # {data[itemIndex].number}
-            </Text>
-            <Text className="listTitle">{data[itemIndex].title}</Text>
-          </SimpleGrid>
-        </Box>
+            <Box
+              p="md"
+              style={{
+                ...itemStyle,
+                backgroundColor: isDark ? 'var(--mantine-color-gray-7)' : 'white',
+                cursor: 'pointer',
+                maxWidth: '800px',
+                margin: '0 auto',
+              }}
+              className={`${classes.favouriteItem} favourite-item`}
+            >
+              <Group justify="space-between" align="center">
+                <div style={{ flex: 1 }}>
+                  <Text fw={700} size="md">
+                    #{song.number} - {song.title}
+                  </Text>
+                </div>
+
+                <ActionIcon
+                  variant="filled"
+                  color="red"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleFavoriteToggle(song.number);
+                  }}
+                  style={{ flexShrink: 0 }}
+                >
+                  <FaHeart size={14} />
+                </ActionIcon>
+              </Group>
+            </Box>
+          </UnstyledButton>
+        </div>
       );
     },
-    [isDark, finalList.length, memoDisplaySong]
+    [finalList, isDark, handleSongClick, handleFavoriteToggle]
   );
 
   const EmptyListRender = useCallback(
     () => (
-      <Container style={{ textAlign: 'center' }}>
-        <Text>Sorry, it seems you haven&apos;t added any favourites yet!</Text>
+      <Container style={{ textAlign: 'center', paddingTop: '2rem' }}>
+        <Text size="lg" mb="md">
+          No favourites yet!
+        </Text>
+        <Text c="dimmed" mb="lg">
+          Start adding songs to your favourites by tapping the heart icon on any song.
+        </Text>
         <Anchor component={Link} to="/songs/index" c="blue.5">
           Browse Songs Index
         </Anchor>
@@ -111,19 +136,33 @@ function Favourites() {
       <Helmet>
         <title>{`Hymns for All Times | ${meta.page}`}</title>
       </Helmet>
-      <SimpleGrid pt="md" h="100%" bg={isDark ? 'gray.8' : 'gray.2'} cols={1}>
-        {finalList.length === 0 && <EmptyListRender />}
-        <Box ref={wrapperRef} pos="relative" style={{ overflow: 'hidden' }} h="100%">
-          <Grid
-            rowHeight={120}
-            columnWidth="50%"
-            columnCount={numColumns.current}
-            rowCount={numRows}
-            cellProps={{ data: finalList }}
-            cellComponent={Cell}
-          />
-        </Box>
-      </SimpleGrid>
+      <Box pt="md" h="100vh" className={classes.favourites}>
+        {finalList.length === 0 ? (
+          <EmptyListRender />
+        ) : (
+          <>
+            <Container mb="md">
+              <Text size="sm" c="dimmed" ta="center">
+                {finalList.length} favourite{finalList.length !== 1 ? 's' : ''}
+              </Text>
+            </Container>
+            <Box
+              style={{
+                height: 'calc(100vh - 120px)',
+                overflow: 'hidden',
+              }}
+            >
+              <List
+                rowComponent={Row}
+                rowCount={finalList.length}
+                rowHeight={calculateRowHeight}
+                rowProps={{}}
+                overscanCount={6}
+              />
+            </Box>
+          </>
+        )}
+      </Box>
     </>
   );
 }

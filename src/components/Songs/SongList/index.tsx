@@ -41,8 +41,7 @@ const itemGroupStyle = {
 };
 
 const calculateRowHeight = () => {
-  const isMobile = window.innerWidth < 768;
-  const baseHeight = isMobile ? 100 : 80;
+  const baseHeight = 80;
   return baseHeight;
 };
 
@@ -76,7 +75,7 @@ const SongListContent = memo(
           <UnstyledButton
             key={song.number}
             onClick={() => onSongClick(song.number)}
-            style={{ ...style, ...itemGroupStyle, width: '100%', padding: 8, marginBottom: 8 }}
+            style={{ ...style, ...itemGroupStyle, width: 'calc(100% - 6px)' }}
             className={classes.songItem}
           >
             <Group justify="space-between" p="sm">

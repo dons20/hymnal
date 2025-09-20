@@ -27,8 +27,8 @@ function useSongLoader() {
      */
     async function loadNewSongs({ songs: fetchedSongs, version }: SongsDB) {
       const localForage = await import('localforage');
-      const localSongs = localForage.createInstance({ storeName: 'items', name: dbName });
-      const localVersion = localForage.createInstance({ storeName: 'version', name: dbName });
+      const localSongs = localForage.default.createInstance({ storeName: 'items', name: dbName });
+      const localVersion = localForage.default.createInstance({ storeName: 'version', name: dbName });
 
       try {
         await Promise.all([
@@ -52,12 +52,12 @@ function useSongLoader() {
     async function checkDB() {
       const localForage = await import('localforage');
 
-      if (!localForage.config) {
+      if (!localForage.default.config) {
         simpleFetch();
         return;
       }
 
-      localForage.config({
+      localForage.default.config({
         name: dbName,
         description: 'Stores the songs db and its version number',
       });
@@ -65,7 +65,7 @@ function useSongLoader() {
         /**
          * Delete old DB
          */
-        const oldDB = localForage.createInstance({ name: 'keyval-store' });
+        const oldDB = localForage.default.createInstance({ name: 'keyval-store' });
         oldDB.dropInstance().catch(() => debug.info('Problem dropping old DB'));
         const query =
           process.env.NODE_ENV === 'production'
@@ -77,7 +77,7 @@ function useSongLoader() {
         debug.log(query);
         const songsDB: SongsDB = query.data;
         debug.log(`%cChecking if songs exist already`, 'color: #3182ce; font-size: medium;');
-        const localSongs = localForage.createInstance({ name: dbName, storeName: 'items' });
+        const localSongs = localForage.default.createInstance({ name: dbName, storeName: 'items' });
         const songsLength = await localSongs.length();
 
         if (songsLength < songsDB.songs.length) {
@@ -86,7 +86,7 @@ function useSongLoader() {
         }
 
         debug.log(`%cChecking for updates`, 'color: #3182ce; font-size: medium;');
-        const version = localForage.createInstance({ name: dbName, storeName: 'version' });
+        const version = localForage.default.createInstance({ name: dbName, storeName: 'version' });
         if (!version) throw new Error('No version stored');
         const versionNumber = (await version.getItem('value')) as string;
         if (songsDB.version !== versionNumber) {
@@ -111,23 +111,23 @@ function useSongLoader() {
     }
 
     async function loadFavourites() {
-      const name = 'Songs';
-      const storeName = 'Favourites';
       const localForage = await import('localforage');
 
-      if (!localForage.config) return;
-      localForage.config({
-        name,
-        storeName,
+      if (!localForage.default.config) return;
+      
+      // Create a specific instance for favourites
+      const favesStore = localForage.default.createInstance({
+        name: 'Songs',
+        storeName: 'Favourites',
         description: 'Your favourite songs',
       });
 
       try {
         const localFavourites: number[] = [];
-        await localForage.iterate((value: number) => {
+        await favesStore.iterate((value: number) => {
           localFavourites.push(value);
         });
-        setFavourites(favourites);
+        setFavourites(localFavourites);
       } catch (e) {
         debug.log('Error obtaining favourites');
         if (e instanceof Error) debug.info(e.message);
@@ -139,7 +139,7 @@ function useSongLoader() {
       checkDB();
       loadFavourites();
     }
-  }, [songs.length, favourites]);
+  }, [songs.length]);
 
   return { songs, favourites, setFavourites };
 }

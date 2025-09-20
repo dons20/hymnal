@@ -1,0 +1,100 @@
+.search {
+  .searchResultItem {
+    & .innerWrapper {
+        @media screen and (min-width: 768px) {
+            box-shadow: var(--mantine-shadow-sm);
+        }
+    }
+    
+    &:hover > div {
+      background: var(--mantine-primary-color-7) !important;
+      color: white !important;
+      transform: translateY(-2px);
+
+      .mantine-Text-root {
+        color: white !important;
+      }
+    }
+  }
+
+  .emptyState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    text-align: center;
+    padding: 2rem;
+
+    .emptyIcon {
+      font-size: 4rem;
+      color: var(--mantine-color-gray-4);
+      margin-bottom: 1rem;
+    }
+  }
+
+  // Search input improvements
+  .mantine-TextInput-root {
+    .mantine-TextInput-input {
+      border-radius: var(--mantine-radius-xl);
+      border: 2px solid transparent;
+      background: light-dark(white, var(--mantine-color-dark-6));
+      transition: all 0.2s ease;
+      box-shadow: var(--mantine-shadow-md);
+      
+      &:focus {
+        border-color: var(--mantine-primary-color-6);
+        box-shadow: var(--mantine-shadow-lg);
+        transform: translateY(-1px);
+      }
+    }
+  }
+
+  // Result item styling
+  .resultItem {
+    background-color: light-dark(white, var(--mantine-color-dark-6));
+    color: light-dark(var(--mantine-color-dark-7), var(--mantine-color-gray-2));
+    border: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+    
+    &:hover {
+      background: var(--mantine-primary-color-7) !important;
+      color: white !important;
+      transform: translateY(-2px);
+
+      .mantine-Text-root {
+        color: white !important;
+      }
+    }
+  }
+
+  // Responsive adjustments
+  @media only screen and (max-width: 768px) {
+    .resultItem {
+      padding: 0.75rem;
+      margin: 0 0.5rem;
+    }
+
+    .mantine-TextInput-root {
+      width: 95% !important;
+    }
+  }
+
+  @media only screen and (min-width: 769px) {
+    .resultItem {
+      padding: 1rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .mantine-TextInput-root {
+      max-width: 600px;
+      width: 90%;
+    }
+  }
+
+  // Results count styling
+  .resultsCount {
+    font-weight: 500;
+    letter-spacing: 0.025em;
+  }
+}

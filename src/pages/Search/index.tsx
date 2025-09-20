@@ -1,15 +1,15 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Helmet } from '@dr.pogodin/react-helmet';
 import Fuse, { FuseResult } from 'fuse.js';
 import { FaSearch } from 'react-icons/fa';
 import { useLocation, useNavigate } from 'react-router';
-import { CellComponentProps, Grid } from 'react-window';
+import { List, RowComponentProps } from 'react-window';
 import { useDebouncedCallback } from 'use-debounce';
 import {
   ActionIcon,
   Box,
   Container,
-  SimpleGrid,
+  Group,
   Text,
   TextInput,
   UnstyledButton,
@@ -17,72 +17,28 @@ import {
 } from '@mantine/core';
 import { useQuery } from '../../helpers';
 import { useMainContext } from '../../utils/context';
-
-import './Search.scss';
+import classes from './Search.module.scss';
 
 const meta = {
   title: 'Search',
   page: 'Search',
 };
 
-function Cell({ rowIndex, style, data }: CellComponentProps<{ data: FuseResult<Song>[] }>) {
-  const navigate = useNavigate();
-  const { colorScheme } = useMantineColorScheme();
-  const isDark = colorScheme === 'dark';
+const calculateRowHeight = () => {
+  const isMobile = window.innerWidth < 768;
+  return isMobile ? 100 : 80;
+};
 
-  /** Triggers navigation to a song at a specified index */
-  const navigateToSong = useCallback(
-    (songNumber: number) => {
-      navigate(`/song/${songNumber}`);
-    },
-    [navigate]
-  );
-
-  const result = data[rowIndex];
-  if (!result) 
-    {return null;}
-  
-
-  return (
-    <div style={{ ...style, padding: '8px 20px' }}>
-      <UnstyledButton
-        onClick={() => navigateToSong(result.item.number)}
-        style={{ width: '100%' }}
-        className="search-result-item"
-      >
-        <Box
-          p="md"
-          style={{
-            border: '1px solid var(--mantine-color-gray-3)',
-            borderRadius: 'var(--mantine-radius-md)',
-            backgroundColor: isDark ? 'var(--mantine-color-gray-7)' : 'white',
-            cursor: 'pointer',
-            transition: 'all 0.2s ease',
-            maxWidth: '800px',
-            margin: '0 auto',
-          }}
-        >
-          <SimpleGrid cols={2} style={{ alignItems: 'center' }}>
-            <Text fw={700} size="lg">
-              #{result.item.number}
-            </Text>
-            <Text fw={600} size="md">
-              {result.item.title}
-            </Text>
-          </SimpleGrid>
-          {result.item.author && (
-            <Text size="sm" c="dimmed" mt="xs">
-              by {result.item.author}
-            </Text>
-          )}
-        </Box>
-      </UnstyledButton>
-    </div>
-  );
-}
+const itemStyle = {
+  border: '1px solid var(--mantine-color-gray-3)',
+  borderRadius: 'var(--mantine-radius-md)',
+  transition: 'all 0.2s ease',
+  marginBottom: '8px',
+};
 
 function Search() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { songs, dispatch } = useMainContext();
   const { colorScheme } = useMantineColorScheme();
   const isDark = colorScheme === 'dark';
@@ -97,7 +53,53 @@ function Search() {
   const [searchResults, setSearchResults] = useState<FuseResult<Song>[]>(
     fuse.search(extractedQuery || searchQuery)
   );
-  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  /** Triggers navigation to a song at a specified index */
+  const navigateToSong = useCallback(
+    (songNumber: number) => {
+      navigate(`/song/${songNumber}`);
+    },
+    [navigate]
+  );
+
+  const Row = useCallback(
+    ({ index, style }: RowComponentProps) => {
+      const result = searchResults[index];
+      if (!result) return null;
+
+      return (
+        <div style={{ ...style, padding: '4px 20px' }}>
+          <UnstyledButton
+            onClick={() => navigateToSong(result.item.number)}
+            style={{ width: '100%' }}
+            className={classes.searchResultItem}
+          >
+            <Box
+              p="md"
+              className={classes.innerWrapper}
+              style={{
+                ...itemStyle,
+                backgroundColor: isDark ? 'var(--mantine-color-gray-7)' : 'white',
+                cursor: 'pointer',
+                maxWidth: '800px',
+                margin: '0 auto',
+              }}
+            >
+              <Group justify="space-between" align="center">
+                <Text fw={700} size="lg">
+                  #{result.item.number}
+                </Text>
+                <Text fw={600} size="md" style={{ flex: 1, textAlign: 'left', marginLeft: '1rem' }}>
+                  {result.item.title}
+                </Text>
+              </Group>
+            </Box>
+          </UnstyledButton>
+        </div>
+      );
+    },
+    [searchResults, isDark, navigateToSong]
+  );
 
   const handleSearch = useDebouncedCallback(
     (value: string) => {
@@ -110,16 +112,16 @@ function Search() {
 
   const submitQuery = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (searchQuery.length > 0) 
-      {handleSearch(searchQuery);}
-    
+    if (searchQuery.length > 0) {
+      handleSearch(searchQuery);
+    }
   };
 
   const searchQueryChange = (value: string) => {
     setSearchQuery(value);
-    if (value.length > 0) 
-      {handleSearch(value);}
-     else {
+    if (value.length > 0) {
+      handleSearch(value);
+    } else {
       setSearchResults([]);
       handleSearch.cancel();
     }
@@ -130,9 +132,9 @@ function Search() {
   }, [dispatch]);
 
   useEffect(() => {
-    if (extractedQuery) 
-      {handleSearch(extractedQuery);}
-    
+    if (extractedQuery) {
+      handleSearch(extractedQuery);
+    }
   }, [extractedQuery, handleSearch]);
 
   return (
@@ -140,7 +142,7 @@ function Search() {
       <Helmet>
         <title>{`Hymns for All Times | ${meta.page}`}</title>
       </Helmet>
-      <Box pt="lg" h="100vh" bg={isDark ? 'gray.8' : 'gray.2'}>
+      <Box pt="lg" h="100vh" className={classes.search}>
         <Container style={{ textAlign: 'center' }} mb="lg">
           <form onSubmit={submitQuery}>
             <TextInput
@@ -153,7 +155,13 @@ function Search() {
                   <FaSearch />
                 </ActionIcon>
               }
-              style={{ maxWidth: '600px', width: '90%' }}
+              style={{ maxWidth: '600px', width: '100%', margin: 'auto' }}
+              styles={{
+                input: {
+                  fontSize: '1.1rem',
+                  padding: '0.75rem 1rem',
+                },
+              }}
             />
           </form>
         </Container>
@@ -167,32 +175,35 @@ function Search() {
         )}
 
         <Box
-          ref={wrapperRef}
           style={{
             height: 'calc(100vh - 200px)',
             overflow: 'hidden',
           }}
         >
           {searchResults.length > 0 ? (
-            <Grid
-              rowHeight={120}
-              columnWidth={800}
-              columnCount={1}
+            <List
+              rowComponent={Row}
               rowCount={searchResults.length}
-              cellProps={{ data: searchResults }}
-              style={{ overflowX: 'hidden' }}
-              cellComponent={Cell}
+              rowHeight={calculateRowHeight}
+              rowProps={{}}
+              overscanCount={6}
             />
           ) : searchQuery.length > 0 ? (
-            <Container>
-              <Text ta="center" c="dimmed" mt="xl">
+            <Container className={classes.emptyState}>
+              <Text ta="center" c="dimmed" mt="xl" size="lg">
                 No results found for "{searchQuery}"
+              </Text>
+              <Text ta="center" c="dimmed" mt="sm" size="sm">
+                Try searching with different keywords or check your spelling
               </Text>
             </Container>
           ) : (
-            <Container>
-              <Text ta="center" c="dimmed" mt="xl">
-                Enter a search term to find hymns and songs
+            <Container className={classes.emptyState}>
+              <Text ta="center" c="dimmed" mt="xl" size="lg">
+                Search our collection of hymns and songs
+              </Text>
+              <Text ta="center" c="dimmed" mt="sm" size="lg">
+                Enter a song number, title, or keyword to get started
               </Text>
             </Container>
           )}

@@ -1,4 +1,4 @@
-import { FaBars, FaHome, FaMoon, FaSearch, FaSun } from 'react-icons/fa';
+import { FaBars, FaHeart, FaHome, FaList, FaMoon, FaSearch, FaSun, FaSync } from 'react-icons/fa';
 import { useLocation, useNavigate } from 'react-router';
 import {
   ActionIcon,
@@ -13,16 +13,28 @@ import {
   useMatches,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import { useState } from 'react';
 
 import './Header.scss';
 
 const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [isClearing, setIsClearing] = useState(false);
+  
   const useFullscreen = useMatches({
     base: true,
+    md: false,
     lg: false,
     xl: false,
+  });
+
+  const showHeaderThemeToggle = useMatches({
+    base: false,
+    sm: false,
+    md: true,
+    lg: true,
+    xl: true,
   });
 
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
@@ -32,6 +44,38 @@ const Header = () => {
   const isHomePage = location.pathname === '/' || location.pathname === '/home';
 
   const handleHomeClick = () => navigate('/');
+
+  // Clear and refetch song database
+  const clearAndRefetchDatabase = async () => {
+    try {
+      setIsClearing(true);
+      closeMenu();
+      
+      // Clear local storage
+      const localForage = await import('localforage');
+      
+      // Clear songs storage
+      const songsStore = localForage.default.createInstance({ 
+        name: 'Songs', 
+        storeName: 'items' 
+      });
+      await songsStore.clear();
+      
+      // Clear version storage
+      const versionStore = localForage.default.createInstance({ 
+        name: 'Songs', 
+        storeName: 'version' 
+      });
+      await versionStore.clear();
+      
+      // Reload the page to refetch data
+      window.location.reload();
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Failed to clear database:', error);
+      setIsClearing(false);
+    }
+  };
 
   // Don't render the header on homepage
   if (isHomePage) {
@@ -60,7 +104,7 @@ const Header = () => {
           <Title order={3}>Hymns for All Times</Title>
         </Group>
 
-        {/* Right-side actions: search + menu */}
+        {/* Right-side actions: search + theme toggle (on wider screens) + menu */}
         <Group>
           <ActionIcon
             variant="subtle"
@@ -71,6 +115,18 @@ const Header = () => {
           >
             <FaSearch size={16} />
           </ActionIcon>
+
+          {showHeaderThemeToggle && (
+            <ActionIcon
+              variant="subtle"
+              size="lg"
+              aria-label="Toggle color scheme"
+              data-testid="headerThemeToggle"
+              onClick={toggleColorScheme}
+            >
+              {colorScheme === 'dark' ? <FaSun size={16} /> : <FaMoon size={16} />}
+            </ActionIcon>
+          )}
 
           <ActionIcon
             variant="subtle"
@@ -94,7 +150,7 @@ const Header = () => {
         overlayProps={{ opacity: 0.85, blur: 2 }}
         radius="md"
         withCloseButton
-        title={<Title fw={600}>Menu</Title>}
+        title={<Text size='xl' fw={600}>Menu</Text>}
       >
         <Stack gap="xl" py="lg" data-testid="menuOverlay">
           <Box>
@@ -109,7 +165,10 @@ const Header = () => {
                 className="menu-link"
                 tabIndex={0}
               >
-                Home
+                <Group component="span" gap="md" align="center">
+                  <FaHome size={18} />
+                  <span>Home</span>
+                </Group>
               </Text>
               <Text
                 size="xl"
@@ -121,7 +180,10 @@ const Header = () => {
                 role="link"
                 tabIndex={0}
               >
-                Songs
+                <Group component="span" gap="md" align="center">
+                  <FaList size={18} />
+                  <span>Songs</span>
+                </Group>
               </Text>
 
               <Text
@@ -134,23 +196,44 @@ const Header = () => {
                 role="link"
                 tabIndex={0}
               >
-                Favourites
+                <Group component="span" gap="md" align="center">
+                  <FaHeart size={18} />
+                  <span>Favourites</span>
+                </Group>
               </Text>
             </Stack>
           </Box>
 
           <Box>
+            {!showHeaderThemeToggle && (
+              <Button
+                variant="outline"
+                color={colorScheme === 'dark' ? 'white' : 'blue'}
+                size="xl"
+                fullWidth
+                onClick={toggleColorScheme}
+                aria-label="Toggle color scheme"
+                data-testid="themeToggle"
+              >
+                Enable {colorScheme === 'dark' ? 'Light' : 'Dark'} Mode&nbsp;
+                {colorScheme === 'dark' ? <FaSun /> : <FaMoon />}
+              </Button>
+            )}
+          </Box>
+
+          <Box>
             <Button
               variant="outline"
-              color={colorScheme === 'dark' ? 'white' : 'blue'}
-              size="xl"
+              color="orange"
+              size="md"
               fullWidth
-              onClick={toggleColorScheme}
-              aria-label="Toggle color scheme"
-              data-testid="themeToggle"
+              onClick={clearAndRefetchDatabase}
+              loading={isClearing}
+              leftSection={<FaSync />}
+              aria-label="Clear and refetch song database"
+              data-testid="clearDatabase"
             >
-              Enable {colorScheme === 'dark' ? 'Light' : 'Dark'} Mode&nbsp;
-              {colorScheme === 'dark' ? <FaSun /> : <FaMoon />}
+              {isClearing ? 'Clearing...' : 'Refresh Song Database'}
             </Button>
           </Box>
         </Stack>
