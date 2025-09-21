@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import classes from './Search.module.scss';
 import { Helmet } from '@dr.pogodin/react-helmet';
 import Fuse, { FuseResult } from 'fuse.js';
 import { FaSearch } from 'react-icons/fa';
@@ -17,7 +18,6 @@ import {
 } from '@mantine/core';
 import { useQuery } from '../../helpers';
 import { useMainContext } from '../../utils/context';
-import classes from './Search.module.scss';
 
 const meta = {
   title: 'Search',

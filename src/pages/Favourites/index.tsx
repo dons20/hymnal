@@ -1,21 +1,21 @@
 import { useCallback, useEffect, useMemo } from 'react';
+import classes from './Favourites.module.scss';
 import { Helmet } from '@dr.pogodin/react-helmet';
+import { FaHeart } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router';
 import { List, RowComponentProps } from 'react-window';
-import { FaHeart } from 'react-icons/fa';
-import { 
-  ActionIcon, 
-  Anchor, 
-  Box, 
-  Container, 
-  Group, 
-  Text, 
-  UnstyledButton, 
-  useMantineColorScheme 
+import {
+  ActionIcon,
+  Anchor,
+  Box,
+  Container,
+  Group,
+  Text,
+  UnstyledButton,
+  useMantineColorScheme,
 } from '@mantine/core';
-import { useMainContext } from '../../utils/context';
 import { updateFavesDB } from '../../helpers';
-import classes from './Favourites.module.scss';
+import { useMainContext } from '../../utils/context';
 
 const meta = {
   title: 'Favourites',
@@ -40,10 +40,11 @@ function Favourites() {
   const { colorScheme } = useMantineColorScheme();
   const isDark = colorScheme === 'dark';
 
-  const finalList = useMemo(() => 
-    songs
-      .filter((song) => favourites.includes(song.number - 1))
-      .sort((a, b) => a.number - b.number),
+  const finalList = useMemo(
+    () =>
+      songs
+        .filter((song) => favourites.includes(song.number - 1))
+        .sort((a, b) => a.number - b.number),
     [songs, favourites]
   );
 
@@ -68,10 +69,7 @@ function Favourites() {
       const song = finalList[index];
       return (
         <div style={{ ...style, padding: '4px 20px' }}>
-          <UnstyledButton
-            onClick={() => handleSongClick(song.number)}
-            w="100%"
-          >
+          <UnstyledButton onClick={() => handleSongClick(song.number)} w="100%">
             <Box
               p="md"
               style={{

@@ -1,5 +1,5 @@
 import { MantineColorScheme } from '@mantine/core';
-import { createCtx } from '../helpers';
+import { createCtx } from '@/helpers';
 
 export const pages = {
   HOME: '/home',
@@ -15,6 +15,14 @@ export type State = {
   colorScheme: MantineColorScheme;
 };
 
+export type PWAState = {
+  isInstallable: boolean;
+  isOffline: boolean;
+  isUpdateAvailable: boolean;
+  installApp: () => Promise<void>;
+  updateApp: () => void;
+};
+
 export type ACTIONTYPE =
   | { type: 'setTitle'; payload: string }
   | { type: 'setSubtitle'; payload: string }
@@ -28,6 +36,7 @@ export type CTX = {
   setFavourites: React.Dispatch<React.SetStateAction<number[]>>;
   pages: typeof pages;
   meta: State;
+  pwa: PWAState;
 };
 
 export const [useMainContext, MainContextProvider, MainContextConsumer] = createCtx<CTX>();

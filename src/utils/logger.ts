@@ -11,13 +11,13 @@ declare global {
 }
 
 function setDebug() {
-  if (process.env.NODE_ENV === 'development') 
-    {window.debug = {
+  if (process.env.NODE_ENV === 'development') {
+    window.debug = {
       log: window.console.log.bind(window.console),
       error: window.console.error.bind(window.console),
       info: window.console.info.bind(window.console),
-    };}
-   else {
+    };
+  } else {
     const noop = function () {};
 
     window.debug = {

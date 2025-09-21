@@ -1,12 +1,12 @@
 import { Suspense } from 'react';
 import { screen, waitFor } from '@testing-library/react';
 import localforage from 'localforage';
+import { vi } from 'vitest';
+import { MantineProvider } from '@mantine/core';
 import { SongsDB } from '@/data/songs';
 import { Providers, resizeWindow } from '@/helpers/tests';
 import { renderWithRouter } from '@/utils/tests';
 import App from './App';
-import { vi } from 'vitest';
-import { MantineProvider } from '@mantine/core';
 
 vi.mock('@/__mocks__/createMocks.ts');
 
@@ -65,7 +65,7 @@ describe('#AppTest', () => {
   it.skip('handles device rotations', async () => {
     const spyConfig = vi.spyOn(localforage, 'config');
     const spyCreateInstance = vi.spyOn(localforage, 'createInstance');
-  // vi.spyOn(window, "addEventListener").mockImplementation(() => {});
+    // vi.spyOn(window, "addEventListener").mockImplementation(() => {});
 
     await waitFor(() => {
       expect(spyConfig).toBeTruthy();

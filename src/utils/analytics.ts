@@ -27,17 +27,17 @@ let isAnalyticsDisabled = false;
 export function disableAnalytics() {
   if (typeof window !== 'undefined' && window.umami && !isAnalyticsDisabled) {
     debug.log('📊 Analytics disabled (offline mode)');
-    
+
     // Store the original umami object
     originalUmami = window.umami;
-    
+
     // Replace with no-op functions
     window.umami = {
       track: () => {
         debug.log('📊 Analytics tracking blocked (offline)');
-      }
+      },
     };
-    
+
     isAnalyticsDisabled = true;
   }
 }
@@ -48,7 +48,7 @@ export function disableAnalytics() {
 export function enableAnalytics() {
   if (typeof window !== 'undefined' && originalUmami && isAnalyticsDisabled) {
     debug.log('📊 Analytics enabled (online mode)');
-    
+
     // Restore the original umami object
     window.umami = originalUmami;
     originalUmami = null;
@@ -61,7 +61,7 @@ export function enableAnalytics() {
  */
 export function manageAnalytics() {
   if (typeof window === 'undefined') return;
-  
+
   if (navigator.onLine) {
     enableAnalytics();
   } else {
@@ -74,18 +74,18 @@ export function manageAnalytics() {
  */
 export function setupAnalyticsListeners() {
   if (typeof window === 'undefined') return;
-  
+
   // Handle online/offline events
   window.addEventListener('online', () => {
     debug.log('🌐 Network connection restored');
     enableAnalytics();
   });
-  
+
   window.addEventListener('offline', () => {
     debug.log('🌐 Network connection lost');
     disableAnalytics();
   });
-  
+
   // Initial setup based on current status
   manageAnalytics();
 }

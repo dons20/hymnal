@@ -14,9 +14,9 @@ const STATIC_ASSETS = [
   // Add other static assets as needed
 ];
 
-// Network-first resources (like API calls)
+// Network-first resources (like local JSON data)
 const NETWORK_FIRST_PATTERNS = [
-  /https:\/\/f002\.backblazeb2\.com\/file\/hymnal\/hymns\.json/,
+  /\/static\/hymns\.json$/,
   /\/api\//
 ];
 

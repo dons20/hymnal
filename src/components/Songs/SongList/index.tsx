@@ -269,7 +269,7 @@ const SongList = () => {
       </div>
 
       {/* Floating Filter Button */}
-      <Affix position={{ bottom: 16, right: 16 }}>
+      <Affix position={{ bottom: 16, right: 16 }} zIndex={199}>
         <Tooltip label="Filters" withArrow>
           <ActionIcon
             size="xl"

@@ -1,8 +1,8 @@
 import { render, screen } from '@testing-library/react';
-import SampleImg from '@/img/favourites.svg';
 import { BrowserRouter } from 'react-router';
 import { MantineProvider } from '@mantine/core';
 import { Card } from '@/components';
+import SampleImg from '@/img/favourites.svg';
 
 describe('#Card', () => {
   it('should render content based on props', () => {

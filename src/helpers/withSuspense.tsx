@@ -12,12 +12,13 @@ const withSuspense =
   // @ts-expect-error TODO: Possibly investigate fix for this error
   (props: P, props2: Q) => {
     let fallbackLoader = <></>;
-    if (FallbackComponent === undefined)
-      {fallbackLoader = (
+    if (FallbackComponent === undefined) {
+      fallbackLoader = (
         <Suspense fallback="">
           <Loader />
         </Suspense>
-      );}
+      );
+    }
     // @ts-expect-error TODO: Fix this
     if (FallbackComponent) fallbackLoader = <FallbackComponent {...props2} />;
 

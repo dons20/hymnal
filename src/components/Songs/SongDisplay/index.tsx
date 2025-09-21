@@ -73,7 +73,7 @@ function SongDisplay() {
   const presentationSlides = useMemo(() => {
     if (!songToRender) return [];
 
-    const slides: { type: string; content: string; label: string }[] = [];
+    const slides: { type: string; content: string | VocalPart[]; label: string }[] = [];
     const hasChorus = Boolean(songToRender.chorus);
 
     songToRender.verse.forEach((verse: string, index: number) => {
@@ -88,7 +88,10 @@ function SongDisplay() {
       if (hasChorus) {
         slides.push({
           type: 'chorus',
-          content: songToRender.chorus,
+          content:
+            songToRender.chorusParts && songToRender.chorusParts.length > 0
+              ? songToRender.chorusParts
+              : songToRender.chorus,
           label: 'Chorus',
         });
       }
@@ -96,6 +99,228 @@ function SongDisplay() {
 
     return slides;
   }, [songToRender]);
+
+  // Helper function to render vocal parts with indicators
+  const renderChorusWithParts = (song: Song, isDark: boolean) => {
+    if (!song.chorusParts || song.chorusParts.length === 0) {
+      // Fallback to regular chorus rendering
+      return (
+        <Text style={{ fontSize: 'clamp(16px, 2.5vw, 20px)', lineHeight: 1.6 }}>{song.chorus}</Text>
+      );
+    }
+
+    return (
+      <Box className="chorus-parts">
+        {song.chorusParts.map((part, index) => (
+          <Box
+            key={index}
+            className="chorus-part"
+            style={{ position: 'relative', marginBottom: '0.5rem' }}
+          >
+            {part.part && (
+              <Text
+                component="span"
+                className="part-indicator"
+                style={{
+                  position: 'absolute',
+                  left: '-1.5rem',
+                  top: '0',
+                  fontSize: '0.9rem',
+                  fontWeight: 600,
+                  color:
+                    part.part === 'soprano'
+                      ? isDark
+                        ? '#74c0fc'
+                        : '#1c7ed6' // Blue for soprano
+                      : isDark
+                        ? '#ffec99'
+                        : '#fd7e14', // Orange for baritone
+                  backgroundColor:
+                    part.part === 'soprano'
+                      ? isDark
+                        ? 'rgba(116, 192, 252, 0.15)'
+                        : 'rgba(28, 126, 214, 0.08)'
+                      : isDark
+                        ? 'rgba(255, 236, 153, 0.15)'
+                        : 'rgba(253, 126, 20, 0.08)',
+                  padding: '0.1rem 0.3rem',
+                  borderRadius: '4px',
+                  border: `1px solid ${
+                    part.part === 'soprano'
+                      ? isDark
+                        ? 'rgba(116, 192, 252, 0.3)'
+                        : 'rgba(28, 126, 214, 0.25)'
+                      : isDark
+                        ? 'rgba(255, 236, 153, 0.3)'
+                        : 'rgba(253, 126, 20, 0.25)'
+                  }`,
+                  minWidth: '1.2rem',
+                  textAlign: 'center',
+                  display: 'inline-block',
+                }}
+              >
+                {part.part === 'soprano' ? 'A' : part.part === 'baritone' ? 'B' : '♪'}
+              </Text>
+            )}
+            <Text
+              style={{
+                fontSize: 'clamp(16px, 2.5vw, 20px)',
+                lineHeight: 1.6,
+                paddingLeft: part.part ? '0' : '0',
+                fontWeight: part.part === 'soprano' ? 500 : 400,
+                color:
+                  part.part === 'soprano'
+                    ? isDark
+                      ? '#e9ecef'
+                      : '#212529' // Standard text color for soprano
+                    : isDark
+                      ? '#ced4da'
+                      : '#495057', // Slightly muted for baritone
+              }}
+            >
+              {part.text}
+            </Text>
+          </Box>
+        ))}
+      </Box>
+    );
+  };
+
+  // Helper function to render presentation slide content
+  const renderPresentationContent = (content: string | VocalPart[], isDark: boolean) => {
+    if (typeof content === 'string') {
+      return (
+        <Text
+          lh={1.4}
+          style={{
+            whiteSpace: 'pre-line',
+            wordBreak: 'break-word',
+            maxHeight: '60vh',
+            overflow: 'auto',
+            fontSize: 'clamp(1.2rem, 4vw, 3rem)',
+            textAlign: 'center',
+          }}
+        >
+          {content}
+        </Text>
+      );
+    }
+
+    // Handle VocalPart[] for presentation mode with larger styling
+    return (
+      <Box
+        style={{
+          maxHeight: '60vh',
+          overflow: 'auto',
+          fontSize: 'clamp(1.2rem, 4vw, 3rem)',
+          textAlign: 'center',
+          width: '100%',
+        }}
+      >
+        {content.map((part, index) => {
+          // Check if this is the end of a B part followed by an A part (new pair starting)
+          const isEndOfPair =
+            part.part === 'baritone' &&
+            index < content.length - 1 &&
+            content[index + 1]?.part === 'soprano';
+
+          return (
+            <React.Fragment key={index}>
+              <Box
+                style={{
+                  position: 'relative',
+                  marginBottom: isEndOfPair ? '2rem' : '1.5rem',
+                  paddingLeft: '3rem',
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  justifyContent: 'center',
+                }}
+              >
+                {part.part && (
+                  <Text
+                    component="span"
+                    style={{
+                      position: 'absolute',
+                      left: '0',
+                      top: '0',
+                      fontSize: 'clamp(1rem, 3vw, 2.5rem)',
+                      fontWeight: 600,
+                      color:
+                        part.part === 'soprano'
+                          ? isDark
+                            ? '#74c0fc'
+                            : '#1c7ed6' // Blue for soprano
+                          : isDark
+                            ? '#ffec99'
+                            : '#fd7e14', // Orange for baritone
+                      backgroundColor:
+                        part.part === 'soprano'
+                          ? isDark
+                            ? 'rgba(116, 192, 252, 0.15)'
+                            : 'rgba(28, 126, 214, 0.08)'
+                          : isDark
+                            ? 'rgba(255, 236, 153, 0.15)'
+                            : 'rgba(253, 126, 20, 0.08)',
+                      padding: 'clamp(0.2rem, 1vw, 0.5rem) clamp(0.4rem, 1.5vw, 1rem)',
+                      borderRadius: '8px',
+                      border: `2px solid ${
+                        part.part === 'soprano'
+                          ? isDark
+                            ? 'rgba(116, 192, 252, 0.3)'
+                            : 'rgba(28, 126, 214, 0.25)'
+                          : isDark
+                            ? 'rgba(255, 236, 153, 0.3)'
+                            : 'rgba(253, 126, 20, 0.25)'
+                      }`,
+                      minWidth: 'clamp(2rem, 4vw, 3rem)',
+                      textAlign: 'center',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    {part.part === 'soprano' ? 'A' : part.part === 'baritone' ? 'B' : '♪'}
+                  </Text>
+                )}
+                <Text
+                  style={{
+                    fontSize: 'clamp(1.2rem, 4vw, 3rem)',
+                    lineHeight: 1.4,
+                    fontWeight: part.part === 'soprano' ? 600 : 400,
+                    color:
+                      part.part === 'soprano'
+                        ? isDark
+                          ? '#e9ecef'
+                          : '#212529' // Standard text color for soprano
+                        : isDark
+                          ? '#ced4da'
+                          : '#495057', // Slightly muted for baritone
+                    textAlign: 'center',
+                    whiteSpace: 'pre-line',
+                    wordBreak: 'break-word',
+                    flex: 1,
+                  }}
+                >
+                  {part.text}
+                </Text>
+              </Box>
+              {isEndOfPair && (
+                <Box
+                  style={{
+                    width: '60%',
+                    height: '1px',
+                    margin: '3rem auto',
+                    backgroundColor: isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.15)',
+                    borderRadius: '1px',
+                  }}
+                />
+              )}
+            </React.Fragment>
+          );
+        })}
+      </Box>
+    );
+  };
 
   const songBody = useMemo(
     () =>
@@ -114,9 +339,7 @@ function SongDisplay() {
                 >
                   Chorus
                 </Text>
-                <Text style={{ fontSize: 'clamp(16px, 2.5vw, 20px)', lineHeight: 1.6 }}>
-                  {songToRender.chorus}
-                </Text>
+                {renderChorusWithParts(songToRender, isDark)}
               </Box>
               <Box className="verse">
                 <Text
@@ -211,7 +434,7 @@ function SongDisplay() {
       setTimeout(() => {
         if (currentSlide > 0) setCurrentSlide(currentSlide - 1);
         else setCurrentSlide(presentationSlides.length - 1);
-        
+
         setSlideTransitioning(false);
       }, 150);
     }
@@ -259,11 +482,11 @@ function SongDisplay() {
     const rect = target.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const width = rect.width;
-    
+
     // Define tap areas: left 25%, center 50%, right 25%
     const leftAreaEnd = width * 0.25;
     const rightAreaStart = width * 0.75;
-    
+
     if (x < leftAreaEnd) {
       // Tap on left area - go to previous slide
       previousSlide();
@@ -358,7 +581,7 @@ function SongDisplay() {
                       style={{
                         ...contentStyles,
                         textAlign: 'center',
-                        maxWidth: '90vw',
+                        maxWidth: '95vw',
                         width: '100%',
                         flex: 1,
                         display: 'flex',
@@ -370,25 +593,13 @@ function SongDisplay() {
                       <Text
                         size="lg"
                         fw={600}
-                        mb="xl"
+                        mb="lg"
                         c={isDark ? 'blue.4' : 'blue.6'}
                         style={{ fontSize: 'clamp(1.2rem, 3vw, 2rem)' }}
                       >
                         {currentSlideData.label}
                       </Text>
-                      <Text
-                        lh={1.4}
-                        style={{
-                          whiteSpace: 'pre-line',
-                          wordBreak: 'break-word',
-                          maxHeight: '60vh',
-                          overflow: 'auto',
-                          fontSize: 'clamp(1.2rem, 4vw, 3rem)',
-                          textAlign: 'center',
-                        }}
-                      >
-                        {currentSlideData.content}
-                      </Text>
+                      {renderPresentationContent(currentSlideData.content, isDark)}
                     </Box>
                   )}
                 </Transition>
@@ -446,7 +657,7 @@ function SongDisplay() {
       size="lg"
       my="md"
       py="lg"
-      px="xl"
+      pl="xl"
       bg={colorScheme === 'dark' ? 'transparent' : 'white'}
     >
       <Helmet>
@@ -464,7 +675,16 @@ function SongDisplay() {
         mb="lg"
       >
         <Title order={2} fw={500}>
-          # {songToRender!.number} {songToRender!.title}
+          <Box component="span" display={{ base: 'block', sm: 'inline' }}>
+            # {songToRender!.number}
+          </Box>
+          <Box
+            component="span"
+            display={{ base: 'block', sm: 'inline' }}
+            ml={{ base: 0, sm: 'xs' }}
+          >
+            {songToRender!.title}
+          </Box>
         </Title>
         <Group gap="xs">
           <ActionIcon
@@ -511,7 +731,14 @@ function SongDisplay() {
         </Text>
       )}
       <Box mt="lg" mb="md" maw={1200} mx="auto">
-        <Flex gap="md" direction={{ base: 'row' }} justify="center" wrap="wrap" align="stretch">
+        <Flex
+          gap="md"
+          direction={{ base: 'row' }}
+          justify="center"
+          wrap="wrap"
+          align="stretch"
+          className="navigation-buttons"
+        >
           {isFirstSong && (
             <Button
               onClick={previousSong}
@@ -559,40 +786,44 @@ function SongDisplay() {
 
         {/* Show back to index button separately when both prev/next exist */}
         {isFirstSong && isLastSong && (
-          <Button
-            onClick={backToIndex}
-            variant="outline"
-            fullWidth
-            mt="md"
-            size="md"
-            style={{
-              maxWidth: '500px',
-              minHeight: '42px',
-              marginLeft: 'auto',
-              marginRight: 'auto',
-            }}
-          >
-            Back to Index
-          </Button>
+          <Box className="navigation-buttons">
+            <Button
+              onClick={backToIndex}
+              variant="outline"
+              fullWidth
+              mt="md"
+              size="md"
+              style={{
+                maxWidth: '500px',
+                minHeight: '42px',
+                marginLeft: 'auto',
+                marginRight: 'auto',
+              }}
+            >
+              Back to Index
+            </Button>
+          </Box>
         )}
 
         {/* Show back to index button when only previous exists */}
         {isFirstSong && !isLastSong && (
-          <Button
-            onClick={backToIndex}
-            variant="outline"
-            fullWidth
-            mt="md"
-            size="md"
-            style={{
-              maxWidth: '500px',
-              minHeight: '42px',
-              marginLeft: 'auto',
-              marginRight: 'auto',
-            }}
-          >
-            Back to Index
-          </Button>
+          <Box className="navigation-buttons">
+            <Button
+              onClick={backToIndex}
+              variant="outline"
+              fullWidth
+              mt="md"
+              size="md"
+              style={{
+                maxWidth: '500px',
+                minHeight: '42px',
+                marginLeft: 'auto',
+                marginRight: 'auto',
+              }}
+            >
+              Back to Index
+            </Button>
+          </Box>
         )}
       </Box>
     </Container>

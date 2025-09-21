@@ -35,21 +35,40 @@ function MainContext({ children }: PropsT) {
   const { songs, favourites, setFavourites } = useSongLoader();
   const [state, dispatch] = React.useReducer(reducer, initialAppState);
   const { colorScheme } = useMantineColorScheme();
-  
-  // Initialize PWA functionality
-  usePWA();
+
+  // Initialize PWA functionality (single instance for entire app)
+  const { isInstallable, isOffline, isUpdateAvailable, installApp, updateApp } = usePWA();
 
   // Sync color scheme with context
   React.useEffect(() => {
     dispatch({ type: 'setColorScheme', payload: colorScheme });
   }, [colorScheme]);
 
-  if (songs.length === 0) 
-    {return <Loader />;}
-  
+  if (songs.length === 0) {
+    return <Loader />;
+  }
+
+  // PWA state object to pass through context
+  const pwaState = {
+    isInstallable,
+    isOffline,
+    isUpdateAvailable,
+    installApp,
+    updateApp,
+  };
 
   return (
-    <MainContextProvider value={{ meta: state, songs, favourites, setFavourites, dispatch, pages }}>
+    <MainContextProvider
+      value={{
+        meta: state,
+        songs,
+        favourites,
+        setFavourites,
+        dispatch,
+        pages,
+        pwa: pwaState,
+      }}
+    >
       {children}
     </MainContextProvider>
   );

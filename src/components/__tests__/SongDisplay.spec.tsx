@@ -1,8 +1,8 @@
 import { Suspense } from 'react';
+import { HelmetProvider } from '@dr.pogodin/react-helmet';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { MantineProvider } from '@mantine/core';
-import { HelmetProvider } from '@dr.pogodin/react-helmet';
 import SongDisplay from '@/components/Songs/SongDisplay';
 import { SongsDB } from '@/data/songs';
 import { Providers } from '@/helpers/tests';

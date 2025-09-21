@@ -1,4 +1,15 @@
-import { FaBars, FaDownload, FaHeart, FaHome, FaList, FaMoon, FaSearch, FaSun, FaSync } from 'react-icons/fa';
+import { useState } from 'react';
+import {
+  FaBars,
+  FaDownload,
+  FaHeart,
+  FaHome,
+  FaList,
+  FaMoon,
+  FaSearch,
+  FaSun,
+  FaSync,
+} from 'react-icons/fa';
 import { useLocation, useNavigate } from 'react-router';
 import {
   ActionIcon,
@@ -13,8 +24,7 @@ import {
   useMatches,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { useState } from 'react';
-import { usePWA } from '../../hooks/usePWA';
+import { useMainContext } from '@/utils/context';
 
 import './Header.scss';
 
@@ -22,8 +32,9 @@ const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isClearing, setIsClearing] = useState(false);
-  const { isInstallable, installApp } = usePWA();
-  
+  const { pwa } = useMainContext();
+  const { isInstallable, installApp } = pwa;
+
   const useFullscreen = useMatches({
     base: true,
     md: false,
@@ -52,24 +63,26 @@ const Header = () => {
     try {
       setIsClearing(true);
       closeMenu();
-      
-      // Clear local storage
+
       const localForage = await import('localforage');
-      
-      // Clear songs storage
-      const songsStore = localForage.default.createInstance({ 
-        name: 'Songs', 
-        storeName: 'items' 
+      const songsStore = localForage.default.createInstance({
+        name: 'Songs',
+        storeName: 'items',
       });
       await songsStore.clear();
-      
-      // Clear version storage
-      const versionStore = localForage.default.createInstance({ 
-        name: 'Songs', 
-        storeName: 'version' 
+      const hashStore = localForage.default.createInstance({
+        name: 'Songs',
+        storeName: 'hash',
+      });
+      await hashStore.clear();
+
+      // Clear old version storage if it exists
+      const versionStore = localForage.default.createInstance({
+        name: 'Songs',
+        storeName: 'version',
       });
       await versionStore.clear();
-      
+
       // Reload the page to refetch data
       window.location.reload();
     } catch (error) {
@@ -106,7 +119,6 @@ const Header = () => {
           <Title order={3}>Hymns for All Times</Title>
         </Group>
 
-        {/* Right-side actions: search + theme toggle (on wider screens) + menu */}
         <Group>
           <ActionIcon
             variant="subtle"
@@ -152,7 +164,11 @@ const Header = () => {
         overlayProps={{ opacity: 0.85, blur: 2 }}
         radius="md"
         withCloseButton
-        title={<Text size='xl' fw={600}>Menu</Text>}
+        title={
+          <Text size="xl" fw={600}>
+            Menu
+          </Text>
+        }
       >
         <Stack gap="xl" py="lg" data-testid="menuOverlay">
           <Box>
@@ -211,18 +227,17 @@ const Header = () => {
               <Button
                 variant="outline"
                 color={colorScheme === 'dark' ? 'white' : 'blue'}
-                size="xl"
+                size="md"
                 fullWidth
                 onClick={toggleColorScheme}
                 aria-label="Toggle color scheme"
                 data-testid="themeToggle"
+                leftSection={colorScheme === 'dark' ? <FaSun /> : <FaMoon />}
               >
                 Enable {colorScheme === 'dark' ? 'Light' : 'Dark'} Mode&nbsp;
-                {colorScheme === 'dark' ? <FaSun /> : <FaMoon />}
               </Button>
             )}
 
-            {/* Install App Button - only show if installable */}
             {isInstallable && (
               <Button
                 variant="outline"
@@ -241,9 +256,7 @@ const Header = () => {
                 Install App
               </Button>
             )}
-          </Box>
 
-          <Box>
             <Button
               variant="outline"
               color="orange"
@@ -252,10 +265,11 @@ const Header = () => {
               onClick={clearAndRefetchDatabase}
               loading={isClearing}
               leftSection={<FaSync />}
-              aria-label="Clear and refetch song database"
+              aria-label="Clear local song cache"
               data-testid="clearDatabase"
+              mt="md"
             >
-              {isClearing ? 'Clearing...' : 'Refresh Song Database'}
+              {isClearing ? 'Clearing...' : 'Clear Song Cache'}
             </Button>
           </Box>
         </Stack>

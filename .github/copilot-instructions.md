@@ -10,7 +10,7 @@
 
 - **Context**: App-wide state (songs, favourites, UI meta) is managed via a custom context (`src/utils/context.ts`) using a `createCtx` helper. Use `useMainContext()` for access.
 - **Routing**: All navigation is via React Router. Main routes: `/home`, `/songs/index`, `/songs/favourites`, `/song/:songID`, `/search`.
-- **Component Structure**: UI is split into reusable components (e.g., `Card`, `Header`, `BottomNav`, `SongList`, `SongDisplay`). Pages compose these.
+- **Component Structure**: UI is split into reusable components (e.g., `Card`, `Header`, `SongList`, `SongDisplay`). Pages compose these.
 - **Song Data**: Songs are loaded from JSON (see `src/helpers/index.tsx` for logic). Favourites are stored in localforage. Song numbers are 1-based, but favourites use 0-based indexes.
 - **Search**: Uses Fuse.js for fuzzy search on song number/title. See `Header` for search logic and dropdown/modal UX.
 - **Presentation Mode**: `SongDisplay` supports a presentation mode for slide-style display of verses/chorus.
@@ -29,12 +29,12 @@
 - **Styling**: SCSS modules per component/page. Mantine theming is used for color/dark mode.
 - **Testing**: Vitest and Testing Library. Tests in `src/components/__tests__/`.
 - **Song/Favourite Indexing**: Song numbers are 1-based, but favourites and some internal logic use 0-based indexes. Be careful when toggling favourites.
-- **Mobile UX**: `BottomNav` only appears on mobile and when scrolled to bottom. Responsive design is a priority.
-- **Data Sync**: Song data is checked/updated on load. See `checkDB` and `loadNewSongs` in `src/helpers/index.tsx`.
+- **Mobile UX**: Responsive design is a priority.
+- **Data Loading**: Song data is loaded from bundled `hymns.json` with content-based cache invalidation. See `useSongLoader` hook for logic.
 
 ## Integration Points
 
-- **External Data**: Song data can be loaded from remote or local JSON. See `checkDB` for logic.
+- **Local Data**: Song data is loaded from bundled JSON with intelligent caching. No external dependencies.
 - **Local Storage**: Uses localforage for songs, version, and favourites.
 - **Mantine**: All UI components use Mantine for styling and theming.
 

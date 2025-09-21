@@ -22,14 +22,15 @@ export function usePWA() {
     installPrompt: null,
   });
 
-  const [serviceWorkerRegistration, setServiceWorkerRegistration] = useState<ServiceWorkerRegistration | null>(null);
+  const [serviceWorkerRegistration, setServiceWorkerRegistration] =
+    useState<ServiceWorkerRegistration | null>(null);
 
   // Register service worker and set up analytics
   useEffect(() => {
     if ('serviceWorker' in navigator) {
       registerServiceWorker();
     }
-    
+
     // Set up analytics management for offline/online modes
     setupAnalyticsListeners();
   }, []);
@@ -37,7 +38,7 @@ export function usePWA() {
   // Monitor online/offline status
   useEffect(() => {
     const handleOnline = () => {
-      setPwaState(prev => ({ ...prev, isOffline: false }));
+      setPwaState((prev) => ({ ...prev, isOffline: false }));
       notifications.show({
         id: 'online-status',
         title: 'Connection Restored',
@@ -48,7 +49,7 @@ export function usePWA() {
     };
 
     const handleOffline = () => {
-      setPwaState(prev => ({ ...prev, isOffline: true }));
+      setPwaState((prev) => ({ ...prev, isOffline: true }));
       notifications.show({
         id: 'offline-status',
         title: 'Offline Mode',
@@ -73,22 +74,24 @@ export function usePWA() {
       // Only preventDefault if we want to show our own custom install UI
       // For now, let's allow the native browser prompt to show
       debug.log('PWA: Install prompt available');
-      
-      setPwaState(prev => ({ 
-        ...prev, 
-        isInstallable: true, 
-        installPrompt: e 
+
+      setPwaState((prev) => ({
+        ...prev,
+        isInstallable: true,
+        installPrompt: e,
       }));
 
       // Show our own install notification for desktop users
       // Mobile users will see the native browser prompt
-      const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        navigator.userAgent
+      );
       const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-      
+
       if (!isMobile) {
         // Only prevent default on desktop where we want custom UI
         e.preventDefault();
-        
+
         // Show install notification after app is cached (desktop only)
         setTimeout(() => {
           notifications.show({
@@ -128,12 +131,12 @@ export function usePWA() {
     };
 
     const handleAppInstalled = () => {
-      setPwaState(prev => ({ 
-        ...prev, 
-        isInstallable: false, 
-        installPrompt: null 
+      setPwaState((prev) => ({
+        ...prev,
+        isInstallable: false,
+        installPrompt: null,
       }));
-      
+
       notifications.show({
         id: 'app-installed',
         title: 'App Installed!',
@@ -166,8 +169,8 @@ export function usePWA() {
         if (newWorker) {
           newWorker.addEventListener('statechange', () => {
             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              setPwaState(prev => ({ ...prev, isUpdateAvailable: true }));
-              
+              setPwaState((prev) => ({ ...prev, isUpdateAvailable: true }));
+
               notifications.show({
                 id: 'app-update',
                 title: 'App Update Available',
@@ -207,18 +210,18 @@ export function usePWA() {
       try {
         await pwaState.installPrompt.prompt();
         const { outcome } = await pwaState.installPrompt.userChoice;
-        
+
         if (outcome === 'accepted') {
           // eslint-disable-next-line no-console
           console.log('User accepted the install prompt');
         }
-        
-        setPwaState(prev => ({ 
-          ...prev, 
-          isInstallable: false, 
-          installPrompt: null 
+
+        setPwaState((prev) => ({
+          ...prev,
+          isInstallable: false,
+          installPrompt: null,
         }));
-        
+
         // Hide install notification
         notifications.hide('pwa-install');
       } catch (error) {

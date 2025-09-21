@@ -10,7 +10,6 @@ const SongDisplay = withSuspense(lazy(() => import('../../components/Songs/SongD
 const Favourites = withSuspense(lazy(() => import('../Favourites')));
 
 function Listing() {
-
   return (
     <Box className="songs">
       <Routes>

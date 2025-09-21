@@ -1,9 +1,16 @@
+declare interface VocalPart {
+  text: string;
+  part?: string; // Allow any string for flexibility with JSON data
+}
+
 declare interface Song {
   number: number;
   title: string;
   verse: string[];
   chorus: string;
   author?: string;
+  // Optional property for songs with multiple vocal parts
+  chorusParts?: VocalPart[];
 }
 
 declare interface HttpResponse<T> extends Response {
