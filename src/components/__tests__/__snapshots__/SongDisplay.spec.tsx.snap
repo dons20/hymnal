@@ -152,8 +152,7 @@ exports[`#SongDisplay > renders the matching song based on the route 1`] = `
           Verse 1
         </span>
         <p
-          class="mantine-focus-auto m_b6d8b162 mantine-Text-root"
-          style="line-height: 1.6;"
+          class="mantine-focus-auto song-text m_b6d8b162 mantine-Text-root"
         >
           There was one who was willing to die in my stead,
 That a soul so unworthy might live,
@@ -172,8 +171,7 @@ All the sins of my life to forgive.
           Chorus
         </span>
         <p
-          class="mantine-focus-auto m_b6d8b162 mantine-Text-root"
-          style="line-height: 1.6;"
+          class="mantine-focus-auto song-text m_b6d8b162 mantine-Text-root"
         >
           They are nailed to the Cross, they are nailed to the cross,
 O how much He was willing to bear!
@@ -192,8 +190,7 @@ But He carried my sins with Him there.
           Verse 2
         </span>
         <p
-          class="mantine-focus-auto m_b6d8b162 mantine-Text-root"
-          style="line-height: 1.6;"
+          class="mantine-focus-auto song-text m_b6d8b162 mantine-Text-root"
         >
           He is tender and loving and patient with me,
 While He cleanses my heart of its dross,
@@ -212,8 +209,7 @@ For my sins are all nailed to the cross.
           Verse 3
         </span>
         <p
-          class="mantine-focus-auto m_b6d8b162 mantine-Text-root"
-          style="line-height: 1.6;"
+          class="mantine-focus-auto song-text m_b6d8b162 mantine-Text-root"
         >
           I will cling to my Saviour and never depart,
 I will joyfully journey each day,
@@ -229,18 +225,16 @@ That my sins have been taken away.
       James Montgomery
     </p>
     <div
-      class=""
-      style="margin-inline: auto; margin-top: var(--mantine-spacing-lg); margin-bottom: var(--mantine-spacing-md); max-width: calc(75rem * var(--mantine-scale));"
+      class="navigation-container"
     >
       <div
-        class="navigation-buttons m_8bffd616 mantine-Flex-root __m__-rt"
-        style="gap: var(--mantine-spacing-md); align-items: stretch; justify-content: center; flex-wrap: wrap; flex-direction: row;"
+        class="navigation-flex navigation-buttons m_8bffd616 mantine-Flex-root __m__-rt"
       >
         <button
-          class="mantine-focus-auto mantine-active m_77c9d27d mantine-Button-root m_87cf2631 mantine-UnstyledButton-root"
+          class="mantine-focus-auto mantine-active navigation-button m_77c9d27d mantine-Button-root m_87cf2631 mantine-UnstyledButton-root"
           data-size="md"
           data-with-right-section="true"
-          style="--button-height: var(--button-height-md); --button-padding-x: var(--button-padding-x-md); --button-fz: var(--mantine-font-size-md); --button-bg: var(--mantine-color-blue-filled); --button-hover: var(--mantine-color-blue-filled-hover); --button-color: var(--mantine-color-white); --button-bd: calc(0.0625rem * var(--mantine-scale)) solid transparent; flex: 1 1 0%; max-width: 500px; min-height: 42px;"
+          style="--button-height: var(--button-height-md); --button-padding-x: var(--button-padding-x-md); --button-fz: var(--mantine-font-size-md); --button-bg: var(--mantine-color-blue-filled); --button-hover: var(--mantine-color-blue-filled-hover); --button-color: var(--mantine-color-white); --button-bd: calc(0.0625rem * var(--mantine-scale)) solid transparent;"
           type="button"
         >
           <span
@@ -272,10 +266,10 @@ That my sins have been taken away.
           </span>
         </button>
         <button
-          class="mantine-focus-auto mantine-active m_77c9d27d mantine-Button-root m_87cf2631 mantine-UnstyledButton-root"
+          class="mantine-focus-auto mantine-active navigation-button m_77c9d27d mantine-Button-root m_87cf2631 mantine-UnstyledButton-root"
           data-size="md"
           data-variant="outline"
-          style="--button-height: var(--button-height-md); --button-padding-x: var(--button-padding-x-md); --button-fz: var(--mantine-font-size-md); --button-bg: transparent; --button-hover: var(--mantine-color-blue-outline-hover); --button-color: var(--mantine-color-blue-outline); --button-bd: calc(0.0625rem * var(--mantine-scale)) solid var(--mantine-color-blue-outline); max-width: 500px; min-height: 42px; flex: 1 1 0%;"
+          style="--button-height: var(--button-height-md); --button-padding-x: var(--button-padding-x-md); --button-fz: var(--mantine-font-size-md); --button-bg: transparent; --button-hover: var(--mantine-color-blue-outline-hover); --button-color: var(--mantine-color-blue-outline); --button-bd: calc(0.0625rem * var(--mantine-scale)) solid var(--mantine-color-blue-outline);"
           type="button"
         >
           <span

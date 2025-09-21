@@ -1,3 +1,202 @@
+// Basic text styling classes
+.song-text {
+  font-size: clamp(16px, 2.5vw, 20px);
+  line-height: 1.6;
+}
+
+.presentation-text {
+  line-height: 1.4;
+  white-space: pre-line;
+  word-break: break-word;
+  max-height: 60vh;
+  overflow: auto;
+  font-size: clamp(1.2rem, 4vw, 3rem);
+  text-align: center;
+}
+
+.presentation-content-container {
+  max-height: 60vh;
+  overflow: auto;
+  font-size: clamp(1.2rem, 4vw, 3rem);
+  text-align: center;
+  width: 100%;
+}
+
+// Part indicator styling classes
+.part-indicator-regular {
+  position: absolute;
+  left: -1.5rem;
+  top: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.1rem 0.3rem;
+  border-radius: 4px;
+  min-width: 1.2rem;
+  text-align: center;
+  display: inline-block;
+  
+  // Colors will be set via CSS custom properties
+  color: var(--part-indicator-color);
+  background-color: var(--part-indicator-bg);
+  border: 1px solid var(--part-indicator-border);
+}
+
+.part-indicator-presentation {
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-size: clamp(1rem, 3vw, 2.5rem);
+  font-weight: 600;
+  padding: clamp(0.2rem, 1vw, 0.5rem) clamp(0.4rem, 1.5vw, 1rem);
+  border-radius: 8px;
+  min-width: clamp(2rem, 4vw, 3rem);
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  
+  // Colors will be set via CSS custom properties
+  color: var(--part-indicator-color);
+  background-color: var(--part-indicator-bg);
+  border: 2px solid var(--part-indicator-border);
+}
+
+// Presentation mode part container
+.presentation-part-container {
+  position: relative;
+  padding-left: 3rem;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+// Presentation mode text styling
+.presentation-part-text {
+  font-size: clamp(1.2rem, 4vw, 3rem);
+  line-height: 1.4;
+  text-align: center;
+  white-space: pre-line;
+  word-break: break-word;
+  flex: 1;
+  
+  // Color will be set via CSS custom property
+  color: var(--part-text-color);
+}
+
+// Divider styling
+.pair-divider {
+  width: 60%;
+  height: 1px;
+  margin: 3rem auto;
+  border-radius: 1px;
+  
+  // Color will be set via CSS custom property
+  background-color: var(--divider-color);
+}
+
+// Presentation mode layout
+.presentation-mode-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  padding-top: 4rem;
+  padding-bottom: 4rem;
+}
+
+.presentation-slide-content {
+  text-align: center;
+  max-width: 95vw;
+  width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.presentation-slide-label {
+  font-size: clamp(1.2rem, 3vw, 2rem);
+}
+
+.presentation-close-button {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 10000;
+}
+
+.presentation-indicators {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px 12px;
+  border-radius: 20px;
+  backdrop-filter: blur(8px);
+  gap: 8px;
+  
+  // Background will be set via CSS custom property
+  background-color: var(--indicators-bg);
+  border: 1px solid var(--indicators-border);
+}
+
+.presentation-indicator-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  
+  // Color will be set via CSS custom property
+  background-color: var(--dot-color);
+  
+  // Default transition - can be overridden
+  transition: all 0.2s ease;
+  
+  // Disable transitions for reduced motion users
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
+// Navigation button styling
+.navigation-container {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.navigation-flex {
+  gap: 1rem;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  align-items: stretch;
+}
+
+.navigation-button {
+  flex: 1;
+  max-width: 500px;
+  min-height: 42px;
+}
+
+.back-to-index-button {
+  max-width: 500px;
+  min-height: 42px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .container {
   & > .header {
     @media (max-width: 48em) {
