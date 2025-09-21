@@ -21,62 +21,49 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: (id) => {
-          // React ecosystem - Core React libraries
-          if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/')) {
-            return 'react-vendor';
+        manualChunks(id) {
+          // CRITICAL: React core must be first priority to load before anything else
+          if (id.includes('react-dom') || id.includes('react/') || id.includes('react\\') || id === 'react') {
+            return '01-react-core'; // Use numeric prefix to ensure proper ordering
           }
           
-          // React Router - Routing library
-          if (id.includes('node_modules/react-router')) {
-            return 'react-router';
+          // Combine all Mantine packages into one chunk to avoid circular dependencies
+          if (id.includes('@mantine/core') || id.includes('@mantine/hooks') || 
+              id.includes('@mantine/modals') || id.includes('@mantine/notifications')) {
+            return '02-mantine-all'; // Single Mantine chunk
           }
           
-          // Mantine UI - Main UI framework components
-          if (id.includes('node_modules/@mantine/core')) {
-            return 'mantine-core';
+          // React Router (depends on React)
+          if (id.includes('react-router')) {
+            return '03-react-router';
           }
           
-          // Mantine utilities and hooks
-          if (id.includes('node_modules/@mantine/hooks') || 
-              id.includes('node_modules/@mantine/modals') || 
-              id.includes('node_modules/@mantine/notifications')) {
-            return 'mantine-utils';
+          // Icons (may depend on React)
+          if (id.includes('@tabler/icons-react') || id.includes('react-icons')) {
+            return '04-icons';
           }
           
-          // Icons - Icon libraries (these can be large)
-          if (id.includes('node_modules/@tabler/icons-react') || 
-              id.includes('node_modules/react-icons')) {
-            return 'icons';
+          // Other utilities
+          if (id.includes('classnames') || id.includes('focus-visible') || 
+              id.includes('use-debounce') || id.includes('react-intersection-observer') ||
+              id.includes('react-window') || id.includes('@dr.pogodin/react-helmet')) {
+            return '05-utils';
           }
           
-          // Search and data libraries
-          if (id.includes('node_modules/fuse.js') || 
-              id.includes('node_modules/localforage')) {
-            return 'data-libs';
+          // Data libraries (independent)
+          if (id.includes('fuse.js') || id.includes('localforage')) {
+            return '06-data-libs';
           }
           
-          // UI utilities and helpers
-          if (id.includes('node_modules/classnames') || 
-              id.includes('node_modules/focus-visible') || 
-              id.includes('node_modules/use-debounce') || 
-              id.includes('node_modules/react-intersection-observer') || 
-              id.includes('node_modules/react-window') ||
-              id.includes('node_modules/@dr.pogodin/react-helmet')) {
-            return 'ui-utils';
-          }
-          
-          // SCSS/Sass related
-          if (id.includes('node_modules/sass') || id.includes('.scss') || id.includes('.css')) {
-            return 'styles';
-          }
-          
-          // All other vendor packages
-          if (id.includes('node_modules/')) {
-            return 'vendor';
-          }
-        },
+          // Leave everything else in the main bundle
+          return undefined;
+        }
       },
     },
+    chunkSizeWarningLimit: 800,
+  },
+  // Add resolve configuration to handle potential module resolution issues
+  resolve: {
+    dedupe: ['react', 'react-dom'],
   },
 });
