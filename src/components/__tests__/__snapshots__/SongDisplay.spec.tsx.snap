@@ -1,164 +1,289 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`#SongDisplay renders the matching song based on the route 1`] = `
+exports[`#SongDisplay > renders the matching song based on the route 1`] = `
 <DocumentFragment>
+  <style
+    data-mantine-styles="true"
+  >
+    
+
+
+
+
+  </style>
+  <style
+    data-mantine-styles="classes"
+  >
+    @media (max-width: 35.99375em) {.mantine-visible-from-xs {display: none !important;}}@media (min-width: 36em) {.mantine-hidden-from-xs {display: none !important;}}@media (max-width: 47.99375em) {.mantine-visible-from-sm {display: none !important;}}@media (min-width: 48em) {.mantine-hidden-from-sm {display: none !important;}}@media (max-width: 61.99375em) {.mantine-visible-from-md {display: none !important;}}@media (min-width: 62em) {.mantine-hidden-from-md {display: none !important;}}@media (max-width: 74.99375em) {.mantine-visible-from-lg {display: none !important;}}@media (min-width: 75em) {.mantine-hidden-from-lg {display: none !important;}}@media (max-width: 87.99375em) {.mantine-visible-from-xl {display: none !important;}}@media (min-width: 88em) {.mantine-hidden-from-xl {display: none !important;}}
+  </style>
   <div
-    class="chakra-container container css-t3somj"
+    class="container m_7485cace mantine-Container-root"
+    data-size="lg"
+    data-strategy="block"
+    style="--container-size: var(--container-size-lg); margin-block: var(--mantine-spacing-md); padding-block: var(--mantine-spacing-lg); padding-left: var(--mantine-spacing-xl); background: var(--mantine-color-white);"
   >
     <div
-      class="header css-53le5g"
+      class="header m_8bffd616 mantine-Flex-root __m__-r2"
+      style="gap: var(--mantine-spacing-md); justify-content: space-between; flex-wrap: wrap; margin-top: auto; margin-right: auto; margin-bottom: var(--mantine-spacing-lg); margin-left: auto; padding-right: var(--mantine-spacing-lg); max-width: calc(50rem * var(--mantine-scale)); position: relative;"
     >
-      <p
-        class="chakra-text css-0"
+      <h2
+        class="m_8a5d1357 mantine-Title-root"
+        data-order="2"
+        style="--title-fw: var(--mantine-h2-font-weight); --title-lh: var(--mantine-h2-line-height); --title-fz: var(--mantine-h2-font-size); font-weight: 500;"
       >
-        # 1
-      </p>
-      <p
-        class="chakra-text css-0"
-      >
-        There Was One Who Was Willing
-      </p>
+        <style
+          data-mantine-styles="inline"
+        >
+          .__m__-r5{display:block;}@media(min-width: 48em){.__m__-r5{display:inline;}}
+        </style>
+        <span
+          class="__m__-r5"
+        >
+          # 1
+        </span>
+        <style
+          data-mantine-styles="inline"
+        >
+          .__m__-r6{margin-left:0rem;display:block;}@media(min-width: 48em){.__m__-r6{margin-left:var(--mantine-spacing-xs);display:inline;}}
+        </style>
+        <span
+          class="__m__-r6"
+        >
+          There Was One Who Was Willing
+        </span>
+      </h2>
       <div
-        class="css-0"
+        class="m_4081bf90 mantine-Group-root"
+        style="--group-gap: var(--mantine-spacing-xs); --group-align: center; --group-justify: flex-start; --group-wrap: wrap;"
       >
         <button
           aria-label="Back to songs index"
-          class="chakra-button css-1uztc5k"
+          class="mantine-focus-auto mantine-active m_8d3f4000 mantine-ActionIcon-root m_87cf2631 mantine-UnstyledButton-root"
+          data-size="lg"
+          data-variant="outline"
+          style="--ai-size: var(--ai-size-lg); --ai-bg: transparent; --ai-hover: var(--mantine-color-gray-outline-hover); --ai-color: var(--mantine-color-gray-outline); --ai-bd: calc(0.0625rem * var(--mantine-scale)) solid var(--mantine-color-gray-outline); background: var(--mantine-color-gray-1);"
           type="button"
         >
-          <svg
-            aria-hidden="true"
-            color="var(--chakra-colors-gray-600)"
-            fill="currentColor"
-            focusable="false"
-            height="1em"
-            stroke="currentColor"
-            stroke-width="0"
-            viewBox="0 0 448 512"
-            width="1em"
-            xmlns="http://www.w3.org/2000/svg"
+          <span
+            class="m_8d3afb97 mantine-ActionIcon-icon"
           >
-            <path
-              d="M448 360V24c0-13.3-10.7-24-24-24H96C43 0 0 43 0 96v320c0 53 43 96 96 96h328c13.3 0 24-10.7 24-24v-16c0-7.5-3.5-14.3-8.9-18.7-4.2-15.4-4.2-59.3 0-74.7 5.4-4.3 8.9-11.1 8.9-18.6zM128 134c0-3.3 2.7-6 6-6h212c3.3 0 6 2.7 6 6v20c0 3.3-2.7 6-6 6H134c-3.3 0-6-2.7-6-6v-20zm0 64c0-3.3 2.7-6 6-6h212c3.3 0 6 2.7 6 6v20c0 3.3-2.7 6-6 6H134c-3.3 0-6-2.7-6-6v-20zm253.4 250H96c-17.7 0-32-14.3-32-32 0-17.6 14.4-32 32-32h285.4c-1.9 17.1-1.9 46.9 0 64z"
-            />
-          </svg>
+            <svg
+              fill="currentColor"
+              height="1em"
+              stroke="currentColor"
+              stroke-width="0"
+              viewBox="0 0 448 512"
+              width="1em"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M448 360V24c0-13.3-10.7-24-24-24H96C43 0 0 43 0 96v320c0 53 43 96 96 96h328c13.3 0 24-10.7 24-24v-16c0-7.5-3.5-14.3-8.9-18.7-4.2-15.4-4.2-59.3 0-74.7 5.4-4.3 8.9-11.1 8.9-18.6zM128 134c0-3.3 2.7-6 6-6h212c3.3 0 6 2.7 6 6v20c0 3.3-2.7 6-6 6H134c-3.3 0-6-2.7-6-6v-20zm0 64c0-3.3 2.7-6 6-6h212c3.3 0 6 2.7 6 6v20c0 3.3-2.7 6-6 6H134c-3.3 0-6-2.7-6-6v-20zm253.4 250H96c-17.7 0-32-14.3-32-32 0-17.6 14.4-32 32-32h285.4c-1.9 17.1-1.9 46.9 0 64z"
+              />
+            </svg>
+          </span>
         </button>
         <button
           aria-label="Add to Favourites"
-          class="chakra-button faveIcon css-11itnfl"
+          class="mantine-focus-auto mantine-active faveIcon m_8d3f4000 mantine-ActionIcon-root m_87cf2631 mantine-UnstyledButton-root"
+          data-size="lg"
+          data-variant="outline"
+          style="--ai-size: var(--ai-size-lg); --ai-bg: transparent; --ai-hover: var(--mantine-color-gray-outline-hover); --ai-color: var(--mantine-color-gray-outline); --ai-bd: calc(0.0625rem * var(--mantine-scale)) solid var(--mantine-color-gray-outline); background: var(--mantine-color-gray-1);"
           type="button"
         >
-          <svg
-            aria-hidden="true"
-            color="var(--chakra-colors-gray-600)"
-            fill="currentColor"
-            focusable="false"
-            height="1em"
-            stroke="currentColor"
-            stroke-width="0"
-            viewBox="0 0 512 512"
-            width="1em"
-            xmlns="http://www.w3.org/2000/svg"
+          <span
+            class="m_8d3afb97 mantine-ActionIcon-icon"
           >
-            <path
-              d="M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z"
-            />
-          </svg>
+            <svg
+              color="#495057"
+              fill="currentColor"
+              height="1em"
+              stroke="currentColor"
+              stroke-width="0"
+              style="color: rgb(73, 80, 87);"
+              viewBox="0 0 512 512"
+              width="1em"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z"
+              />
+            </svg>
+          </span>
+        </button>
+        <button
+          aria-label="Presentation mode"
+          class="mantine-focus-auto mantine-active m_8d3f4000 mantine-ActionIcon-root m_87cf2631 mantine-UnstyledButton-root"
+          data-size="lg"
+          data-variant="outline"
+          style="--ai-size: var(--ai-size-lg); --ai-bg: transparent; --ai-hover: var(--mantine-color-blue-outline-hover); --ai-color: var(--mantine-color-blue-outline); --ai-bd: calc(0.0625rem * var(--mantine-scale)) solid var(--mantine-color-blue-outline); background: var(--mantine-color-gray-1);"
+          type="button"
+        >
+          <span
+            class="m_8d3afb97 mantine-ActionIcon-icon"
+          >
+            <svg
+              fill="currentColor"
+              height="1em"
+              stroke="currentColor"
+              stroke-width="0"
+              viewBox="0 0 448 512"
+              width="1em"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M0 180V56c0-13.3 10.7-24 24-24h124c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12H64v84c0 6.6-5.4 12-12 12H12c-6.6 0-12-5.4-12-12zM288 44v40c0 6.6 5.4 12 12 12h84v84c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12V56c0-13.3-10.7-24-24-24H300c-6.6 0-12 5.4-12 12zm148 276h-40c-6.6 0-12 5.4-12 12v84h-84c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h124c13.3 0 24-10.7 24-24V332c0-6.6-5.4-12-12-12zM160 468v-40c0-6.6-5.4-12-12-12H64v-84c0-6.6-5.4-12-12-12H12c-6.6 0-12 5.4-12 12v124c0 13.3 10.7 24 24 24h124c6.6 0 12-5.4 12-12z"
+              />
+            </svg>
+          </span>
         </button>
       </div>
     </div>
     <div
-      class="body css-0"
+      class="body"
     >
       <div
-        class="verse css-0"
+        class="verse"
       >
         <span
-          class="label"
+          class="mantine-focus-auto label m_b6d8b162 mantine-Text-root"
+          data-size="lg"
+          style="--text-fz: var(--mantine-font-size-lg); --text-lh: var(--mantine-line-height-lg); color: var(--mantine-color-gray-6); font-weight: 600;"
         >
           Verse 1
         </span>
-        There was one who was willing to die in my stead,
+        <p
+          class="mantine-focus-auto song-text m_b6d8b162 mantine-Text-root"
+        >
+          There was one who was willing to die in my stead,
 That a soul so unworthy might live,
 And the path to the cross He was willing to tread,
 All the sins of my life to forgive.
+        </p>
       </div>
       <div
-        class="chorus css-0"
+        class="chorus"
       >
         <span
-          class="label"
+          class="mantine-focus-auto label m_b6d8b162 mantine-Text-root"
+          data-size="lg"
+          style="--text-fz: var(--mantine-font-size-lg); --text-lh: var(--mantine-line-height-lg); color: var(--mantine-color-gray-6); font-weight: 600;"
         >
           Chorus
         </span>
-        They are nailed to the Cross, they are nailed to the cross,
+        <p
+          class="mantine-focus-auto song-text m_b6d8b162 mantine-Text-root"
+        >
+          They are nailed to the Cross, they are nailed to the cross,
 O how much He was willing to bear!
 With what anguish and loss, Jesus went to the cross!
 But He carried my sins with Him there.
+        </p>
       </div>
       <div
-        class="verse css-0"
+        class="verse"
       >
         <span
-          class="label"
+          class="mantine-focus-auto label m_b6d8b162 mantine-Text-root"
+          data-size="lg"
+          style="--text-fz: var(--mantine-font-size-lg); --text-lh: var(--mantine-line-height-lg); color: var(--mantine-color-gray-6); font-weight: 600;"
         >
           Verse 2
         </span>
-        He is tender and loving and patient with me,
+        <p
+          class="mantine-focus-auto song-text m_b6d8b162 mantine-Text-root"
+        >
+          He is tender and loving and patient with me,
 While He cleanses my heart of its dross,
 But there's no condemnation, I know I am free,
 For my sins are all nailed to the cross.
+        </p>
       </div>
       <div
-        class="verse css-0"
+        class="verse"
       >
         <span
-          class="label"
+          class="mantine-focus-auto label m_b6d8b162 mantine-Text-root"
+          data-size="lg"
+          style="--text-fz: var(--mantine-font-size-lg); --text-lh: var(--mantine-line-height-lg); color: var(--mantine-color-gray-6); font-weight: 600;"
         >
           Verse 3
         </span>
-        I will cling to my Saviour and never depart,
+        <p
+          class="mantine-focus-auto song-text m_b6d8b162 mantine-Text-root"
+        >
+          I will cling to my Saviour and never depart,
 I will joyfully journey each day,
 With a song on my lips and a song in my heart,
 That my sins have been taken away.
+        </p>
       </div>
     </div>
     <p
-      class="chakra-text footer css-1etkgh2"
+      class="mantine-focus-auto footer m_b6d8b162 mantine-Text-root"
+      style="color: var(--mantine-color-gray-7); text-align: right; font-style: italic;"
     >
       James Montgomery
     </p>
     <div
-      class="css-mm4t09"
+      class="navigation-container"
     >
-      <button
-        class="chakra-button css-1skxxy0"
-        type="button"
+      <div
+        class="navigation-flex navigation-buttons m_8bffd616 mantine-Flex-root __m__-rt"
       >
-        Next Song 
-        <svg
-          class="chakra-icon css-11gi69r"
-          fill="currentColor"
-          focusable="false"
-          height="20"
-          stroke="currentColor"
-          stroke-width="0"
-          viewBox="0 0 512 512"
-          width="20"
-          xmlns="http://www.w3.org/2000/svg"
+        <button
+          class="mantine-focus-auto mantine-active navigation-button m_77c9d27d mantine-Button-root m_87cf2631 mantine-UnstyledButton-root"
+          data-size="md"
+          data-with-right-section="true"
+          style="--button-height: var(--button-height-md); --button-padding-x: var(--button-padding-x-md); --button-fz: var(--mantine-font-size-md); --button-bg: var(--mantine-color-blue-filled); --button-hover: var(--mantine-color-blue-filled-hover); --button-color: var(--mantine-color-white); --button-bd: calc(0.0625rem * var(--mantine-scale)) solid transparent;"
+          type="button"
         >
-          <path
-            d="M256 8c137 0 248 111 248 248S393 504 256 504 8 393 8 256 119 8 256 8zm-28.9 143.6l75.5 72.4H120c-13.3 0-24 10.7-24 24v16c0 13.3 10.7 24 24 24h182.6l-75.5 72.4c-9.7 9.3-9.9 24.8-.4 34.3l11 10.9c9.4 9.4 24.6 9.4 33.9 0L404.3 273c9.4-9.4 9.4-24.6 0-33.9L271.6 106.3c-9.4-9.4-24.6-9.4-33.9 0l-11 10.9c-9.5 9.6-9.3 25.1.4 34.4z"
-          />
-        </svg>
-      </button>
+          <span
+            class="m_80f1301b mantine-Button-inner"
+          >
+            <span
+              class="m_811560b9 mantine-Button-label"
+            >
+              Next Song
+            </span>
+            <span
+              class="m_a74036a mantine-Button-section"
+              data-position="right"
+            >
+              <svg
+                fill="currentColor"
+                height="1em"
+                stroke="currentColor"
+                stroke-width="0"
+                viewBox="0 0 512 512"
+                width="1em"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M256 8c137 0 248 111 248 248S393 504 256 504 8 393 8 256 119 8 256 8zm-28.9 143.6l75.5 72.4H120c-13.3 0-24 10.7-24 24v16c0 13.3 10.7 24 24 24h182.6l-75.5 72.4c-9.7 9.3-9.9 24.8-.4 34.3l11 10.9c9.4 9.4 24.6 9.4 33.9 0L404.3 273c9.4-9.4 9.4-24.6 0-33.9L271.6 106.3c-9.4-9.4-24.6-9.4-33.9 0l-11 10.9c-9.5 9.6-9.3 25.1.4 34.4z"
+                />
+              </svg>
+            </span>
+          </span>
+        </button>
+        <button
+          class="mantine-focus-auto mantine-active navigation-button m_77c9d27d mantine-Button-root m_87cf2631 mantine-UnstyledButton-root"
+          data-size="md"
+          data-variant="outline"
+          style="--button-height: var(--button-height-md); --button-padding-x: var(--button-padding-x-md); --button-fz: var(--mantine-font-size-md); --button-bg: transparent; --button-hover: var(--mantine-color-blue-outline-hover); --button-color: var(--mantine-color-blue-outline); --button-bd: calc(0.0625rem * var(--mantine-scale)) solid var(--mantine-color-blue-outline);"
+          type="button"
+        >
+          <span
+            class="m_80f1301b mantine-Button-inner"
+          >
+            <span
+              class="m_811560b9 mantine-Button-label"
+            >
+              Back to Index
+            </span>
+          </span>
+        </button>
+      </div>
     </div>
-    <button
-      class="chakra-button css-4xx2wk"
-      type="button"
-    >
-      Back to Index
-    </button>
   </div>
 </DocumentFragment>
 `;

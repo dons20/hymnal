@@ -1,0 +1,137 @@
+.songs {
+  .songItem {
+    background-color: light-dark(white, var(--mantine-color-dark-6));
+    color: light-dark(var(--mantine-color-dark-7), var(--mantine-color-gray-2));
+    border: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+    width: calc(100% - 6px);
+    margin: 3px 0 3px 6px;
+    padding: 8px;
+
+    @media screen and (min-width: 768px) {
+      box-shadow: var(--mantine-shadow-sm);
+    }
+    
+    &:hover {
+        background: var(--mantine-primary-color-7);
+        color: white;
+
+        :global(.mantine-Text-root) {
+          color: white;
+        }
+
+        :global(.mantine-ActionIcon-root) {
+          color: white;
+          border-color: white;
+        }
+    }
+  }
+
+  .songWrapper {
+    padding: 3px 0;
+  }
+
+  .listItem {
+    align-items: center;
+    cursor: pointer;
+    height: 100%;
+    text-align: left;
+    user-select: none;
+    transition:
+      background 0.1s ease-in-out,
+      color 0.1s ease-in;
+    will-change: background, color;
+    &:hover {
+      background: var(--mantine-primary-color-9);
+      color: #fff;
+    }
+  }
+
+  .listNumber {
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+
+  .listTitle {
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  .utilityHeader {
+    align-items: center;
+    // background-color: #fff;
+    // color: #333;
+    display: grid;
+    font-size: 1.3rem;
+    grid-template-rows: 100%;
+    grid-template-columns: 1fr;
+    height: 3.5rem;
+    justify-items: center;
+    position: sticky;
+    max-width: 500px;
+    margin: auto;
+    top: 0;
+    position: relative;
+    width: 100%;
+    z-index: 10;
+
+    button {
+      align-items: center;
+      // background-color: #fff;
+      border: 0;
+      cursor: pointer;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      width: 100%;
+      height: 100%;
+      padding: 0.5rem;
+    }
+    .icon {
+      height: 100%;
+      color: var(--dark-neutral-color);
+      fill: var(--dark-neutral-color);
+
+      &.active {
+        color: var(--primary-color);
+        fill: var(--primary-color);
+      }
+    }
+    .label {
+      border-right: none;
+    }
+  }
+
+  .faveIcon {
+    &:hover {
+      transform: translateY(-2px);
+    }
+  }
+
+  .loader {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  @media only screen and (min-width: 475px) {
+    .listNumber {
+      font-size: 1rem;
+    }
+
+    .listTitle {
+      font-size: 1.2rem;
+    }
+  }
+  @media only screen and (min-width: 975px) {
+    .listTitle {
+      font-size: 1.4rem;
+    }
+  }
+}
+
+.custom-overlay {
+  min-width: 300px;
+  max-width: 400px;
+  margin: auto;
+}

@@ -1,8 +1,8 @@
 // react-testing-library renders your components to document.body,
 // this adds jest-dom's custom assertions
-import "@testing-library/jest-dom";
+import '@testing-library/jest-dom';
 
-// @ts-ignore
+// @ts-expect-error implicit any type
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
 // Object.defineProperty(window, 'matchMedia', {

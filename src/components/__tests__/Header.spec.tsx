@@ -1,176 +1,104 @@
-import userEvent from "@testing-library/user-event";
-import { render, screen, waitFor } from "@testing-library/react";
-import { MemoryRouter, BrowserRouter } from "react-router-dom";
-import { Providers, resizeWindow } from "helpers/tests";
-import { ColorModeScript } from "@chakra-ui/system";
-import { ChakraProvider } from "@chakra-ui/react";
-import MainContext from "components/Providers";
-import { createMemoryHistory } from "history";
-import Header from "components/Header";
-import { SongsDB } from "data/songs";
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router';
+import { MantineProvider } from '@mantine/core';
+import Header from '@/components/Header';
+import { SongsDB } from '@/data/songs';
+import { Providers } from '@/helpers/tests';
 
 const songs = SongsDB;
 const user = userEvent.setup();
 
-beforeEach(() => {
-    window.matchMedia = jest.fn().mockImplementation(() => ({
-        matches: false,
-        media: "",
-        onchange: null,
-        addListener: jest.fn(),
-        removeListener: jest.fn(),
-    }));
+const mockPWAState = {
+  isInstallable: false,
+  isOffline: false,
+  isUpdateAvailable: false,
+  installApp: async () => {},
+  updateApp: () => {},
+};
+
+const mockContextValue = {
+  songs,
+  favourites: [],
+  setFavourites: () => {},
+  dispatch: () => {},
+  pages: { HOME: '/home', INDEX: '/songs', FAVOURITES: '/favourites', SETTINGS: '/settings' },
+  meta: { title: '', subtitle: '', width: 1024, colorScheme: 'light' as const },
+  pwa: mockPWAState,
+};
+
+// Mock the navigate function
+const mockNavigate = vi.fn();
+vi.mock('react-router', async () => {
+  const actual = await vi.importActual('react-router');
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+    useLocation: () => ({ pathname: '/songs/index' }),
+  };
 });
 
-describe("#Header", () => {
-	it("should render correctly", async () => {
-		const { asFragment } = render(
-			<BrowserRouter>
-				<Providers value={{ songs }}>
-					<Header />
-				</Providers>
-			</BrowserRouter>
-		);
-		const title = await screen.findByText(/Hymns for All Times/);
-		expect(title).toBeInTheDocument();
-		expect(asFragment()).toMatchSnapshot();
-	});
-	it("should show the search results when typing and hide them when query is erased", async () => {
-		render(
-			<BrowserRouter>
-				<Providers value={{ songs }}>
-					<MainContext>
-						<Header />
-					</MainContext>
-				</Providers>
-			</BrowserRouter>
-		);
+describe('#Header', () => {
+  beforeEach(() => {
+    mockNavigate.mockClear();
+  });
 
-		const searchWrapper: HTMLFormElement = await screen.findByRole("search");
-		expect(searchWrapper).toBeInTheDocument();
+  it('renders the title and action icons', async () => {
+    render(
+      <MantineProvider defaultColorScheme="light">
+        <MemoryRouter initialEntries={['/songs/index']}>
+          <Providers value={mockContextValue}>
+            <Header />
+          </Providers>
+        </MemoryRouter>
+      </MantineProvider>
+    );
+    const title = await screen.findByText(/Hymns for All Times/);
+    expect(title).toBeInTheDocument();
 
-		const searchField: HTMLInputElement = await screen.findByTestId("desktopSearch");
-		await user.type(searchField, "test");
+    // Icons present
+    expect(await screen.findByTestId('searchTrigger')).toBeInTheDocument();
+    expect(await screen.findByTestId('menuTrigger')).toBeInTheDocument();
+  });
 
-		const resultsList = await screen.findByTestId("searchItemsWrapper");
+  it('navigates to search when clicking the search icon', async () => {
+    render(
+      <MantineProvider defaultColorScheme="light">
+        <MemoryRouter initialEntries={['/songs/index']}>
+          <Providers value={mockContextValue}>
+            <Header />
+          </Providers>
+        </MemoryRouter>
+      </MantineProvider>
+    );
 
-		expect(searchField.value).toBe("test");
-		await waitFor(() => expect(resultsList).not.toBeEmptyDOMElement());
+    await user.click(await screen.findByTestId('searchTrigger'));
+    expect(mockNavigate).toHaveBeenCalledWith('/search');
+  });
 
-		searchField.setSelectionRange(0, 4);
-		await user.type(searchField, "{backspace}");
+  it('opens overlay menu and navigates via links', async () => {
+    render(
+      <MantineProvider defaultColorScheme="light">
+        <MemoryRouter initialEntries={['/songs/index']}>
+          <Providers value={mockContextValue}>
+            <Header />
+          </Providers>
+        </MemoryRouter>
+      </MantineProvider>
+    );
 
-		const searchResultsBox = await screen.findByTestId("searchResultsBox");
-		expect(searchResultsBox).toHaveProperty("hidden");
-	});
-	it("should send the user to a song's page directly when they click a result", async () => {
-		render(
-			<BrowserRouter>
-				<Providers value={{ songs }}>
-					<MainContext>
-						<Header />
-					</MainContext>
-				</Providers>
-			</BrowserRouter>
-		);
+    await user.click(await screen.findByTestId('menuTrigger'));
+    expect(await screen.findByTestId('menuOverlay')).toBeInTheDocument();
 
-		const searchWrapper: HTMLFormElement = await screen.findByRole("search");
-		expect(searchWrapper).toBeInTheDocument();
+    // Navigate to Songs
+    const songsLink = await screen.findByText('Songs');
+    await user.click(songsLink);
+    expect(mockNavigate).toHaveBeenCalledWith('/songs/index');
 
-		const searchField: HTMLInputElement = screen.getByTestId("desktopSearch");
-		await user.type(searchField, "test");
-
-		const resultsList = screen.getByTestId("searchItemsWrapper");
-
-		await waitFor(() => expect(resultsList.childElementCount).toBeGreaterThan(0));
-		const result = await screen.findByText("Lovest Thou Me");
-		await user.click(result);
-
-		await waitFor(() => {
-			expect(window.location.href).toContain("/songs/399");
-		});
-	});
-	it("should navigate to the search results page when a search is submitted", async () => {
-		render(
-			<BrowserRouter>
-				<Providers value={{ songs }}>
-					<Header />
-				</Providers>
-			</BrowserRouter>
-		);
-
-		const searchField = screen.getByTestId("desktopSearch");
-		await user.type(searchField, "test");
-
-		await user.type(searchField, "[Enter]");
-		await waitFor(() => {
-			expect(window.location.href).toContain("/search?query=test");
-		});
-	});
-	it("should toggle night mode when the user clicks the night mode toggle button", async () => {
-		render(
-			<ChakraProvider>
-				<ColorModeScript initialColorMode="light" />
-				<MemoryRouter initialEntries={["/home"]}>
-					<Providers value={{ songs }}>
-						<Header />
-					</Providers>
-				</MemoryRouter>
-			</ChakraProvider>
-		);
-		const colorModeToggle = await screen.findByLabelText("Toggle Color Mode");
-
-		await waitFor(() => expect(document.body).toHaveClass("chakra-ui-light"));
-
-		await user.click(colorModeToggle);
-		await waitFor(() => expect(document.body).toHaveClass("chakra-ui-dark"));
-	});
-	it("should navigate the user home when they click the main logo", async () => {
-		const history = createMemoryHistory();
-		render(
-			<MemoryRouter>
-				<Providers value={{ songs }}>
-					<Header />
-				</Providers>
-			</MemoryRouter>
-		);
-
-		const logo = await screen.findByRole("heading", { name: /Hymns For All Times/i });
-
-		await user.click(logo);
-		expect(history.location.pathname).toBe("/");
-	});
-	it("should show a modal popup with a search bar and toggle button on smaller screens", async () => {
-		window.matchMedia = jest.fn().mockImplementation(query => ({
-			matches: query === "(max-width: 550px)",
-			media: "",
-			onchange: null,
-			addListener: jest.fn(),
-			removeListener: jest.fn(),
-		}));
-
-		render(
-			<BrowserRouter>
-				<Providers value={{ songs }}>
-					<Header />
-				</Providers>
-			</BrowserRouter>
-		);
-
-		resizeWindow(450, 1000);
-		const mobileMenuToggle = await screen.findByTestId("mobileMenuTrigger");
-		await user.click(mobileMenuToggle);
-
-		const searchField = await screen.findByTestId("mobileSearch");
-		const searchButton = await screen.findByLabelText("Search Song Database");
-
-		await user.type(searchField, "people");
-		await user.click(searchButton);
-
-		await waitFor(() => {
-			expect(window.location.href).toContain("/search?query=people");
-		});
-	});
-	it.todo("should navigate the user to the search results page when submitting the mobile search field");
-	it.todo("should toggle night mode when the user clicks the mobile toggle button");
+    // Open again and navigate to Favourites
+    await user.click(await screen.findByTestId('menuTrigger'));
+    const favesLink = await screen.findByText('Favourites');
+    await user.click(favesLink);
+    expect(mockNavigate).toHaveBeenCalledWith('/songs/favourites');
+  });
 });

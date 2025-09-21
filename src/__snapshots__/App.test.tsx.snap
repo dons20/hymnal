@@ -1,19 +1,38 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`#App renders without crashing 1`] = `
+exports[`#App > renders without crashing 1`] = `
 <DocumentFragment>
+  <style
+    data-mantine-styles="true"
+  >
+    
+
+
+
+
+  </style>
+  <style
+    data-mantine-styles="classes"
+  >
+    @media (max-width: 35.99375em) {.mantine-visible-from-xs {display: none !important;}}@media (min-width: 36em) {.mantine-hidden-from-xs {display: none !important;}}@media (max-width: 47.99375em) {.mantine-visible-from-sm {display: none !important;}}@media (min-width: 48em) {.mantine-hidden-from-sm {display: none !important;}}@media (max-width: 61.99375em) {.mantine-visible-from-md {display: none !important;}}@media (min-width: 62em) {.mantine-hidden-from-md {display: none !important;}}@media (max-width: 74.99375em) {.mantine-visible-from-lg {display: none !important;}}@media (min-width: 75em) {.mantine-hidden-from-lg {display: none !important;}}@media (max-width: 87.99375em) {.mantine-visible-from-xl {display: none !important;}}@media (min-width: 88em) {.mantine-hidden-from-xl {display: none !important;}}
+  </style>
   <div
-    class="root css-0"
+    class="_root_c1a19f m_7485cace mantine-Container-root"
+    data-fluid="true"
+    data-strategy="block"
   >
     <section
-      class="app_body css-0"
+      class="_app_body_c1a19f m_7485cace mantine-Container-root"
+      data-fluid="true"
+      data-strategy="block"
     >
       <main
-        class="app_inner  css-1157erc"
+        class="_app_inner_c1a19f _app_inner_mobile_c1a19f m_7485cace mantine-Container-root"
+        data-fluid="true"
+        data-strategy="block"
+        style="padding: 0rem;"
       >
-        <div
-          class="wrapper"
-        />
+        <div />
       </main>
     </section>
   </div>

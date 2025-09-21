@@ -3,21 +3,21 @@
  */
 
 interface FilterPropT {
-	enabled: boolean;
-	currValue: string | null;
+  enabled: boolean;
+  currValue: string | null;
 }
 
 export const DEFAULT_ALPHA_PROPS = {
-	enabled: false,
-	sortDescending: false,
+  enabled: false,
+  sortDescending: false,
 };
 
 export const DEFAULT_NUM_PROPS = {
-	enabled: true,
-	sortDescending: false,
+  enabled: true,
+  sortDescending: false,
 };
 
 export const DEFAULT_FILTER_PROPS: FilterPropT = {
-	enabled: false,
-	currValue: null,
+  enabled: false,
+  currValue: null,
 };

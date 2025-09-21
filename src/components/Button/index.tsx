@@ -1,16 +1,31 @@
-import { Button as CoreButton, ButtonProps } from "@chakra-ui/react";
-import { Link, LinkProps } from "react-router-dom";
+import { MouseEventHandler, ReactNode } from 'react';
+import { Link } from 'react-router';
+import { ButtonProps, Button as MantineButton } from '@mantine/core';
 
-interface ButtonLink extends ButtonProps {
-	as: typeof Link;
+interface ButtonP extends Omit<ButtonProps, 'component'> {
+  children: ReactNode;
+  to?: string;
+  component?: typeof Link;
+  onClick?: MouseEventHandler<HTMLButtonElement>;
 }
 
-type ButtonP = ButtonProps | (ButtonLink & LinkProps);
+const Button = ({ children, size = 'lg', color = 'blue', to, component, ...rest }: ButtonP) => {
+  if (to && component) {
+    // When it's a link, remove onClick and pass to and component
+    const { onClick, ...linkProps } = rest;
+    return (
+      <MantineButton size={size} color={color} component={component} to={to} {...linkProps}>
+        {children}
+      </MantineButton>
+    );
+  }
 
-const Button = ({ children, size = "lg", colorScheme = "blue", ...rest }: ButtonP) => (
-	<CoreButton size={size} colorScheme={colorScheme} {...rest}>
-		{children}
-	</CoreButton>
-);
+  // When it's a regular button
+  return (
+    <MantineButton size={size} color={color} {...rest}>
+      {children}
+    </MantineButton>
+  );
+};
 
 export default Button;

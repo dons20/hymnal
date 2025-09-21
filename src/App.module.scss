@@ -1,32 +1,50 @@
 .root {
-	width: 100%;
+  width: 100%;
+  padding: 0;
 }
 
 .app {
-	&_body {
-		display: grid;
-		grid-template-rows: auto 1fr auto;
-		min-height: 100vh;
-		flex-direction: column;
-		font-size: calc(10px + 1.75vmin);
-	}
+  &_body {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    min-height: 100vh;
+    flex-direction: column;
+    font-size: calc(10px + 1.75vmin);
+    padding: 0;
+  }
 
-	&_inner {
-		display: grid;
-		grid-template-rows: minmax(150px, auto) 1fr;
-		align-items: center;
-		&_mobile {
-			padding-bottom: 3rem;
-		}
-	}
+  &_inner {
+    display: grid;
+    grid-template-rows: minmax(150px, auto) 1fr;
+    align-items: center;
+    width: 100%;
 
-	&_link {
-		color: #61dafb;
-	}
+    &_mobile {
+      padding-bottom: 0rem;
+    }
+  }
+
+  &_link {
+    color: #61dafb;
+  }
 }
 
 .wrapper {
-	margin: 0 auto;
-	width: 100%;
-	height: 100%;
+  position: relative;
+  z-index: 2;
+  margin: 0 auto;
+  width: 100%;
+  min-height: 0;
+  background-color: transparent;
+  padding: 0;
+
+  @media (min-width: 768px) {
+    margin-top: -60px;
+    margin-bottom: auto;
+    width: min(100%, 1100px);
+    background-color: var(--mantine-color-body);
+    border-radius: var(--mantine-radius-lg);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+    padding: 16px;
+  }
 }

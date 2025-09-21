@@ -1,19 +1,92 @@
 .page-header {
-	width: 100%;
-	& .search {
-		width: 100%;
-		max-width: 30rem;
-	}
+  width: 100%;
+  & .search {
+    width: 100%;
+    max-width: 30rem;
+  }
+}
+
+.menu-link {
+  cursor: pointer;
+  padding: 16px 20px;
+  border-radius: var(--mantine-radius-md);
+  background: transparent;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  position: relative;
+  display: block;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+  border: 2px solid transparent;
+
+  // Icon styling
+  svg {
+    transition: transform 0.2s ease;
+  }
+
+  // Add a subtle underline effect
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 8px;
+    left: 20px;
+    right: 20px;
+    height: 2px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.2s ease;
+    opacity: 0.7;
+  }
+
+  &:hover::after {
+    transform: scaleX(1);
+  }
+
+  &:hover svg {
+    transform: translateX(4px);
+  }
+
+  &:focus-visible {
+    outline: none;
+    border-color: var(--mantine-primary-color-5);
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
+}
+
+body[data-mantine-color-scheme='dark'] .menu-link {
+  color: var(--mantine-color-gray-0);
+
+  &:hover {
+    background-color: var(--mantine-color-gray-7);
+    color: var(--mantine-primary-color-3);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+}
+
+body[data-mantine-color-scheme='light'] .menu-link {
+  color: var(--mantine-color-dark-6);
+
+  &:hover {
+    background-color: var(--mantine-color-gray-0);
+    color: var(--mantine-primary-color-7);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
 }
 
 @media only screen and (max-width: 575px) {
-	.page-header {
-		& .search {
-			max-width: 90vw;
-		}
-	}
-	.ant-page-header-heading-title {
-		float: none;
-		text-align: center;
-	}
+  .page-header {
+    & .search {
+      max-width: 90vw;
+    }
+  }
+  .ant-page-header-heading-title {
+    float: none;
+    text-align: center;
+  }
 }

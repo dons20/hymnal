@@ -1,0 +1,54 @@
+.favourites {
+  .favouriteItem {
+    background-color: light-dark(white, var(--mantine-color-dark-6));
+    color: light-dark(var(--mantine-color-dark-7), var(--mantine-color-gray-2));
+    border: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+    
+    &:hover {
+      background: var(--mantine-primary-color-7) !important;
+      color: white !important;
+      transform: translateY(-2px);
+
+      .mantine-Text-root {
+        color: white !important;
+      }
+
+      .mantine-ActionIcon-root {
+        background-color: rgba(255, 255, 255, 0.1) !important;
+        border-color: white !important;
+      }
+    }
+  }
+
+  .emptyState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    text-align: center;
+    padding: 2rem;
+
+    .emptyIcon {
+      font-size: 4rem;
+      color: var(--mantine-color-gray-4);
+      margin-bottom: 1rem;
+    }
+  }
+
+  // Responsive adjustments
+  @media only screen and (max-width: 768px) {
+    .favouriteItem {
+      padding: 0.75rem;
+      margin: 0 0.5rem;
+    }
+  }
+
+  @media only screen and (min-width: 769px) {
+    .favouriteItem {
+      padding: 1rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+  }
+}

@@ -1,35 +1,41 @@
 // Maintain load order for correct initial loading, modify carefully
-import "react-app-polyfill/stable";
-import { createRoot } from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
-import { ChakraProvider, ColorModeScript } from "@chakra-ui/react";
-import { createStandaloneToast } from '@chakra-ui/toast';
-import { customTheme } from "theme";
+import '@mantine/core/styles.css';
+import '@mantine/notifications/styles.css';
 
-import MainContext from "components/Providers";
-import { unregister } from "./serviceWorker";
-import "focus-visible/dist/focus-visible";
-import "./index.scss";
+import { HelmetProvider } from '@dr.pogodin/react-helmet';
+import { createRoot } from 'react-dom/client';
+import { BrowserRouter } from 'react-router';
+import { ColorSchemeScript, MantineProvider } from '@mantine/core';
+import { ModalsProvider } from '@mantine/modals';
+import { Notifications } from '@mantine/notifications';
+import MainContext from '@/components/Providers';
+import { theme } from '@/theme';
 
-import App from "./App";
+import 'focus-visible/dist/focus-visible';
+import './index.scss';
 
-const { ToastContainer } = createStandaloneToast();
-const container = document.getElementById("root");
-const root = createRoot(container!);
+import App from './App';
+
+const container = document.getElementById('root');
+
+if (!container) {
+  throw new Error('Root element not found');
+}
+
+const root = createRoot(container);
 
 root.render(
-	<ChakraProvider resetCSS theme={customTheme}>
-		<ColorModeScript initialColorMode={customTheme.config.initialColorMode} />
-		<BrowserRouter>
-			<MainContext>
-				<App />	
-			</MainContext>
-		</BrowserRouter>
-		<ToastContainer />
-	</ChakraProvider>
+  <HelmetProvider>
+    <ColorSchemeScript defaultColorScheme="auto" />
+    <MantineProvider theme={theme} defaultColorScheme="auto">
+      <ModalsProvider>
+        <Notifications />
+        <BrowserRouter>
+          <MainContext>
+            <App />
+          </MainContext>
+        </BrowserRouter>
+      </ModalsProvider>
+    </MantineProvider>
+  </HelmetProvider>
 );
-
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: http://bit.ly/CRA-PWA
-unregister();

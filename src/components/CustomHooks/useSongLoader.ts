@@ -1,143 +1,157 @@
-import { useEffect, useState } from "react";
-import hymns from "static/hymns.json";
-import setDebug from "utils/logger";
-import { SongsDB } from "helpers";
-import axios from "axios";
+import { useEffect, useState } from 'react';
+import { SongsDB } from '@/helpers';
+import hymns from '@/static/hymns.json';
+import setDebug from '@/utils/logger';
 
-const dbName = "Songs";
+const dbName = 'Songs';
 
 setDebug();
 const { debug } = window;
 
 /**
- * @deprecated
- * Should probably read from db directly...
+ * Creates a simple hash from the hymns data for cache invalidation
+ */
+function createContentHash(data: SongsDB): string {
+  const content = JSON.stringify(data.songs);
+  let hash = 0;
+  for (let i = 0; i < content.length; i++) {
+    const char = content.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash &= hash; // Convert to 32-bit integer
+  }
+  return hash.toString(36);
+}
+
+/**
+ * Local-first song loader - uses only the bundled hymns.json file
  */
 function useSongLoader() {
-	const [songs, setSongs] = useState<Song[]>([]);
-	const [favourites, setFavourites] = useState<number[]>([]);
-	debug.log(songs);
+  const [songs, setSongs] = useState<Song[]>([]);
+  const [favourites, setFavourites] = useState<number[]>([]);
 
-	/**
-	 * Initiates the process of loading songs from the db
-	 */
-	useEffect(() => {
-		/**
-		 * Loads songs from JSON and stores them locally
-		 */
-		async function loadNewSongs({ songs: fetchedSongs, version }: SongsDB) {
-			const localForage = await import("localforage");
-			const localSongs = localForage.createInstance({ storeName: "items", name: dbName });
-			const localVersion = localForage.createInstance({ storeName: "version", name: dbName });
+  /**
+   * Loads songs from the bundled JSON and stores them locally
+   */
+  async function loadSongs() {
+    const localForage = await import('localforage');
 
-			try {
-				await Promise.all([
-					fetchedSongs.forEach(async (song, i) => localSongs.setItem(`${i}`, song)),
-					localVersion.setItem("value", version).catch(e => debug.info(e)),
-				]);
+    if (!localForage.default.config) {
+      // If no storage available, just use the hymns directly
+      setSongs(hymns.songs);
+      return;
+    }
 
-				setSongs(fetchedSongs);
-			} catch (err) {
-				if (err instanceof Error) debug.info(err.message);
-			}
-		}
+    localForage.default.config({
+      name: dbName,
+      description: 'Stores the songs db and content hash for cache invalidation',
+    });
 
-		const simpleFetch = async () => {
-			const query = process.env.NODE_ENV === "production" ? await axios.get<SongsDB>(process.env.HYMNS_URL || "https://f002.backblazeb2.com/file/hymnal/hymns.json") : { data: hymns };
-			setSongs(query.data.songs);
-		};
+    try {
+      const localSongs = localForage.default.createInstance({ name: dbName, storeName: 'items' });
+      const hashStore = localForage.default.createInstance({ name: dbName, storeName: 'hash' });
 
-		/**
-		 * Checks if songs have already been stored
-		 */
-		async function checkDB() {
-			const localForage = await import("localforage");
+      // Create content hash from current bundled data
+      const currentHash = createContentHash(hymns as SongsDB);
+      const storedHash = (await hashStore.getItem('value')) as string;
 
-			if (!localForage.config) {
-				simpleFetch();
-				return;
-			}
+      debug.log(`%cChecking hymns data...`, 'color: #3182ce; font-size: medium;');
 
-			localForage.config({
-				name: dbName,
-				description: "Stores the songs db and its version number",
-			});
-			try {
-				/**
-				 * Delete old DB
-				 */
-				const oldDB = localForage.createInstance({ name: "keyval-store" });
-				oldDB.dropInstance().catch(() => debug.info("Problem dropping old DB"));
-				const query = process.env.NODE_ENV === "production" ? await axios.get<SongsDB>(process.env.HYMNS_URL || "https://f002.backblazeb2.com/file/hymnal/hymns.json") : { data: hymns };
-				if (!query.data) return;
-				debug.log(query);
-				const songsDB: SongsDB = query.data;
-				debug.log(`%cChecking if songs exist already`, "color: #3182ce; font-size: medium;");
-				const localSongs = localForage.createInstance({ name: dbName, storeName: "items" });
-				const songsLength = await localSongs.length();
+      // Check if we have cached songs and if content hasn't changed
+      const songsLength = await localSongs.length();
+      const hasValidCache = songsLength > 0 && storedHash === currentHash;
 
-				if (songsLength < songsDB.songs.length) {
-					debug.info("Items out of sync with latest items");
-					loadNewSongs(songsDB);
-				}
+      if (hasValidCache) {
+        // Load from cache - content hasn't changed
+        debug.log(`%cLoading songs from local storage...`, 'color: #3182ce; font-size: medium;');
+        const songStorage: Song[] = [];
+        await localSongs.iterate((value: Song) => {
+          songStorage.push(value);
+        });
 
-				debug.log(`%cChecking for updates`, "color: #3182ce; font-size: medium;");
-				const version = localForage.createInstance({ name: dbName, storeName: "version" });
-				if (!version) throw new Error("No version stored");
-				const versionNumber = (await version.getItem("value")) as string;
-				if (songsDB.version !== versionNumber) {
-					debug.info("Version mismatch, sync necessary");
-					loadNewSongs(songsDB);
-				}
+        if (songStorage.length > 0) {
+          setSongs(songStorage);
+          debug.log(
+            `%c${songStorage.length} songs loaded from local storage (cached)`,
+            'color: #10b981; font-size: medium;'
+          );
+          return;
+        }
+      }
 
-				debug.log(`%cSongs found! Attempting to load...`, "color: #3182ce; font-size: medium;");
-				const songStorage: Song[] = [];
-				await localSongs.iterate((value: Song) => {
-					songStorage.push(value);
-				});
+      // Cache is invalid or doesn't exist - refresh from bundled data
+      if (storedHash !== currentHash) {
+        debug.log(`%cContent changed, refreshing cache...`, 'color: #f59e0b; font-size: medium;');
+      } else {
+        debug.log(`%cNo cache found, initializing...`, 'color: #3182ce; font-size: medium;');
+      }
 
-				setSongs(songStorage);
-			} catch (e) {
-				debug.log(
-					`%cLocal entries outdated or undefined, parsing songs DB...`,
-					"color: #3182ce; font-size: medium;"
-				);
-				if (e instanceof Error) debug.info(e.message);
-			}
-		}
+      // Clear existing cache
+      await localSongs.clear();
 
-		async function loadFavourites() {
-			const name = "Songs";
-			const storeName = "Favourites";
-			const localForage = await import("localforage");
+      // Store new songs and hash
+      const storePromises = hymns.songs.map(async (song, index) =>
+        localSongs.setItem(`${index}`, song)
+      );
 
-			if (!localForage.config) return;
-			localForage.config({
-				name,
-				storeName,
-				description: "Your favourite songs",
-			});
+      await Promise.all([...storePromises, hashStore.setItem('value', currentHash)]);
 
-			try {
-				const localFavourites: number[] = [];
-				await localForage.iterate((value: number) => {
-					localFavourites.push(value);
-				});
-				setFavourites(favourites);
-			} catch (e) {
-				debug.log("Error obtaining favourites");
-				if (e instanceof Error) debug.info(e.message);
-			}
-		}
+      setSongs(hymns.songs);
+      debug.log(
+        `%c${hymns.songs.length} songs loaded and cached from bundled data`,
+        'color: #10b981; font-size: medium;'
+      );
+    } catch (error) {
+      debug.log(`%cError loading songs, using fallback`, 'color: #ef4444; font-size: medium;');
+      if (error instanceof Error) debug.info(error.message);
 
-		if (songs.length <= 1) {
-			debug.log("%cLoading Songs...", "color: #3182ce; font-size: large; font-weight: bold");
-			checkDB();
-			loadFavourites();
-		}
-	}, [songs.length, favourites]);
+      // Fallback to bundled data
+      setSongs(hymns.songs);
+    }
+  }
 
-	return { songs, favourites, setFavourites };
+  async function loadFavourites() {
+    const localForage = await import('localforage');
+
+    if (!localForage.default.config) return;
+
+    // Create a specific instance for favourites
+    const favesStore = localForage.default.createInstance({
+      name: 'Songs',
+      storeName: 'Favourites',
+      description: 'Your favourite songs',
+    });
+
+    try {
+      const localFavourites: number[] = [];
+      await favesStore.iterate((value: number) => {
+        localFavourites.push(value);
+      });
+      setFavourites(localFavourites);
+      debug.log(
+        `%c${localFavourites.length} favourites loaded`,
+        'color: #8b5cf6; font-size: medium;'
+      );
+    } catch (e) {
+      debug.log('Error obtaining favourites');
+      if (e instanceof Error) debug.info(e.message);
+    }
+  }
+
+  /**
+   * Initiates the process of loading songs and favourites
+   */
+  useEffect(() => {
+    if (songs.length <= 1) {
+      debug.log(
+        '%cLoading Songs (Local-First)...',
+        'color: #3182ce; font-size: large; font-weight: bold'
+      );
+      loadSongs();
+      loadFavourites();
+    }
+  }, [songs.length]);
+
+  return { songs, favourites, setFavourites };
 }
 
 export default useSongLoader;

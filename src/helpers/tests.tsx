@@ -1,23 +1,21 @@
-import { act } from "react-dom/test-utils";
-import { MainContextProvider } from "utils/context";
+import { act } from 'react-dom/test-utils';
+import { CTX, MainContextProvider } from '../utils/context';
 
 type ProviderT = {
-	children: React.ReactNode;
-	value: any;
+  children: React.ReactNode;
+  value: unknown;
 };
 
 const resizeWindow = (x: number, y: number) => {
-	// @ts-ignore
-	window.innerWidth = x;
-	// @ts-ignore
-	window.innerHeight = y;
-	act(() => {
-		window.dispatchEvent(new Event("resize"));
-	});
+  window.innerWidth = x;
+  window.innerHeight = y;
+  act(() => {
+    window.dispatchEvent(new Event('resize'));
+  });
 };
 
 const Providers = ({ children, value }: ProviderT) => (
-	<MainContextProvider value={value}>{children}</MainContextProvider>
+  <MainContextProvider value={value as CTX}>{children}</MainContextProvider>
 );
 
 export { resizeWindow, Providers };

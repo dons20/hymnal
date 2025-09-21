@@ -1,21 +1,22 @@
-import { Heading, Box, useColorModeValue } from "@chakra-ui/react";
-import { useMainContext } from "utils/context";
-import "./PictureHeader.scss";
+import { Box, Title } from '@mantine/core';
+import { useMainContext } from '../../utils/context';
+
+import './PictureHeader.scss';
 
 function PictureHeader() {
-	const { meta } = useMainContext();
-	const headerOverlay = useColorModeValue("#0d222f", "#061a2b");
+  const { meta } = useMainContext();
 
-	return (
-		<Box className="picture-header" bgColor={headerOverlay}>
-			<Box className="bgImgCont">
-				<Box className="hCont">
-					{meta.title && <Heading className="heading">{meta.title}</Heading>}
-					{meta.subtitle && <Heading className="heading">{meta.subtitle}</Heading>}
-				</Box>
-			</Box>
-		</Box>
-	);
+  return (
+    <Box className="picture-header">
+      <Box className="bgImgCont">
+        <div className="overlay" />
+        <Box className="hCont">
+          {meta.title && <Title className="heading">{meta.title}</Title>}
+          {meta.subtitle && <Title className="subheading">{meta.subtitle}</Title>}
+        </Box>
+      </Box>
+    </Box>
+  );
 }
 
 export default PictureHeader;
