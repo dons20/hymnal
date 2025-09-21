@@ -47,7 +47,7 @@ function useSongLoader() {
     };
 
     /**
-     * Checks if songs have already been stored
+     * Checks if songs have already been stored and loads them offline-first
      */
     async function checkDB() {
       const localForage = await import('localforage');
@@ -61,52 +61,87 @@ function useSongLoader() {
         name: dbName,
         description: 'Stores the songs db and its version number',
       });
+      
       try {
-        /**
-         * Delete old DB
-         */
-        const oldDB = localForage.default.createInstance({ name: 'keyval-store' });
-        oldDB.dropInstance().catch(() => debug.info('Problem dropping old DB'));
-        const query =
-          process.env.NODE_ENV === 'production'
-            ? await axios.get<SongsDB>(
-                process.env.HYMNS_URL || 'https://f002.backblazeb2.com/file/hymnal/hymns.json'
-              )
-            : { data: hymns };
-        if (!query.data) return;
-        debug.log(query);
-        const songsDB: SongsDB = query.data;
-        debug.log(`%cChecking if songs exist already`, 'color: #3182ce; font-size: medium;');
+        // Try to load songs from local storage first (offline-first approach)
         const localSongs = localForage.default.createInstance({ name: dbName, storeName: 'items' });
         const songsLength = await localSongs.length();
-
-        if (songsLength < songsDB.songs.length) {
-          debug.info('Items out of sync with latest items');
-          loadNewSongs(songsDB);
+        
+        if (songsLength > 0) {
+          debug.log(`%cLoading songs from local storage...`, 'color: #3182ce; font-size: medium;');
+          const songStorage: Song[] = [];
+          await localSongs.iterate((value: Song) => {
+            songStorage.push(value);
+          });
+          
+          if (songStorage.length > 0) {
+            setSongs(songStorage);
+            debug.log(`%c${songStorage.length} songs loaded from local storage`, 'color: #10b981; font-size: medium;');
+          }
         }
-
-        debug.log(`%cChecking for updates`, 'color: #3182ce; font-size: medium;');
-        const version = localForage.default.createInstance({ name: dbName, storeName: 'version' });
-        if (!version) throw new Error('No version stored');
-        const versionNumber = (await version.getItem('value')) as string;
-        if (songsDB.version !== versionNumber) {
-          debug.info('Version mismatch, sync necessary');
-          loadNewSongs(songsDB);
+        
+        // Then try to update from network (if online)
+        if (navigator.onLine) {
+          await updateFromNetwork(localForage);
         }
-
-        debug.log(`%cSongs found! Attempting to load...`, 'color: #3182ce; font-size: medium;');
-        const songStorage: Song[] = [];
-        await localSongs.iterate((value: Song) => {
-          songStorage.push(value);
-        });
-
-        setSongs(songStorage);
       } catch (e) {
         debug.log(
           `%cLocal entries outdated or undefined, parsing songs DB...`,
           'color: #3182ce; font-size: medium;'
         );
         if (e instanceof Error) debug.info(e.message);
+        
+        // Fallback to static data if all else fails
+        if (songs.length === 0) {
+          simpleFetch();
+        }
+      }
+    }
+
+    async function updateFromNetwork(localForage: any) {
+      try {
+        /**
+         * Delete old DB
+         */
+        const oldDB = localForage.default.createInstance({ name: 'keyval-store' });
+        oldDB.dropInstance().catch(() => debug.info('Problem dropping old DB'));
+        
+        const query =
+          process.env.NODE_ENV === 'production'
+            ? await axios.get<SongsDB>(
+                process.env.HYMNS_URL || 'https://f002.backblazeb2.com/file/hymnal/hymns.json'
+              )
+            : { data: hymns };
+            
+        if (!query.data) return;
+        
+        const songsDB: SongsDB = query.data;
+        debug.log(`%cChecking for updates from network...`, 'color: #3182ce; font-size: medium;');
+        
+        const localSongs = localForage.default.createInstance({ name: dbName, storeName: 'items' });
+        const songsLength = await localSongs.length();
+
+        if (songsLength < songsDB.songs.length) {
+          debug.info('Items out of sync with latest items, updating...');
+          loadNewSongs(songsDB);
+          return;
+        }
+
+        debug.log(`%cChecking version...`, 'color: #3182ce; font-size: medium;');
+        const version = localForage.default.createInstance({ name: dbName, storeName: 'version' });
+        if (!version) throw new Error('No version stored');
+        const versionNumber = (await version.getItem('value')) as string;
+        
+        if (songsDB.version !== versionNumber) {
+          debug.info('Version mismatch, sync necessary');
+          loadNewSongs(songsDB);
+          return;
+        }
+
+        debug.log(`%cSongs are up to date`, 'color: #10b981; font-size: medium;');
+      } catch (error) {
+        debug.log(`%cNetwork update failed, using cached data`, 'color: #f59e0b; font-size: medium;');
+        if (error instanceof Error) debug.info(error.message);
       }
     }
 

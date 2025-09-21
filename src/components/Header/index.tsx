@@ -1,4 +1,4 @@
-import { FaBars, FaHeart, FaHome, FaList, FaMoon, FaSearch, FaSun, FaSync } from 'react-icons/fa';
+import { FaBars, FaDownload, FaHeart, FaHome, FaList, FaMoon, FaSearch, FaSun, FaSync } from 'react-icons/fa';
 import { useLocation, useNavigate } from 'react-router';
 import {
   ActionIcon,
@@ -14,6 +14,7 @@ import {
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useState } from 'react';
+import { usePWA } from '../../hooks/usePWA';
 
 import './Header.scss';
 
@@ -21,6 +22,7 @@ const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isClearing, setIsClearing] = useState(false);
+  const { isInstallable, installApp } = usePWA();
   
   const useFullscreen = useMatches({
     base: true,
@@ -217,6 +219,26 @@ const Header = () => {
               >
                 Enable {colorScheme === 'dark' ? 'Light' : 'Dark'} Mode&nbsp;
                 {colorScheme === 'dark' ? <FaSun /> : <FaMoon />}
+              </Button>
+            )}
+
+            {/* Install App Button - only show if installable */}
+            {isInstallable && (
+              <Button
+                variant="outline"
+                color="green"
+                size="md"
+                fullWidth
+                onClick={() => {
+                  installApp();
+                  closeMenu();
+                }}
+                leftSection={<FaDownload />}
+                aria-label="Install Hymnal App"
+                data-testid="installApp"
+                mt={!showHeaderThemeToggle ? 'md' : 0}
+              >
+                Install App
               </Button>
             )}
           </Box>

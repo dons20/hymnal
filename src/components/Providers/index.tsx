@@ -2,6 +2,7 @@ import React from 'react';
 import { useMantineColorScheme } from '@mantine/core';
 import { Loader } from '@/components';
 import { useSongLoader } from '@/components/CustomHooks';
+import { usePWA } from '@/hooks/usePWA';
 import { ACTIONTYPE, MainContextProvider, pages, State } from '@/utils/context';
 
 type PropsT = {
@@ -34,6 +35,9 @@ function MainContext({ children }: PropsT) {
   const { songs, favourites, setFavourites } = useSongLoader();
   const [state, dispatch] = React.useReducer(reducer, initialAppState);
   const { colorScheme } = useMantineColorScheme();
+  
+  // Initialize PWA functionality
+  usePWA();
 
   // Sync color scheme with context
   React.useEffect(() => {
