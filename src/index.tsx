@@ -5,7 +5,7 @@ import '@mantine/notifications/styles.css';
 import { HelmetProvider } from '@dr.pogodin/react-helmet';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router';
-import { ColorSchemeScript, MantineProvider } from '@mantine/core';
+import { MantineProvider } from '@mantine/core';
 import { ModalsProvider } from '@mantine/modals';
 import { Notifications } from '@mantine/notifications';
 import MainContext from '@/components/Providers';
@@ -15,6 +15,15 @@ import 'focus-visible/dist/focus-visible';
 import './index.scss';
 
 import App from './App';
+
+// Register PWA service worker
+import { registerSW } from 'virtual:pwa-register';
+
+// Register service worker with auto-update
+registerSW({
+  onNeedRefresh() {},
+  onOfflineReady() {},
+});
 
 const container = document.getElementById('root');
 
@@ -26,8 +35,7 @@ const root = createRoot(container);
 
 root.render(
   <HelmetProvider>
-    <ColorSchemeScript defaultColorScheme="auto" />
-    <MantineProvider theme={theme} defaultColorScheme="auto">
+    <MantineProvider theme={theme} defaultColorScheme="light">
       <ModalsProvider>
         <Notifications />
         <BrowserRouter>

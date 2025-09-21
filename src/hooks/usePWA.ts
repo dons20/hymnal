@@ -27,8 +27,10 @@ export function usePWA() {
 
   // Register service worker and set up analytics
   useEffect(() => {
+    // vite-plugin-pwa handles service worker registration automatically
+    // but we still need to set up update detection and messaging
     if ('serviceWorker' in navigator) {
-      registerServiceWorker();
+      setupServiceWorkerListeners();
     }
 
     // Set up analytics management for offline/online modes
@@ -39,6 +41,9 @@ export function usePWA() {
   useEffect(() => {
     const handleOnline = () => {
       setPwaState((prev) => ({ ...prev, isOffline: false }));
+      
+      // Hide offline notification and show online notification
+      notifications.hide('offline-status');
       notifications.show({
         id: 'online-status',
         title: 'Connection Restored',
@@ -50,6 +55,10 @@ export function usePWA() {
 
     const handleOffline = () => {
       setPwaState((prev) => ({ ...prev, isOffline: true }));
+      
+      // Hide online and other connection-related notifications
+      notifications.hide('online-status');
+      notifications.hide('cache-ready'); // Don't show both offline and cache-ready at same time
       notifications.show({
         id: 'offline-status',
         title: 'Offline Mode',
@@ -92,6 +101,10 @@ export function usePWA() {
         // Only prevent default on desktop where we want custom UI
         e.preventDefault();
 
+        // Hide other install-related notifications
+        notifications.hide('pwa-ios-hint');
+        notifications.hide('pwa-mobile-hint');
+        
         // Show install notification after app is cached (desktop only)
         setTimeout(() => {
           notifications.show({
@@ -105,6 +118,10 @@ export function usePWA() {
         }, 2000);
       } else if (isIOS) {
         // iOS Safari doesn't support beforeinstallprompt, show instructions
+        // Hide other install-related notifications
+        notifications.hide('pwa-install');
+        notifications.hide('pwa-mobile-hint');
+        
         setTimeout(() => {
           notifications.show({
             id: 'pwa-ios-hint',
@@ -117,6 +134,10 @@ export function usePWA() {
         }, 3000);
       } else {
         // Android Chrome and other browsers
+        // Hide other install-related notifications
+        notifications.hide('pwa-install');
+        notifications.hide('pwa-ios-hint');
+        
         setTimeout(() => {
           notifications.show({
             id: 'pwa-mobile-hint',
@@ -137,6 +158,11 @@ export function usePWA() {
         installPrompt: null,
       }));
 
+      // Hide all install-related notifications
+      notifications.hide('pwa-install');
+      notifications.hide('pwa-ios-hint');
+      notifications.hide('pwa-mobile-hint');
+
       notifications.show({
         id: 'app-installed',
         title: 'App Installed!',
@@ -155,21 +181,36 @@ export function usePWA() {
     };
   }, []);
 
-  const registerServiceWorker = async () => {
+  const setupServiceWorkerListeners = async () => {
     try {
-      const registration = await navigator.serviceWorker.register('/sw.js');
+      // Get the registration that vite-plugin-pwa created
+      const registration = await navigator.serviceWorker.ready;
       setServiceWorkerRegistration(registration);
 
       // Listen for service worker messages
       navigator.serviceWorker.addEventListener('message', handleServiceWorkerMessage);
+
+      // Track if this is the initial installation
+      const isInitialInstall = !navigator.serviceWorker.controller;
 
       // Check for updates
       registration.addEventListener('updatefound', () => {
         const newWorker = registration.installing;
         if (newWorker) {
           newWorker.addEventListener('statechange', () => {
-            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            // Only show update notification if:
+            // 1. The new worker is installed 
+            // 2. There's already a controlling service worker (not first install)
+            // 3. The page is not being refreshed
+            if (newWorker.state === 'installed' && 
+                navigator.serviceWorker.controller && 
+                !isInitialInstall) {
+              
               setPwaState((prev) => ({ ...prev, isUpdateAvailable: true }));
+
+              // Hide install-related notifications when showing update
+              notifications.hide('cache-ready');
+              notifications.hide('pwa-install');
 
               notifications.show({
                 id: 'app-update',
@@ -184,24 +225,47 @@ export function usePWA() {
         }
       });
 
+      // Also check if there's already an update waiting
+      if (registration.waiting && !isInitialInstall) {
+        setPwaState((prev) => ({ ...prev, isUpdateAvailable: true }));
+        
+        // Hide conflicting notifications
+        notifications.hide('cache-ready');
+        notifications.hide('pwa-install');
+        
+        notifications.show({
+          id: 'app-update',
+          title: 'App Update Available',
+          message: 'A new version is available. Refresh to update.',
+          color: 'blue',
+          autoClose: false,
+          withCloseButton: true,
+        });
+      }
+
       // eslint-disable-next-line no-console
-      console.log('Service Worker registered successfully');
+      console.log('Service Worker listeners set up successfully');
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.error('Service Worker registration failed:', error);
+      console.error('Service Worker listener setup failed:', error);
     }
   };
 
   const handleServiceWorkerMessage = (event: MessageEvent) => {
     if (event.data && event.data.type === 'SW_INSTALLED') {
-      // Show caching complete notification
-      notifications.show({
-        id: 'cache-ready',
-        title: 'App Ready for Offline Use!',
-        message: event.data.message || 'All content has been cached and is available offline.',
-        color: 'green',
-        autoClose: 5000,
-      });
+      // Only show cache-ready notification if we're online and not showing update notifications
+      if (navigator.onLine && !pwaState.isUpdateAvailable) {
+        // Hide offline notification if showing cache-ready
+        notifications.hide('offline-status');
+        
+        notifications.show({
+          id: 'cache-ready',
+          title: 'App Ready for Offline Use!',
+          message: event.data.message || 'All content has been cached and is available offline.',
+          color: 'green',
+          autoClose: 5000,
+        });
+      }
     }
   };
 
@@ -222,8 +286,10 @@ export function usePWA() {
           installPrompt: null,
         }));
 
-        // Hide install notification
+        // Hide all install-related notifications
         notifications.hide('pwa-install');
+        notifications.hide('pwa-ios-hint');
+        notifications.hide('pwa-mobile-hint');
       } catch (error) {
         // eslint-disable-next-line no-console
         console.error('Install prompt failed:', error);
@@ -233,6 +299,9 @@ export function usePWA() {
 
   const updateApp = () => {
     if (serviceWorkerRegistration) {
+      // Hide update notification immediately
+      notifications.hide('app-update');
+      
       serviceWorkerRegistration.waiting?.postMessage({ type: 'SKIP_WAITING' });
       window.location.reload();
     }
