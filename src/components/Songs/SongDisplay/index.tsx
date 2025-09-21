@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Helmet } from '@dr.pogodin/react-helmet';
-import { FaArrowCircleLeft, FaArrowCircleRight, FaBook, FaExpand, FaHeart } from 'react-icons/fa';
+import { FaArrowCircleLeft, FaArrowCircleRight, FaBook, FaExpandArrowsAlt, FaHeart } from 'react-icons/fa';
 import { Navigate, useNavigate, useParams } from 'react-router';
 import {
   ActionIcon,
@@ -11,6 +11,7 @@ import {
   Portal,
   Text,
   Title,
+  Tooltip,
   Transition,
   useMantineColorScheme,
 } from '@mantine/core';
@@ -614,41 +615,47 @@ function SongDisplay() {
           </Box>
         </Title>
         <Group gap="xs">
-          <ActionIcon
-            variant="outline"
-            color="gray"
-            bg={isDark ? 'gray.8' : 'gray.1'}
-            size="lg"
-            onClick={backToIndex}
-            aria-label="Back to songs index"
-          >
-            <FaBook />
-          </ActionIcon>
-          <ActionIcon
-            variant="outline"
-            color={isFavourite ? 'red' : 'gray'}
-            bg={isFavourite ? (isDark ? 'red.9' : 'red.1') : isDark ? 'gray.8' : 'gray.1'}
-            size="lg"
-            onClick={() => toggleFavourite(songToRender.number)}
-            aria-label="Add to Favourites"
-            className="faveIcon"
-          >
-            <FaHeart
-              color={
-                isFavourite ? (isDark ? '#ff6b6b' : '#e03131') : isDark ? '#868e96' : '#495057'
-              }
-            />
-          </ActionIcon>
-          <ActionIcon
-            variant="outline"
-            color="blue"
-            bg={isDark ? 'gray.8' : 'gray.1'}
-            size="lg"
-            onClick={togglePresentationMode}
-            aria-label="Presentation mode"
-          >
-            <FaExpand />
-          </ActionIcon>
+          <Tooltip label="Song List" position="bottom" withArrow>
+            <ActionIcon
+              variant="outline"
+              color="gray"
+              bg={isDark ? 'gray.8' : 'gray.1'}
+              size="lg"
+              onClick={backToIndex}
+              aria-label="Back to songs index"
+            >
+              <FaBook />
+            </ActionIcon>
+          </Tooltip>
+          <Tooltip label={isFavourite ? "Remove Favourite" : "Add Favourite"} position="bottom" withArrow>
+            <ActionIcon
+              variant="outline"
+              color={isFavourite ? 'red' : 'gray'}
+              bg={isFavourite ? (isDark ? 'red.9' : 'red.1') : isDark ? 'gray.8' : 'gray.1'}
+              size="lg"
+              onClick={() => toggleFavourite(songToRender.number)}
+              aria-label="Add to Favourites"
+              className="faveIcon"
+            >
+              <FaHeart
+                color={
+                  isFavourite ? (isDark ? '#ff6b6b' : '#e03131') : isDark ? '#868e96' : '#495057'
+                }
+              />
+            </ActionIcon>
+          </Tooltip>
+          <Tooltip label="Present" position="bottom" withArrow>
+            <ActionIcon
+              variant="outline"
+              color="blue"
+              bg={isDark ? 'gray.8' : 'gray.1'}
+              size="lg"
+              onClick={togglePresentationMode}
+              aria-label="Presentation mode"
+            >
+              <FaExpandArrowsAlt />
+            </ActionIcon>
+          </Tooltip>
         </Group>
       </Flex>
       <Box className="body">{songBody}</Box>
