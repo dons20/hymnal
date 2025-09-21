@@ -1,129 +1,168 @@
-import { useCallback, useEffect, useRef } from "react";
-import { Box, Container, Grid, Link as ChakraLink, Text } from "@chakra-ui/layout";
-import { GridChildComponentProps, FixedSizeGrid } from "react-window";
-import { useColorModeValue } from "@chakra-ui/color-mode";
-import AutoSizer from "react-virtualized-auto-sizer";
-import { useMainContext } from "utils/context";
-import { useNavigate } from "react-router";
-import { Link } from "react-router-dom";
-import { Helmet } from "react-helmet";
+import { useCallback, useEffect, useMemo } from 'react';
+import classes from './Favourites.module.scss';
+import { Helmet } from '@dr.pogodin/react-helmet';
+import { FaHeart } from 'react-icons/fa';
+import { Link, useNavigate } from 'react-router';
+import { List, RowComponentProps } from 'react-window';
+import {
+  ActionIcon,
+  Anchor,
+  Box,
+  Container,
+  Group,
+  Text,
+  UnstyledButton,
+  useMantineColorScheme,
+} from '@mantine/core';
+import { updateFavesDB } from '../../helpers';
+import { useMainContext } from '../../utils/context';
 
 const meta = {
-    title: "Favourites",
-    page: "Favourites",
+  title: 'Favourites',
+  page: 'Favourites',
+};
+
+const calculateRowHeight = () => {
+  const isMobile = window.innerWidth < 768;
+  return isMobile ? 100 : 80;
+};
+
+const itemStyle = {
+  border: '1px solid var(--mantine-color-gray-3)',
+  borderRadius: 'var(--mantine-radius-md)',
+  transition: 'all 0.2s ease',
+  marginBottom: '8px',
 };
 
 function Favourites() {
-    const navigate = useNavigate();
-    const { songs, favourites, dispatch } = useMainContext();
-    const finalList = songs.filter(song => favourites.includes(song.number - 1)).sort((a, b) => a.number - b.number);
-    const pageBG = useColorModeValue("gray.200", "gray.800");
-    const cellBG = useColorModeValue("gray.50", "gray.700");
-    const wrapperRef = useRef<HTMLDivElement>(null);
-    const numRows = favourites.length;
-    const numColumns = useRef(1);
+  const navigate = useNavigate();
+  const { songs, favourites, setFavourites, dispatch } = useMainContext();
+  const { colorScheme } = useMantineColorScheme();
+  const isDark = colorScheme === 'dark';
 
-    /** Triggers navigation to a song at a specified index */
-    const memoDisplaySong = useCallback(
-        (e: React.MouseEvent<HTMLDivElement>) => {
-            function displaySong(ev: React.MouseEvent<HTMLDivElement>) {
-                const songID = ev.currentTarget.getAttribute("data-song-id");
-                navigate(`${process.env.PUBLIC_URL}/songs/${songID}`);
-            }
+  const finalList = useMemo(
+    () =>
+      songs
+        .filter((song) => favourites.includes(song.number - 1))
+        .sort((a, b) => a.number - b.number),
+    [songs, favourites]
+  );
 
-            displaySong(e);
-        },
-        [navigate]
-    );
+  const handleSongClick = useCallback(
+    (songNumber: number) => {
+      navigate(`/song/${songNumber}`);
+    },
+    [navigate]
+  );
 
-    /** Renders a single cell */
-    const Cell = useCallback(
-        ({ columnIndex, rowIndex, style, data }: GridChildComponentProps) => {
-            const itemIndex = rowIndex * numColumns.current + columnIndex;
-            if (itemIndex >= finalList.length) return null;
-            return (
-                <Box
-                    key={data[itemIndex].number}
-                    className="gridItemWrapper"
-                    style={style}
-                    pl={window.innerWidth * 0.07}
-                    cursor="default"
+  const handleFavoriteToggle = useCallback(
+    (songNumber: number) => {
+      const newFavorites = favourites.filter((fave) => fave !== songNumber - 1);
+      setFavourites(newFavorites);
+      updateFavesDB(newFavorites);
+    },
+    [favourites, setFavourites]
+  );
+
+  const Row = useCallback(
+    ({ index, style }: RowComponentProps) => {
+      const song = finalList[index];
+      return (
+        <div style={{ ...style, padding: '4px 20px' }}>
+          <UnstyledButton onClick={() => handleSongClick(song.number)} w="100%">
+            <Box
+              p="md"
+              style={{
+                ...itemStyle,
+                backgroundColor: isDark ? 'var(--mantine-color-gray-7)' : 'white',
+                cursor: 'pointer',
+                maxWidth: '800px',
+                margin: '0 auto',
+              }}
+              className={`${classes.favouriteItem} favourite-item`}
+            >
+              <Group justify="space-between" align="center">
+                <div style={{ flex: 1 }}>
+                  <Text fw={700} size="md">
+                    #{song.number} - {song.title}
+                  </Text>
+                </div>
+
+                <ActionIcon
+                  variant="filled"
+                  color="red"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleFavoriteToggle(song.number);
+                  }}
+                  style={{ flexShrink: 0 }}
                 >
-                    <Grid
-                        data-song-id={data[itemIndex].number}
-                        h={100}
-                        px={3}
-                        py={3}
-                        alignItems="center"
-                        maxW="800px"
-                        margin="auto"
-                        bg={cellBG}
-                        onClick={memoDisplaySong}
-                        templateColumns="80px 1fr"
-                        shadow="md"
-                        borderRadius="md"
-                        cursor="pointer"
-                        transition="transform 0.1s ease-in-out"
-                        willChange="transform"
-                        _hover={{ transform: "translateY(-2px)" }}
-                    >
-                        <Text className="listNumber"># {data[itemIndex].number}</Text>
-                        <Text className="listTitle">{data[itemIndex].title}</Text>
-                    </Grid>
-                </Box>
-            );
-        },
-        [cellBG, finalList.length, memoDisplaySong]
-    );
+                  <FaHeart size={14} />
+                </ActionIcon>
+              </Group>
+            </Box>
+          </UnstyledButton>
+        </div>
+      );
+    },
+    [finalList, isDark, handleSongClick, handleFavoriteToggle]
+  );
 
-    const EmptyListRender = useCallback(
-        () => (
-            <Container centerContent>
-                <Text>Sorry, it seems you haven&apos;t added any favourites yet!</Text>
-                <ChakraLink as={Link} to="/songs/index" color="blue.500">
-                    Browse Songs Index
-                </ChakraLink>
+  const EmptyListRender = useCallback(
+    () => (
+      <Container style={{ textAlign: 'center', paddingTop: '2rem' }}>
+        <Text size="lg" mb="md">
+          No favourites yet!
+        </Text>
+        <Text c="dimmed" mb="lg">
+          Start adding songs to your favourites by tapping the heart icon on any song.
+        </Text>
+        <Anchor component={Link} to="/songs/index" c="blue.5">
+          Browse Songs Index
+        </Anchor>
+      </Container>
+    ),
+    []
+  );
+
+  useEffect(() => {
+    dispatch({ type: 'setTitle', payload: meta.title });
+  }, [dispatch]);
+
+  return (
+    <>
+      <Helmet>
+        <title>{`Hymns for All Times | ${meta.page}`}</title>
+      </Helmet>
+      <Box pt="md" h="100vh" className={classes.favourites}>
+        {finalList.length === 0 ? (
+          <EmptyListRender />
+        ) : (
+          <>
+            <Container mb="md">
+              <Text size="sm" c="dimmed" ta="center">
+                {finalList.length} favourite{finalList.length !== 1 ? 's' : ''}
+              </Text>
             </Container>
-        ),
-        []
-    );
-
-    useEffect(() => {
-        dispatch({ type: "setTitle", payload: meta.title });
-    }, [dispatch]);
-
-    return (
-        <>
-            {/* @ts-expect-error Helmet no longer updated */}
-            <Helmet>
-                <title>{`Hymns for All Times | ${meta.page}`}</title>
-            </Helmet>
-            <Grid pt={5} templateRows="1fr" h="100%" bg={pageBG}>
-                {finalList.length === 0 && <EmptyListRender />}
-                <Box ref={wrapperRef} pos="relative" overflow="hidden" h="100%">
-                    <AutoSizer>
-                        {({ height, width }) => (
-                            <>
-                                {/** @ts-expect-error Fixed size grid has TS issue */}
-                                <FixedSizeGrid
-                                    height={height}
-                                    width={width}
-                                    rowHeight={120}
-                                    columnWidth={width - window.innerWidth * 0.07}
-                                    columnCount={numColumns.current}
-                                    rowCount={numRows}
-                                    itemData={finalList}
-                                    style={{ overflowX: "hidden" }}
-                                >
-                                    {Cell}
-                                </FixedSizeGrid>
-                            </>
-                        )}
-                    </AutoSizer>
-                </Box>
-            </Grid>
-        </>
-    );
+            <Box
+              style={{
+                height: 'calc(100vh - 120px)',
+                overflow: 'hidden',
+              }}
+            >
+              <List
+                rowComponent={Row}
+                rowCount={finalList.length}
+                rowHeight={calculateRowHeight}
+                rowProps={{}}
+                overscanCount={6}
+              />
+            </Box>
+          </>
+        )}
+      </Box>
+    </>
+  );
 }
 
 export default Favourites;

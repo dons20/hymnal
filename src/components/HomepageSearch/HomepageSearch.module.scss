@@ -1,0 +1,125 @@
+.input {
+  font-size: 1.1rem;
+  padding: 16px 20px;
+  height: 56px;
+  color: #333;
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 25px;
+  transition: all 0.3s ease;
+
+  &::placeholder {
+    color: rgba(51, 51, 51, 0.7);
+  }
+
+  &:focus {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: var(--mantine-primary-color-6);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+
+    & .section {
+      transform: translateY(-2px);
+    }
+  }
+
+  :root[data-mantine-color-scheme='dark'] & {
+    background: rgba(0, 0, 0, 0.3);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    &:focus {
+      background: rgba(0, 0, 0, 0.4);
+      border-color: var(--mantine-primary-color-6);
+    }
+  }
+}
+
+.section {
+  width: 60px;
+
+  :root[data-mantine-color-scheme='dark'] & {
+    color: white;
+  }
+}
+
+.searchContainer {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto 3rem auto;
+}
+
+.searchDropdown {
+  z-index: 100;
+  margin-top: 4px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: var(--mantine-radius-md);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  animation: slideDown 0.2s ease-out;
+
+  &.darkTheme {
+    background: rgba(28, 28, 28, 0.95);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+.searchResultItem {
+  width: 100%;
+  padding: 12px;
+  border-radius: var(--mantine-radius-sm);
+  transition: all 0.2s ease;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--mantine-primary-color-6);
+
+    * {
+      color: white !important;
+    }
+  }
+
+  &.darkTheme:hover {
+    background: var(--mantine-primary-color-6);
+  }
+}
+
+.viewMore {
+  margin-top: 4px;
+  padding: 12px 8px;
+  font-weight: 700;
+  text-align: center;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+
+  :root[data-mantine-color-scheme='dark'] & {
+    border-top-color: rgba(255, 255, 255, 0.12);
+  }
+}
+
+// Smooth slide down animation
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+.keyboardSpacer {
+  width: 100%;
+  pointer-events: none;
+  // No background; purely layout spacer
+}
