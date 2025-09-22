@@ -1,0 +1,2 @@
+[build]
+  command = "VITE_APP_URL=$DEPLOY_PRIME_URL npm run build"
