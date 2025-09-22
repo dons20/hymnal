@@ -1,2 +1,3 @@
 [build]
-    command = 'if [ "$CONTEXT" = "production" ]; then VITE_APP_URL=$URL; else VITE_APP_URL=$DEPLOY_PRIME_URL; fi; npm run build'
+  command = "chmod +x build.sh && npm run build"
+  publish = "dist"
