@@ -1,2 +1,2 @@
 [build]
-  command = "VITE_APP_URL=$DEPLOY_PRIME_URL npm run build"
+    command = 'if [ "$CONTEXT" = "production" ]; then VITE_APP_URL=$URL; else VITE_APP_URL=$DEPLOY_PRIME_URL; fi; npm run build'
