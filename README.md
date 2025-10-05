@@ -1,18 +1,44 @@
 # Hymns for all Times
 
-![Social Banner](./public/social_banner_1.jpg)
+![Social Banner](./public/social_banner.jpg)
 
-A modern, react-powered single page application, allowing users to ditch their paper hymnals in favor of something portable. Built with Typescript, a few other awesome libraries have helped bring this project to life, including Chakra UI, FuseJS and localforage.
+A modern, React + TypeScript progressive web app (PWA) for browsing and displaying hymns. It’s built with Mantine UI, React Router, Fuse.js (search), and localforage (offline storage), bundled with Vite. Dark mode is supported and adapts to your device preferences.
 
-![Desktop Dark Mode](<./promo/iPhone6 - Song List.png>)
+While this particular version is built with a specific object structure in mind (Songs), it is flexible enough to work with other setups, provided you update the types.
 
-While this particular version is built with a specific object structure in mind (Songs), it is absolutely flexible enough to work with other setups, provided you update the types.
+## Screenshots
 
-This application supports dark mode and will adapt to your device preferences.
+Desktop — Light
 
-![Desktop Dark Mode](<./promo/Desktop - Home - Dark.png>)
+![](<./promo/Desktop - Home (Light).png>)
 
-![Mobile Dark Mode](<./promo/iPhone6 - Song Display.png>)
+![](<./promo/Desktop - Song List (Light).png>)
+
+![](<./promo/Desktop - Song Display (Light).png>)
+
+Desktop — Dark
+
+![](<./promo/Desktop - Home (Dark).png>)
+
+![](<./promo/Desktop - Song List (Dark).png>)
+
+![](<./promo/Desktop - Song Display (Dark).png>)
+
+Mobile (iPhone 12) — Light
+
+![](<./promo/iPhone 12 - Home (Light).png>)
+
+![](<./promo/iPhone 12 - Song List (Light).png>)
+
+![](<./promo/iPhone 12 - Song Display (Light).png>)
+
+Mobile (iPhone 12) — Dark
+
+![](<./promo/iPhone 12 - Home (Dark).png>)
+
+![](<./promo/iPhone 12 - Song List (Dark).png>)
+
+![](<./promo/iPhone 12 - Song Display (Dark).png>)
 
 ## Copyright
 
@@ -26,10 +52,13 @@ If you have any suggestions feel free to open an issue!
 
 ## Development
 
-Get started by ensuring you have an up-to-date version of `node` (14.15 LTS is recommended) with `yarn` installed.
+Get started by ensuring you have an up-to-date version of Node.js (LTS recommended) with npm or yarn installed.
 
-- `yarn install` to get the latest dependencies installed locally
-- `yarn start` - Launches the development server
-- `yarn test` - Will run jest for testing
-- `yarn build` - Will compile the production version of the website
-- `yarn analyze` - Will analyze a compiled build folder from the step above and give you insight into how large the bundles are.
+- `npm install` to install dependencies
+- `npm run dev` - Launches the Vite development server
+- `npm test` - Typechecks, lints, runs unit tests (Vitest), and builds
+- `npm run build` - Builds the production app (see `build.sh`)
+- `npm run preview` - Previews a production build locally
+- `npm run analyze` - Analyzes the built bundle (after build)
+
+Optional: Storybook is available for component development via `npm run storybook`.
