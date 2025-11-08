@@ -65,7 +65,7 @@ function Search() {
   const Row = useCallback(
     ({ index, style }: RowComponentProps) => {
       const result = searchResults[index];
-      if (!result) return null;
+      if (!result) return <></>;
 
       return (
         <div style={{ ...style, padding: '4px 20px' }}>
