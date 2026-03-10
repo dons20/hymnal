@@ -199,8 +199,10 @@
 
 .container {
   & > .header {
-    @media (max-width: 48em) {
-      .mantine-Title-root {
+    .mantine-Title-root {
+      padding-right: 3.5rem;
+
+      @media (max-width: 48em) {
         line-height: 1.3;
       }
     }
@@ -211,6 +213,10 @@
     white-space: pre-line;
     grid-row-gap: 1.5rem;
     justify-content: center;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    grid-template-columns: minmax(auto, 800px);
     
     .chorus-parts {
       .chorus-part {

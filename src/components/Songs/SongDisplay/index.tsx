@@ -13,7 +13,6 @@ import {
   Box,
   Container,
   Flex,
-  Group,
   Text,
   Title,
   Tooltip,
@@ -148,7 +147,7 @@ function SongDisplay() {
 
   // Useful for navigating to the correct spot in the song list
   const backToIndex = () =>
-    navigate('/songs/index', { state: { songNumber: songToRender.number - 1 } });
+    navigate('/songs/index', { state: { songNumber: songToRender.number } });
   const previousSong = () => navigate(`/song/${songToRender.number - 1}`);
   const nextSong = () => navigate(`/song/${songToRender.number + 1}`);
 
@@ -194,17 +193,16 @@ function SongDisplay() {
       <Flex
         className="header"
         pos="relative"
-        pr="lg"
-        justify="space-between"
+        justify="flex-start"
         wrap="wrap"
         gap="md"
+        mb="2rem"
         maw={800}
-        m="auto"
-        mb="lg"
+        mx="auto"
       >
         <Title order={2} fw={500}>
           <Box component="span" display={{ base: 'block', sm: 'inline' }}>
-            # {songToRender!.number}
+            #{songToRender!.number}
           </Box>
           <Box
             component="span"
@@ -214,8 +212,14 @@ function SongDisplay() {
             {songToRender!.title}
           </Box>
         </Title>
-        <Group gap="xs">
-          <Tooltip label="Song List" position="bottom" withArrow>
+        <Flex
+          direction="column"
+          gap="xs"
+          pos="absolute"
+          right={0}
+          top={0}
+        >
+          <Tooltip label="Song List" position="left" withArrow>
             <ActionIcon
               variant="outline"
               color="gray"
@@ -229,7 +233,7 @@ function SongDisplay() {
           </Tooltip>
           <Tooltip
             label={isFavourite ? 'Remove Favourite' : 'Add Favourite'}
-            position="bottom"
+            position="left"
             withArrow
           >
             <ActionIcon
@@ -248,7 +252,7 @@ function SongDisplay() {
               />
             </ActionIcon>
           </Tooltip>
-          <Tooltip label="Present" position="bottom" withArrow>
+          <Tooltip label="Present" position="left" withArrow>
             <ActionIcon
               variant="outline"
               color="blue"
@@ -260,7 +264,7 @@ function SongDisplay() {
               <FaExpandArrowsAlt />
             </ActionIcon>
           </Tooltip>
-        </Group>
+        </Flex>
       </Flex>
       <Box className="body">{songBody}</Box>
       {songToRender.author ? (
