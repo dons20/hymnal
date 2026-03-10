@@ -23,7 +23,7 @@ import {
   useMantineColorScheme,
   useMatches,
 } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
+import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import { useMainContext } from '@/utils/context';
 
 import './Header.scss';
@@ -34,6 +34,7 @@ const Header = () => {
   const [isClearing, setIsClearing] = useState(false);
   const { pwa } = useMainContext();
   const { isInstallable, installApp } = pwa;
+  const isMobile = useMediaQuery('(max-width: 768px)');
 
   const useFullscreen = useMatches({
     base: true,
@@ -97,23 +98,24 @@ const Header = () => {
         px={{ base: 'sm', sm: 'md' }}
         py="md"
         className="page-header"
+        pos="sticky"
+        top={0}
+        gap="xs"
         style={{
-          position: 'sticky',
-          top: 0,
           zIndex: 100,
           backgroundColor:
             colorScheme === 'dark' ? 'var(--mantine-color-gray-8)' : 'var(--mantine-color-gray-1)',
           borderBottom: `1px solid ${colorScheme === 'dark' ? 'var(--mantine-color-gray-7)' : 'var(--mantine-color-gray-3)'}`,
         }}
       >
-        <Group gap="xs" wrap="nowrap" style={{ cursor: 'pointer', flex: 1, minWidth: 0 }} onClick={handleHomeClick}>
-          <ActionIcon variant="subtle" size="lg" aria-label="Home" style={{ flexShrink: 0 }}>
+        <Group gap={isMobile ? 0 : 'xs'} wrap="nowrap" style={{ cursor: 'pointer' }} onClick={handleHomeClick}>
+          <ActionIcon variant="subtle" size="lg" aria-label="Home">
             <FaHome size={16} />
           </ActionIcon>
-          <Title order={3} style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Hymns for All Times</Title>
+          <Title order={3}>Hymns for All Times</Title>
         </Group>
 
-        <Group gap="xs" style={{ flexShrink: 0 }}>
+        <Group gap={0} style={{ flexShrink: 0 }}>
           <ActionIcon
             variant="subtle"
             size="lg"
