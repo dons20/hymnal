@@ -1552,7 +1552,7 @@
       "chorus": "Jesus Christ the Lord opened up the way, Way to Heaven's gate, opened up the way;\n(Je-sus opened up ... the way ... to heaven's gate)\nWhen the Saviour died, died upon the cross To redeem the lost, to redeem the lost;\n(When He died ... on the cross, ... to redeem ... all the lost),\nHe prepared the road, to His blest abode, Jesus made the road to His blest abode\n(He ... prepared the road, ... that leads ... to His abode)\nTis a road that's marked by the Saviour's blood But it safely leads to heaven above.\n(‘Tis a road ... marked by blood, ... but it leads ... us home to God.)",
       "chorusParts": [
         {
-          "text": "Jesus Christ the Lord opened up the way, Way to Heaven's gate, opened up the way;",
+          "text": "Jesus Christ the Lord opened up the way,\nWay to Heaven's gate, opened up the way;",
           "part": "soprano"
         },
         {
@@ -1560,7 +1560,7 @@
           "part": "baritone"
         },
         {
-          "text": "When the Saviour died, died upon the cross - To redeem the lost, to redeem the lost;",
+          "text": "When the Saviour died, died upon the cross -\nTo redeem the lost, to redeem the lost;",
           "part": "soprano"
         },
         {
@@ -1568,7 +1568,7 @@
           "part": "baritone"
         },
         {
-          "text": "He prepared the road, to His blest abode, Jesus made the road to His blest abode",
+          "text": "He prepared the road, to His blest abode,\nJesus made the road to His blest abode",
           "part": "soprano"
         },
         {
@@ -1576,7 +1576,7 @@
           "part": "baritone"
         },
         {
-          "text": "Tis a road that's marked by the Saviour's blood But it safely leads to heaven above.",
+          "text": "Tis a road that's marked by the Saviour's blood\nBut it safely leads to heaven above.",
           "part": "soprano"
         },
         {
@@ -1584,7 +1584,7 @@
           "part": "baritone"
         }
       ],
-      "author": ""
+      "author": "E. M. Bartlett"
     },
     {
       "number": 134,

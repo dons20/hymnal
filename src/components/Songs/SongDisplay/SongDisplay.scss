@@ -8,18 +8,17 @@
   line-height: 1.4;
   white-space: pre-line;
   word-break: break-word;
-  max-height: 60vh;
-  overflow: auto;
   font-size: clamp(1.2rem, 4vw, 3rem);
-  text-align: center;
+  text-align: left;
+  margin: 0 auto;
 }
 
 .presentation-content-container {
-  max-height: 60vh;
   overflow: auto;
   font-size: clamp(1.2rem, 4vw, 3rem);
-  text-align: center;
+  text-align: left;
   width: 100%;
+  max-height: 100%;
 }
 
 // Part indicator styling classes
@@ -42,9 +41,6 @@
 }
 
 .part-indicator-presentation {
-  position: absolute;
-  left: 0;
-  top: 0;
   font-size: clamp(1rem, 3vw, 2.5rem);
   font-weight: 600;
   padding: clamp(0.2rem, 1vw, 0.5rem) clamp(0.4rem, 1.5vw, 1rem);
@@ -54,6 +50,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  // flex: 0 0 auto;
   
   // Colors will be set via CSS custom properties
   color: var(--part-indicator-color);
@@ -63,18 +60,18 @@
 
 // Presentation mode part container
 .presentation-part-container {
-  position: relative;
-  padding-left: 3rem;
   display: flex;
   align-items: flex-start;
-  justify-content: center;
+  justify-content: flex-start;
+  column-gap: 1rem;
+  width: 100%;
 }
 
 // Presentation mode text styling
 .presentation-part-text {
   font-size: clamp(1.2rem, 4vw, 3rem);
   line-height: 1.4;
-  text-align: center;
+  text-align: left;
   white-space: pre-line;
   word-break: break-word;
   flex: 1;
@@ -105,44 +102,48 @@
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  padding: 2rem;
-  padding-top: 4rem;
-  padding-bottom: 4rem;
+  padding: 1rem 1.5rem;
+  gap: 1rem;
 }
 
 .presentation-slide-content {
-  text-align: center;
-  max-width: 95vw;
+  text-align: left;
   width: 100%;
   flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
+  overflow: auto;
+  padding-top: 0.5rem;
+
+  @media screen and (min-width: 1200px) {
+    width: 80%;
+  }
 }
 
 .presentation-slide-label {
   font-size: clamp(1.2rem, 3vw, 2rem);
+  text-align: center;
+  width: 100%;
 }
 
 .presentation-close-button {
   position: absolute;
-  top: 16px;
-  right: 16px;
+  top: 1rem;
+  right: 1rem;
   z-index: 10000;
 }
 
 .presentation-indicators {
-  position: absolute;
-  bottom: 16px;
-  left: 50%;
-  transform: translateX(-50%);
   padding: 8px 12px;
   border-radius: 20px;
   backdrop-filter: blur(8px);
   gap: 8px;
+  flex-shrink: 0;
   
   // Background will be set via CSS custom property
   background-color: var(--indicators-bg);
