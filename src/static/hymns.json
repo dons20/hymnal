@@ -1,5 +1,5 @@
 {
-  "version": "1.2.0",
+  "version": "1.2.1",
   "songs": [
     {
       "number": 1,
@@ -1560,7 +1560,7 @@
           "part": "baritone"
         },
         {
-          "text": "When the Saviour died, died upon the cross -\nTo redeem the lost, to redeem the lost;",
+          "text": "When the Saviour died, died upon the cross-\nTo redeem the lost, to redeem the lost;",
           "part": "soprano"
         },
         {
