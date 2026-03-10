@@ -12,6 +12,9 @@ Desktop — Light
 
 ![](<./promo/Desktop - Home (Light).png>)
 
+<details>
+<summary>See more image previews</summary>
+
 ![](<./promo/Desktop - Song List (Light).png>)
 
 ![](<./promo/Desktop - Song Display (Light).png>)
@@ -23,6 +26,12 @@ Desktop — Dark
 ![](<./promo/Desktop - Song List (Dark).png>)
 
 ![](<./promo/Desktop - Song Display (Dark).png>)
+
+Desktop — Presentation Mode
+
+![](<./promo/Desktop - Presentation Song 1.png>)
+
+![](<./promo/Desktop - Presentation Song 133 (Chorus).png>)
 
 Mobile (iPhone 12) — Light
 
@@ -39,6 +48,8 @@ Mobile (iPhone 12) — Dark
 ![](<./promo/iPhone 12 - Song List (Dark).png>)
 
 ![](<./promo/iPhone 12 - Song Display (Dark).png>)
+
+</details>
 
 ## Copyright
 
