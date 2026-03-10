@@ -42,14 +42,6 @@ const Header = () => {
     xl: false,
   });
 
-  const showHeaderThemeToggle = useMatches({
-    base: false,
-    sm: false,
-    md: true,
-    lg: true,
-    xl: true,
-  });
-
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
   const [isMenuOpen, { open: openMenu, close: closeMenu }] = useDisclosure(false);
 
@@ -130,17 +122,15 @@ const Header = () => {
             <FaSearch size={16} />
           </ActionIcon>
 
-          {showHeaderThemeToggle && (
-            <ActionIcon
-              variant="subtle"
-              size="lg"
-              aria-label="Toggle color scheme"
-              data-testid="headerThemeToggle"
-              onClick={toggleColorScheme}
-            >
-              {colorScheme === 'dark' ? <FaSun size={16} /> : <FaMoon size={16} />}
-            </ActionIcon>
-          )}
+          <ActionIcon
+            variant="subtle"
+            size="lg"
+            aria-label="Toggle color scheme"
+            data-testid="headerThemeToggle"
+            onClick={toggleColorScheme}
+          >
+            {colorScheme === 'dark' ? <FaSun size={16} /> : <FaMoon size={16} />}
+          </ActionIcon>
 
           <ActionIcon
             variant="subtle"
@@ -164,8 +154,15 @@ const Header = () => {
         overlayProps={{ opacity: 0.85, blur: 2 }}
         radius="md"
         withCloseButton
+        classNames={{
+          content: 'menu-modal-content',
+          header: 'menu-modal-header',
+          title: 'menu-modal-title',
+          body: 'menu-modal-body',
+          close: 'menu-modal-close',
+        }}
         title={
-          <Text size="xl" fw={600}>
+          <Text size="xl" fw={700}>
             Menu
           </Text>
         }
@@ -173,75 +170,63 @@ const Header = () => {
         <Stack gap="xl" py="lg" data-testid="menuOverlay">
           <Box>
             <Stack gap="sm">
-              <Text
-                size="xl"
-                role="link"
+              <Button
+                variant="subtle"
+                color="blue"
+                size="md"
+                fullWidth
+                justify="flex-start"
                 onClick={() => {
                   closeMenu();
                   navigate('/home');
                 }}
                 className="menu-link"
-                tabIndex={0}
+                data-active={location.pathname === '/home' || location.pathname === '/'}
+                leftSection={<FaHome size={18} />}
               >
-                <Group component="span" gap="md" align="center">
-                  <FaHome size={18} />
-                  <span>Home</span>
-                </Group>
-              </Text>
-              <Text
-                size="xl"
+                Home
+              </Button>
+              <Button
+                variant="subtle"
+                color="blue"
+                size="md"
+                fullWidth
+                justify="flex-start"
                 onClick={() => {
                   closeMenu();
                   navigate('/songs/index');
                 }}
                 className="menu-link"
-                role="link"
-                tabIndex={0}
+                data-active={location.pathname.startsWith('/songs/index')}
+                leftSection={<FaList size={18} />}
               >
-                <Group component="span" gap="md" align="center">
-                  <FaList size={18} />
-                  <span>Songs</span>
-                </Group>
-              </Text>
+                Songs
+              </Button>
 
-              <Text
-                size="xl"
+              <Button
+                variant="subtle"
+                color="blue"
+                size="md"
+                fullWidth
+                justify="flex-start"
                 onClick={() => {
                   closeMenu();
                   navigate('/songs/favourites');
                 }}
                 className="menu-link"
-                role="link"
-                tabIndex={0}
+                data-active={location.pathname.startsWith('/songs/favourites')}
+                leftSection={<FaHeart size={18} />}
               >
-                <Group component="span" gap="md" align="center">
-                  <FaHeart size={18} />
-                  <span>Favourites</span>
-                </Group>
-              </Text>
+                Favourites
+              </Button>
             </Stack>
           </Box>
 
-          <Box>
-            {!showHeaderThemeToggle && (
-              <Button
-                variant="outline"
-                color={colorScheme === 'dark' ? 'white' : 'blue'}
-                size="md"
-                fullWidth
-                onClick={toggleColorScheme}
-                aria-label="Toggle color scheme"
-                data-testid="themeToggle"
-                leftSection={colorScheme === 'dark' ? <FaSun /> : <FaMoon />}
-              >
-                Enable {colorScheme === 'dark' ? 'Light' : 'Dark'} Mode&nbsp;
-              </Button>
-            )}
-
+          <Box className="menu-actions">
             {isInstallable && (
               <Button
-                variant="outline"
-                color="green"
+                variant="filled"
+                color="blue"
                 size="md"
                 fullWidth
                 onClick={() => {
@@ -251,15 +236,15 @@ const Header = () => {
                 leftSection={<FaDownload />}
                 aria-label="Install Hymnal App"
                 data-testid="installApp"
-                mt={!showHeaderThemeToggle ? 'md' : 0}
+                className="menu-action menu-action-primary"
               >
                 Install App
               </Button>
             )}
 
             <Button
-              variant="outline"
-              color="orange"
+              variant="subtle"
+              color="blue"
               size="md"
               fullWidth
               onClick={clearAndRefetchDatabase}
@@ -267,6 +252,7 @@ const Header = () => {
               leftSection={<FaSync />}
               aria-label="Clear local song cache"
               data-testid="clearDatabase"
+              className="menu-action menu-action-secondary"
               mt="md"
             >
               {isClearing ? 'Clearing...' : 'Clear Song Cache'}

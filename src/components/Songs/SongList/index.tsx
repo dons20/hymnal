@@ -1,14 +1,15 @@
-import React, { memo, useCallback, useEffect, useMemo, useState, useTransition } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState, useTransition } from 'react';
 import classes from './SongList.module.scss';
 import { Helmet } from '@dr.pogodin/react-helmet';
-import { FaFilter, FaHeart } from 'react-icons/fa';
-import { useNavigate } from 'react-router';
-import { List, type RowComponentProps } from 'react-window';
+import { FaFilter, FaHeart, FaSearch } from 'react-icons/fa';
+import { useNavigate, useLocation } from 'react-router';
+import { List, type RowComponentProps, useListCallbackRef } from 'react-window';
 import {
   ActionIcon,
   Affix,
   Box,
   Button,
+  CloseButton,
   Divider,
   Drawer,
   Group,
@@ -17,6 +18,7 @@ import {
   Stack,
   Switch,
   Text,
+  TextInput,
   Tooltip,
   UnstyledButton,
 } from '@mantine/core';
@@ -52,14 +54,31 @@ const SongListContent = memo(
     onSongClick,
     onToggleFavourite,
     isPending,
+    scrollToSongNumber,
   }: {
     displaySongs: Song[];
     favourites: number[];
     onSongClick: (songNumber: number) => void;
     onToggleFavourite: (songNumber: number) => void;
     isPending: boolean;
+    scrollToSongNumber?: number | null;
   }) => {
+    const [listApi, setListApi] = useListCallbackRef(null);
     const favouritesSet = useMemo(() => new Set(favourites), [favourites]);
+
+    useEffect(() => {
+      if (!listApi || scrollToSongNumber == null || displaySongs.length === 0) return;
+      const index = displaySongs.findIndex((s) => s.number === scrollToSongNumber);
+      if (index !== -1 && listApi.element) {
+        // scrollToRow has no offset support, so drive scrollTop directly.
+        // Subtract one row of height so the target isn't flush against the top
+        // of the visible area, which also absorbs any overlap from the negative
+        // margin on the outer wrapper.
+        const rowHeight = calculateRowHeight();
+        listApi.element.scrollTop = Math.max(0, (index - 1) * rowHeight);
+      }
+    // Scroll once when the list API first becomes ready
+    }, [listApi]);
 
     const Row = ({
       index,
@@ -107,6 +126,7 @@ const SongListContent = memo(
       <Box pos="relative" h="70vh">
         <LoadingOverlay visible={isPending} zIndex={1000} overlayProps={{ blur: 2 }} />
         <List
+          listRef={setListApi}
           rowComponent={Row}
           rowCount={displaySongs.length}
           rowHeight={calculateRowHeight}
@@ -120,7 +140,17 @@ const SongListContent = memo(
 
 const SongList = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { songs, favourites, setFavourites, dispatch } = useMainContext();
+
+  const scrollToSongNumber: number | null = location.state?.songNumber ?? null;
+
+  // Clear location state immediately so a manual page refresh doesn't re-scroll
+  useEffect(() => {
+    if (scrollToSongNumber != null) {
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, []);
 
   // Set the page title when component mounts
   useEffect(() => {
@@ -135,6 +165,7 @@ const SongList = () => {
   const [enableRangeFilter, setEnableRangeFilter] = useState(false);
   const [rangeFilter, setRangeFilter] = useState<[number, number] | null>(null);
   const [onlyFaves, setOnlyFaves] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Separate applied state (used by list) from UI state (used by Drawer controls)
   const [applied, setApplied] = useState({
@@ -196,6 +227,15 @@ const SongList = () => {
   const displaySongs = useMemo(() => {
     let list = [...songs];
 
+    // Apply inline search query
+    if (searchQuery.trim()) {
+      const q = searchQuery.trim().toLowerCase();
+      list = list.filter(
+        (song) =>
+          song.title.toLowerCase().includes(q) || song.number.toString().includes(q)
+      );
+    }
+
     // Apply filters
     if (applied.enableLetterFilter && applied.letterFilter) {
       list = list.filter(
@@ -224,7 +264,7 @@ const SongList = () => {
     if (applied.sortDirection === 'desc') list.reverse();
 
     return list;
-  }, [songs, favourites, applied]);
+  }, [songs, favourites, applied, searchQuery]);
 
   const handleSongClick = useCallback(
     (songNumber: number) => {
@@ -259,12 +299,27 @@ const SongList = () => {
 
       {/* List */}
       <div className={classes.songs}>
+        <div className={classes.searchBar}>
+          <TextInput
+            placeholder="Search by title or number..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.currentTarget.value)}
+            leftSection={<FaSearch size={14} />}
+            rightSection={
+              searchQuery ? <CloseButton onClick={() => setSearchQuery('')} aria-label="Clear search" /> : null
+            }
+            size="md"
+            radius="md"
+            aria-label="Search songs"
+          />
+        </div>
         <SongListContent
           displaySongs={displaySongs}
           favourites={favourites}
           onSongClick={handleSongClick}
           onToggleFavourite={handleFavoriteToggle}
           isPending={isPending}
+          scrollToSongNumber={scrollToSongNumber}
         />
       </div>
 

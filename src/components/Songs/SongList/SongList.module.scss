@@ -1,4 +1,19 @@
 .songs {
+  .searchBar {
+    padding: 10px 6px 6px;
+    margin-bottom: 1rem;
+
+    :global(.mantine-TextInput-input) {
+      background-color: light-dark(white, var(--mantine-color-dark-6));
+      border-color: light-dark(var(--mantine-color-gray-4), var(--mantine-color-dark-4));
+      transition: border-color 0.15s ease;
+
+      &:focus {
+        border-color: var(--mantine-primary-color-6);
+      }
+    }
+  }
+
   .songItem {
     background-color: light-dark(white, var(--mantine-color-dark-6));
     color: light-dark(var(--mantine-color-dark-7), var(--mantine-color-gray-2));
