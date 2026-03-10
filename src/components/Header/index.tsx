@@ -93,7 +93,9 @@ const Header = () => {
     <>
       <Group
         justify="space-between"
-        p="md"
+        wrap="nowrap"
+        px={{ base: 'sm', sm: 'md' }}
+        py="md"
         className="page-header"
         style={{
           position: 'sticky',
@@ -104,14 +106,14 @@ const Header = () => {
           borderBottom: `1px solid ${colorScheme === 'dark' ? 'var(--mantine-color-gray-7)' : 'var(--mantine-color-gray-3)'}`,
         }}
       >
-        <Group style={{ cursor: 'pointer' }} onClick={handleHomeClick}>
-          <ActionIcon variant="subtle" size="lg" aria-label="Home">
+        <Group gap="xs" wrap="nowrap" style={{ cursor: 'pointer', flex: 1, minWidth: 0 }} onClick={handleHomeClick}>
+          <ActionIcon variant="subtle" size="lg" aria-label="Home" style={{ flexShrink: 0 }}>
             <FaHome size={16} />
           </ActionIcon>
-          <Title order={3}>Hymns for All Times</Title>
+          <Title order={3} style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Hymns for All Times</Title>
         </Group>
 
-        <Group>
+        <Group gap="xs" style={{ flexShrink: 0 }}>
           <ActionIcon
             variant="subtle"
             size="lg"
