@@ -166,9 +166,7 @@ export const renderPresentationContent = (content: string | VocalPart[], isDark:
                 className="pair-divider"
                 style={
                   {
-                    '--divider-color': isDark
-                      ? 'rgba(255, 255, 255, 0.2)'
-                      : 'rgba(0, 0, 0, 0.15)',
+                    '--divider-color': isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.15)',
                   } as React.CSSProperties
                 }
               />

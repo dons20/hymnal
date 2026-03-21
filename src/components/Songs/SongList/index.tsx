@@ -2,8 +2,8 @@ import { memo, useCallback, useEffect, useMemo, useState, useTransition } from '
 import classes from './SongList.module.scss';
 import { Helmet } from '@dr.pogodin/react-helmet';
 import { FaFilter, FaHeart, FaSearch } from 'react-icons/fa';
-import { useNavigate, useLocation } from 'react-router';
-import { List, type RowComponentProps, useListCallbackRef } from 'react-window';
+import { useLocation, useNavigate } from 'react-router';
+import { List, useListCallbackRef, type RowComponentProps } from 'react-window';
 import {
   ActionIcon,
   Affix,
@@ -77,7 +77,7 @@ const SongListContent = memo(
         const rowHeight = calculateRowHeight();
         listApi.element.scrollTop = Math.max(0, (index - 1) * rowHeight);
       }
-    // Scroll once when the list API first becomes ready
+      // Scroll once when the list API first becomes ready
     }, [listApi]);
 
     const Row = ({
@@ -231,8 +231,7 @@ const SongList = () => {
     if (searchQuery.trim()) {
       const q = searchQuery.trim().toLowerCase();
       list = list.filter(
-        (song) =>
-          song.title.toLowerCase().includes(q) || song.number.toString().includes(q)
+        (song) => song.title.toLowerCase().includes(q) || song.number.toString().includes(q)
       );
     }
 
@@ -306,7 +305,9 @@ const SongList = () => {
             onChange={(e) => setSearchQuery(e.currentTarget.value)}
             leftSection={<FaSearch size={14} />}
             rightSection={
-              searchQuery ? <CloseButton onClick={() => setSearchQuery('')} aria-label="Clear search" /> : null
+              searchQuery ? (
+                <CloseButton onClick={() => setSearchQuery('')} aria-label="Clear search" />
+              ) : null
             }
             size="md"
             radius="md"

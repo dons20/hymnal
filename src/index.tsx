@@ -14,10 +14,9 @@ import { theme } from '@/theme';
 import 'focus-visible/dist/focus-visible';
 import './index.scss';
 
-import App from './App';
-
 // Register PWA service worker
 import { registerSW } from 'virtual:pwa-register';
+import App from './App';
 
 // Register service worker with auto-update
 registerSW({

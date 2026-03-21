@@ -108,7 +108,12 @@ const Header = () => {
           borderBottom: `1px solid ${colorScheme === 'dark' ? 'var(--mantine-color-gray-7)' : 'var(--mantine-color-gray-3)'}`,
         }}
       >
-        <Group gap={isMobile ? 0 : 'xs'} wrap="nowrap" style={{ cursor: 'pointer' }} onClick={handleHomeClick}>
+        <Group
+          gap={isMobile ? 0 : 'xs'}
+          wrap="nowrap"
+          style={{ cursor: 'pointer' }}
+          onClick={handleHomeClick}
+        >
           <ActionIcon variant="subtle" size="lg" aria-label="Home">
             <FaHome size={16} />
           </ActionIcon>

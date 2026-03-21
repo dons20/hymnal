@@ -23,8 +23,8 @@ exports[`#SongDisplay > renders the matching song based on the route 1`] = `
     style="--container-size: var(--container-size-lg); margin-block: var(--mantine-spacing-md); padding-block: var(--mantine-spacing-lg); padding-left: var(--mantine-spacing-xl); background: var(--mantine-color-white);"
   >
     <div
-      class="header m_8bffd616 mantine-Flex-root __m__-r2"
-      style="gap: var(--mantine-spacing-md); justify-content: space-between; flex-wrap: wrap; margin-top: auto; margin-right: auto; margin-bottom: var(--mantine-spacing-lg); margin-left: auto; padding-right: var(--mantine-spacing-lg); max-width: calc(50rem * var(--mantine-scale)); position: relative;"
+      class="header m_8bffd616 mantine-Flex-root __m__-_r_2_"
+      style="gap: var(--mantine-spacing-md); justify-content: flex-start; flex-wrap: wrap; margin-inline: auto; margin-bottom: 2rem; max-width: calc(50rem * var(--mantine-scale)); position: relative;"
     >
       <h2
         class="m_8a5d1357 mantine-Title-root"
@@ -34,27 +34,27 @@ exports[`#SongDisplay > renders the matching song based on the route 1`] = `
         <style
           data-mantine-styles="inline"
         >
-          .__m__-r5{display:block;}@media(min-width: 48em){.__m__-r5{display:inline;}}
+          .__m__-_r_5_{display:block;}@media(min-width: 48em){.__m__-_r_5_{display:inline;}}
         </style>
         <span
-          class="__m__-r5"
+          class="__m__-_r_5_"
         >
-          # 1
+          #1
         </span>
         <style
           data-mantine-styles="inline"
         >
-          .__m__-r6{margin-left:0rem;display:block;}@media(min-width: 48em){.__m__-r6{margin-left:var(--mantine-spacing-xs);display:inline;}}
+          .__m__-_r_6_{margin-left:0rem;display:block;}@media(min-width: 48em){.__m__-_r_6_{margin-left:var(--mantine-spacing-xs);display:inline;}}
         </style>
         <span
-          class="__m__-r6"
+          class="__m__-_r_6_"
         >
           There Was One Who Was Willing
         </span>
       </h2>
       <div
-        class="m_4081bf90 mantine-Group-root"
-        style="--group-gap: var(--mantine-spacing-xs); --group-align: center; --group-justify: flex-start; --group-wrap: wrap;"
+        class="m_8bffd616 mantine-Flex-root __m__-_r_7_"
+        style="gap: var(--mantine-spacing-xs); flex-direction: column; position: absolute; top: 0rem; right: 0rem;"
       >
         <button
           aria-label="Back to songs index"
@@ -131,7 +131,7 @@ exports[`#SongDisplay > renders the matching song based on the route 1`] = `
               xmlns="http://www.w3.org/2000/svg"
             >
               <path
-                d="M0 180V56c0-13.3 10.7-24 24-24h124c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12H64v84c0 6.6-5.4 12-12 12H12c-6.6 0-12-5.4-12-12zM288 44v40c0 6.6 5.4 12 12 12h84v84c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12V56c0-13.3-10.7-24-24-24H300c-6.6 0-12 5.4-12 12zm148 276h-40c-6.6 0-12 5.4-12 12v84h-84c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h124c13.3 0 24-10.7 24-24V332c0-6.6-5.4-12-12-12zM160 468v-40c0-6.6-5.4-12-12-12H64v-84c0-6.6-5.4-12-12-12H12c-6.6 0-12 5.4-12 12v124c0 13.3 10.7 24 24 24h124c6.6 0 12-5.4 12-12z"
+                d="M448 344v112a23.94 23.94 0 0 1-24 24H312c-21.39 0-32.09-25.9-17-41l36.2-36.2L224 295.6 116.77 402.9 153 439c15.09 15.1 4.39 41-17 41H24a23.94 23.94 0 0 1-24-24V344c0-21.4 25.89-32.1 41-17l36.19 36.2L184.46 256 77.18 148.7 41 185c-15.1 15.1-41 4.4-41-17V56a23.94 23.94 0 0 1 24-24h112c21.39 0 32.09 25.9 17 41l-36.2 36.2L224 216.4l107.23-107.3L295 73c-15.09-15.1-4.39-41 17-41h112a23.94 23.94 0 0 1 24 24v112c0 21.4-25.89 32.1-41 17l-36.19-36.2L263.54 256l107.28 107.3L407 327.1c15.1-15.2 41-4.5 41 16.9z"
               />
             </svg>
           </span>
@@ -228,13 +228,14 @@ That my sins have been taken away.
       class="navigation-container"
     >
       <div
-        class="navigation-flex navigation-buttons m_8bffd616 mantine-Flex-root __m__-rt"
+        class="navigation-flex navigation-buttons m_8bffd616 mantine-Flex-root __m__-_r_17_"
+        style="gap: var(--mantine-spacing-md); justify-content: center; flex-wrap: wrap;"
       >
         <button
           class="mantine-focus-auto mantine-active navigation-button m_77c9d27d mantine-Button-root m_87cf2631 mantine-UnstyledButton-root"
           data-size="md"
           data-with-right-section="true"
-          style="--button-height: var(--button-height-md); --button-padding-x: var(--button-padding-x-md); --button-fz: var(--mantine-font-size-md); --button-bg: var(--mantine-color-blue-filled); --button-hover: var(--mantine-color-blue-filled-hover); --button-color: var(--mantine-color-white); --button-bd: calc(0.0625rem * var(--mantine-scale)) solid transparent;"
+          style="--button-height: var(--button-height-md); --button-padding-x: var(--button-padding-x-md); --button-fz: var(--mantine-font-size-md); --button-bg: var(--mantine-color-blue-filled); --button-hover: var(--mantine-color-blue-filled-hover); --button-color: var(--mantine-color-white); --button-bd: calc(0.0625rem * var(--mantine-scale)) solid transparent; order: 2;"
           type="button"
         >
           <span
@@ -269,7 +270,7 @@ That my sins have been taken away.
           class="mantine-focus-auto mantine-active navigation-button m_77c9d27d mantine-Button-root m_87cf2631 mantine-UnstyledButton-root"
           data-size="md"
           data-variant="outline"
-          style="--button-height: var(--button-height-md); --button-padding-x: var(--button-padding-x-md); --button-fz: var(--mantine-font-size-md); --button-bg: transparent; --button-hover: var(--mantine-color-blue-outline-hover); --button-color: var(--mantine-color-blue-outline); --button-bd: calc(0.0625rem * var(--mantine-scale)) solid var(--mantine-color-blue-outline);"
+          style="--button-height: var(--button-height-md); --button-padding-x: var(--button-padding-x-md); --button-fz: var(--mantine-font-size-md); --button-bg: transparent; --button-hover: var(--mantine-color-blue-outline-hover); --button-color: var(--mantine-color-blue-outline); --button-bd: calc(0.0625rem * var(--mantine-scale)) solid var(--mantine-color-blue-outline); order: 1;"
           type="button"
         >
           <span

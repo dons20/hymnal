@@ -212,13 +212,7 @@ function SongDisplay() {
             {songToRender!.title}
           </Box>
         </Title>
-        <Flex
-          direction="column"
-          gap="xs"
-          pos="absolute"
-          right={0}
-          top={0}
-        >
+        <Flex direction="column" gap="xs" pos="absolute" right={0} top={0}>
           <Tooltip label="Song List" position="left" withArrow>
             <ActionIcon
               variant="outline"
@@ -272,17 +266,10 @@ function SongDisplay() {
           {songToRender.author}
         </Text>
       ) : (
-        <Box mb="md">
-          &nbsp;
-        </Box>
+        <Box mb="md">&nbsp;</Box>
       )}
       <Box className="navigation-container">
-        <Flex
-          className="navigation-flex navigation-buttons"
-          gap="md"
-          wrap="wrap"
-          justify="center"
-        >
+        <Flex className="navigation-flex navigation-buttons" gap="md" wrap="wrap" justify="center">
           {!isFirstSong && (
             <Button
               onClick={previousSong}

@@ -52,11 +52,7 @@ export const PresentationMode: React.FC<PresentationModeProps> = ({
 
       {/* Portal for presentation mode - rendered outside component tree */}
       <Portal>
-        <Transition
-          mounted={presentationMode}
-          transition="fade"
-          duration={reducedMotion ? 0 : 300}
-        >
+        <Transition mounted={presentationMode} transition="fade" duration={reducedMotion ? 0 : 300}>
           {(styles) => (
             <Box
               className="presentation-mode-overlay presentation-mode"
