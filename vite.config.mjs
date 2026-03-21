@@ -2,7 +2,6 @@ import path from 'node:path';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
-import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig({
   server: {
@@ -11,7 +10,6 @@ export default defineConfig({
   },
   plugins: [
     react(),
-    tsconfigPaths(),
     VitePWA({
       registerType: 'autoUpdate',
       workbox: {
@@ -192,5 +190,6 @@ export default defineConfig({
   // Add resolve configuration to handle potential module resolution issues
   resolve: {
     dedupe: ['react', 'react-dom'],
+    tsconfigPaths: true,
   },
 });

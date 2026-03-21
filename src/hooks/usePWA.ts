@@ -41,7 +41,7 @@ export function usePWA() {
   useEffect(() => {
     const handleOnline = () => {
       setPwaState((prev) => ({ ...prev, isOffline: false }));
-      
+
       // Hide offline notification and show online notification
       notifications.hide('offline-status');
       notifications.show({
@@ -55,7 +55,7 @@ export function usePWA() {
 
     const handleOffline = () => {
       setPwaState((prev) => ({ ...prev, isOffline: true }));
-      
+
       // Hide online and other connection-related notifications
       notifications.hide('online-status');
       notifications.hide('cache-ready'); // Don't show both offline and cache-ready at same time
@@ -104,7 +104,7 @@ export function usePWA() {
         // Hide other install-related notifications
         notifications.hide('pwa-ios-hint');
         notifications.hide('pwa-mobile-hint');
-        
+
         // Show install notification after app is cached (desktop only)
         setTimeout(() => {
           notifications.show({
@@ -122,7 +122,7 @@ export function usePWA() {
         // Hide other install-related notifications
         notifications.hide('pwa-install');
         notifications.hide('pwa-mobile-hint');
-        
+
         setTimeout(() => {
           notifications.show({
             id: 'pwa-ios-hint',
@@ -138,7 +138,7 @@ export function usePWA() {
         // Hide other install-related notifications
         notifications.hide('pwa-install');
         notifications.hide('pwa-ios-hint');
-        
+
         setTimeout(() => {
           notifications.show({
             id: 'pwa-mobile-hint',
@@ -200,13 +200,14 @@ export function usePWA() {
         if (newWorker) {
           newWorker.addEventListener('statechange', () => {
             // Only show update notification if:
-            // 1. The new worker is installed 
+            // 1. The new worker is installed
             // 2. There's already a controlling service worker (not first install)
             // 3. The page is not being refreshed
-            if (newWorker.state === 'installed' && 
-                navigator.serviceWorker.controller && 
-                !isInitialInstall) {
-              
+            if (
+              newWorker.state === 'installed' &&
+              navigator.serviceWorker.controller &&
+              !isInitialInstall
+            ) {
               setPwaState((prev) => ({ ...prev, isUpdateAvailable: true }));
 
               // Hide install-related notifications when showing update
@@ -229,11 +230,11 @@ export function usePWA() {
       // Also check if there's already an update waiting
       if (registration.waiting && !isInitialInstall) {
         setPwaState((prev) => ({ ...prev, isUpdateAvailable: true }));
-        
+
         // Hide conflicting notifications
         notifications.hide('cache-ready');
         notifications.hide('pwa-install');
-        
+
         notifications.show({
           id: 'app-update',
           title: 'App Update Available',
@@ -258,7 +259,7 @@ export function usePWA() {
       if (navigator.onLine && !pwaState.isUpdateAvailable) {
         // Hide offline notification if showing cache-ready
         notifications.hide('offline-status');
-        
+
         notifications.show({
           id: 'cache-ready',
           title: 'App Ready for Offline Use!',
@@ -302,7 +303,7 @@ export function usePWA() {
     if (serviceWorkerRegistration) {
       // Hide update notification immediately
       notifications.hide('app-update');
-      
+
       serviceWorkerRegistration.waiting?.postMessage({ type: 'SKIP_WAITING' });
       window.location.reload();
     }

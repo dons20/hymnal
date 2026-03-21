@@ -26,8 +26,7 @@ export const createPresentationSlides = (song: Song | null): PresentationSlide[]
     if (hasChorus) {
       slides.push({
         type: 'chorus',
-        content:
-          song.chorusParts && song.chorusParts.length > 0 ? song.chorusParts : song.chorus,
+        content: song.chorusParts && song.chorusParts.length > 0 ? song.chorusParts : song.chorus,
         label: 'Chorus',
       });
     }
