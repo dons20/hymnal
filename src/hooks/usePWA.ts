@@ -110,10 +110,11 @@ export function usePWA() {
           notifications.show({
             id: 'pwa-install',
             title: 'Install App',
-            message: 'Install Hymnal for quick access and offline use!',
-            color: 'blue',
-            autoClose: false,
+            message: 'Tap to install the Hymnal for quick access and offline use!',
+            autoClose: 5000,
             withCloseButton: true,
+            withBorder: true,
+            radius: 'sm',
           });
         }, 2000);
       } else if (isIOS) {
